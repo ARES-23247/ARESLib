@@ -1,0 +1,56 @@
+plugins {
+    id 'java-library'
+}
+
+group = 'org.areslib'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
+    maven { url 'https://maven.brott.dev/' }
+}
+
+configurations {
+    ftcAars
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    // Dashboard AAR
+    ftcAars 'com.acmerobotics.dashboard:dashboard:0.4.16@aar'
+    
+    // FTC SDK AARs
+    ftcAars 'org.firstinspires.ftc:RobotCore:10.1.1@aar'
+    ftcAars 'org.firstinspires.ftc:Hardware:10.1.1@aar'
+    ftcAars 'org.firstinspires.ftc:FtcCommon:10.1.1@aar'
+    
+    // No PhotonCore right now
+}
+
+// Automatically unpack AARs at configuration time so the IDE Language Server
+// sees the JAR files instantly without needing an external build task.
+configurations.ftcAars.resolvedConfiguration.resolvedArtifacts.each { artifact ->
+    def aarFile = artifact.file
+    def outDir = file("${project.projectDir}/.gradle/ftc-jars")
+    outDir.mkdirs()
+    
+    def jarFile = file("$outDir/${artifact.name}-${artifact.moduleVersion.id.version}.jar")
+    
+    if (!jarFile.exists()) {
+        copy {
+            from zipTree(aarFile)
+            into outDir
+            include 'classes.jar'
+            rename('classes.jar', jarFile.name)
+        }
+    }
+    
+    // Inject the extracted JAR directly back into the compile classpath
+    dependencies.add('compileOnly', files(jarFile))
+}
+
+test {
+    useJUnitPlatform()
+}

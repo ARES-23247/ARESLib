@@ -1,0 +1,36 @@
+package org.areslib.hardware;
+
+public class DifferentialDriveIOSim implements DifferentialDriveIO {
+    private static final double DRIVE_KV = 3.0; // meters per sec per volt
+    private static final double LOOP_PERIOD_SECS = 0.02; // 20ms
+
+    private double leftAppliedVolts = 0.0;
+    private double rightAppliedVolts = 0.0;
+
+    private double leftPositionMeters = 0.0;
+    private double leftVelocityMps = 0.0;
+    private double rightPositionMeters = 0.0;
+    private double rightVelocityMps = 0.0;
+
+    @Override
+    public void updateInputs(DifferentialDriveInputs inputs) {
+        // Integrate physics
+        leftVelocityMps = leftAppliedVolts * DRIVE_KV;
+        leftPositionMeters += leftVelocityMps * LOOP_PERIOD_SECS;
+
+        rightVelocityMps = rightAppliedVolts * DRIVE_KV;
+        rightPositionMeters += rightVelocityMps * LOOP_PERIOD_SECS;
+
+        // Populate inputs
+        inputs.leftPositionMeters = leftPositionMeters;
+        inputs.leftVelocityMps = leftVelocityMps;
+        inputs.rightPositionMeters = rightPositionMeters;
+        inputs.rightVelocityMps = rightVelocityMps;
+    }
+
+    @Override
+    public void setVoltages(double leftVolts, double rightVolts) {
+        leftAppliedVolts = Math.max(-12.0, Math.min(12.0, leftVolts));
+        rightAppliedVolts = Math.max(-12.0, Math.min(12.0, rightVolts));
+    }
+}

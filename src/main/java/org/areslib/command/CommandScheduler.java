@@ -1,0 +1,174 @@
+package org.areslib.command;
+
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
+
+/**
+ * The scheduler responsible for running Commands. A Command-based robot should call
+ * {@link CommandScheduler#run()} in its periodic block in order to run commands synchronously.
+ * 
+ * Uses standard Java logic and handles generic subsystems and commands.
+ */
+public final class CommandScheduler {
+    private static CommandScheduler instance;
+
+    // A set of all registered subsystems
+    private final Set<Subsystem> m_subsystems = new LinkedHashSet<>();
+    // Subsystem default commands
+    private final Map<Subsystem, Command> m_defaultCommands = new LinkedHashMap<>();
+    
+    // Commands currently executing
+    private final Set<Command> m_scheduledCommands = new LinkedHashSet<>();
+    // Subsystems required by currently executing commands
+    private final Map<Subsystem, Command> m_requirements = new LinkedHashMap<>();
+
+    private CommandScheduler() {}
+
+    /**
+     * Returns the Singleton instance of the scheduler.
+     *
+     * @return the instance
+     */
+    public static synchronized CommandScheduler getInstance() {
+        if (instance == null) {
+            instance = new CommandScheduler();
+        }
+        return instance;
+    }
+
+    /**
+     * Registers subsystems with the scheduler. This must be called for the subsystem's periodic
+     * block to run when the scheduler is run, and for the subsystem's default command to be
+     * scheduled.
+     *
+     * @param subsystems the subsystem to register
+     */
+    public void registerSubsystem(Subsystem... subsystems) {
+        m_subsystems.addAll(Arrays.asList(subsystems));
+    }
+
+    /**
+     * Un-registers subsystems with the scheduler. The subsystem's periodic will no longer run,
+     * and its default command will no longer be scheduled.
+     *
+     * @param subsystems the subsystem to un-register
+     */
+    public void unregisterSubsystem(Subsystem... subsystems) {
+        m_subsystems.removeAll(Arrays.asList(subsystems));
+    }
+
+    /**
+     * Sets the default command for a subsystem. The default command will run whenever there is no
+     * other command currently scheduled that requires the subsystem.
+     *
+     * @param subsystem the subsystem whose default command should be set
+     * @param defaultCommand the default command to associate with the subsystem
+     */
+    public void setDefaultCommand(Subsystem subsystem, Command defaultCommand) {
+        if (!defaultCommand.getRequirements().contains(subsystem)) {
+            defaultCommand.addRequirements(subsystem);
+        }
+        m_defaultCommands.put(subsystem, defaultCommand);
+    }
+
+    /**
+     * Schedules a command for execution.
+     *
+     * @param command the command to schedule
+     */
+    public void schedule(Command command) {
+        if (m_scheduledCommands.contains(command)) {
+            return; // Already scheduled
+        }
+
+        // Check requirements and interrupt conflicting commands
+        Set<Subsystem> requirements = command.getRequirements();
+        for (Subsystem requirement : requirements) {
+            if (m_requirements.containsKey(requirement)) {
+                Command conflicting = m_requirements.get(requirement);
+                conflicting.end(true);
+                m_scheduledCommands.remove(conflicting);
+                for (Subsystem conflictingReq : conflicting.getRequirements()) {
+                    m_requirements.remove(conflictingReq);
+                }
+            }
+        }
+
+        command.initialize();
+        m_scheduledCommands.add(command);
+        for (Subsystem requirement : requirements) {
+            m_requirements.put(requirement, command);
+        }
+    }
+
+    /**
+     * Cancels a command. The scheduler will call its end() method and un-schedule it.
+     *
+     * @param command the command to cancel
+     */
+    public void cancel(Command command) {
+        if (!m_scheduledCommands.contains(command)) {
+            return;
+        }
+
+        command.end(true);
+        m_scheduledCommands.remove(command);
+        for (Subsystem requirement : command.getRequirements()) {
+            m_requirements.remove(requirement);
+        }
+    }
+
+    /**
+     * Runs a single iteration of the scheduler. The execution occurs in the following order:
+     *
+     * <p>1. Subsystem periodic methods are called.
+     * <p>2. Default commands are scheduled for subsystems that have no acting command and a default command assigned.
+     * <p>3. Newly-scheduled commands' execute() methods are called.
+     * <p>4. Commands that have finished their run are removed, and their end() methods are called.
+     */
+    public void run() {
+        // 1. Run subsystem periodics
+        for (Subsystem subsystem : m_subsystems) {
+            subsystem.periodic();
+        }
+
+        // 2. Schedule default commands
+        for (Subsystem subsystem : m_subsystems) {
+            if (!m_requirements.containsKey(subsystem) && m_defaultCommands.containsKey(subsystem)) {
+                schedule(m_defaultCommands.get(subsystem));
+            }
+        }
+
+        // 3. Execute commands
+        Set<Command> commandsToRemove = new LinkedHashSet<>();
+        for (Command command : m_scheduledCommands) {
+            command.execute();
+            if (command.isFinished()) {
+                command.end(false);
+                commandsToRemove.add(command);
+            }
+        }
+
+        // 4. Clean up finished commands
+        for (Command command : commandsToRemove) {
+            m_scheduledCommands.remove(command);
+            for (Subsystem req : command.getRequirements()) {
+                m_requirements.remove(req);
+            }
+        }
+    }
+
+    /**
+     * Cancels all currently-scheduled commands.
+     */
+    public void cancelAll() {
+        for (Command command : m_scheduledCommands) {
+            command.end(true);
+        }
+        m_scheduledCommands.clear();
+        m_requirements.clear();
+    }
+}
