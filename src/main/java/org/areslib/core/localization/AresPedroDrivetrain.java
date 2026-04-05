@@ -24,16 +24,18 @@ public class AresPedroDrivetrain extends Drivetrain {
         // We will convert these into reasonable inputs for Swerve Drive kinematics.
         // ARESlib DriveSubsystem takes (forwardMetersPerSec, strafeMetersPerSec, turnRadPerSec)
         
-        // We can synthesize a final chassis speeds vector from these:
-        double forwardInput = driveError.getYComponent() + driveVector.getYComponent();
-        double strafeInput = -(driveError.getXComponent() + driveVector.getXComponent());
-        double turnInput = headingError.getMagnitude() + headingVector; // Not exact, but placeholder
+        // Pedro Pathing calculates PID outputs internally and passes them via driveVector and headingVector.
+        // driveError and headingError are the true geometric errors, NOT the control inputs.
+        // We only want the control inputs (PID outputs).
+        double forwardInput = driveVector.getXComponent();
+        double strafeInput = driveVector.getYComponent();
+        double turnInput = headingVector; 
 
-        // Note: Pedro inputs are in inches. Usually for power control, these get scaled.
-        // Converting standard Pedro vectors to meters/sec approximation
-        currentForward = forwardInput * 0.0254;
-        currentStrafe = strafeInput * 0.0254;
-        currentTurn = turnInput;
+        // Note: Pedro typically outputs motor powers natively, but since we are simulating field-centric chassis speeds:
+        // We will scale these raw PID outputs into approximate physical velocities for the simulator.
+        currentForward = forwardInput * 2.0; // Scaled up to represent roughly 2 m/s max
+        currentStrafe = strafeInput * 2.0;
+        currentTurn = turnInput * 2.0; // Scaled up to represent roughly 2 rad/s max
 
         driveSubsystem.drive(currentForward, currentStrafe, currentTurn);
 

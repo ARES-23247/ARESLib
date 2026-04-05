@@ -59,6 +59,14 @@ public class DriveSubsystem extends SubsystemBase {
         org.areslib.telemetry.AresAutoLogger.processInputs("Swerve/FrontRight", frInputs);
         org.areslib.telemetry.AresAutoLogger.processInputs("Swerve/BackLeft", blInputs);
         org.areslib.telemetry.AresAutoLogger.processInputs("Swerve/BackRight", brInputs);
+
+        org.areslib.math.kinematics.SwerveModuleState[] actualStates = new org.areslib.math.kinematics.SwerveModuleState[] {
+            new org.areslib.math.kinematics.SwerveModuleState(flInputs.driveVelocityMps, new org.areslib.math.geometry.Rotation2d(flInputs.turnAbsolutePositionRad)),
+            new org.areslib.math.kinematics.SwerveModuleState(frInputs.driveVelocityMps, new org.areslib.math.geometry.Rotation2d(frInputs.turnAbsolutePositionRad)),
+            new org.areslib.math.kinematics.SwerveModuleState(blInputs.driveVelocityMps, new org.areslib.math.geometry.Rotation2d(blInputs.turnAbsolutePositionRad)),
+            new org.areslib.math.kinematics.SwerveModuleState(brInputs.driveVelocityMps, new org.areslib.math.geometry.Rotation2d(brInputs.turnAbsolutePositionRad)),
+        };
+        org.areslib.telemetry.AresTelemetry.logSwerveStates("Robot/SwerveActual", actualStates);
     }
 
     public double getCommandedVx() { return commandedVx; }
@@ -75,12 +83,25 @@ public class DriveSubsystem extends SubsystemBase {
         );
         org.areslib.math.kinematics.SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds);
 
+        org.areslib.telemetry.AresTelemetry.logSwerveStates("Robot/SwerveTarget", states);
+
         SwerveModuleIO[] modules = {frontLeft, frontRight, backLeft, backRight};
         SwerveModuleIO.SwerveModuleInputs[] inputs = {flInputs, frInputs, blInputs, brInputs};
 
         for (int i = 0; i < 4; i++) {
-            double targetSpeedMps = states[i].speedMetersPerSecond;
-            double targetAngleRad = states[i].angle.getRadians();
+            org.areslib.math.kinematics.SwerveModuleState optimizedState = org.areslib.math.kinematics.SwerveModuleState.optimize(
+                states[i], 
+                new org.areslib.math.geometry.Rotation2d(inputs[i].turnAbsolutePositionRad)
+            );
+
+            double targetSpeedMps = optimizedState.speedMetersPerSecond;
+            double targetAngleRad = optimizedState.angle.getRadians();
+
+            // Prevent snapping back to 0 degrees when stopping
+            if (Math.abs(targetSpeedMps) <= 0.01) {
+                targetAngleRad = inputs[i].turnAbsolutePositionRad;
+                targetSpeedMps = 0.0;
+            }
 
             double feedforwardVolts = driveFeedforward.calculate(targetSpeedMps);
             double drivePidOut = drivePids[i].calculate(inputs[i].driveVelocityMps, targetSpeedMps);

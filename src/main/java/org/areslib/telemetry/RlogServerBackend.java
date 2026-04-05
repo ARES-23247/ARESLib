@@ -17,6 +17,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class RlogServerBackend implements AresLoggerBackend {
     private final Map<String, Integer> keyToId = new HashMap<>();
     private final List<byte[]> startRecordsCache = new ArrayList<>();
+    private final Map<Integer, byte[]> schemaDataCache = new HashMap<>();
     private final List<SocketClient> clients = new CopyOnWriteArrayList<>();
     
     private int nextEntryId = 1; 
@@ -71,6 +72,24 @@ public class RlogServerBackend implements AresLoggerBackend {
                                 initBuf = newBuf;
                             }
                             initBuf.put(startRec);
+                        }
+                    }
+
+                    // Replay cached schema data so the AdvantageScope struct parser doesn't drop greyed out data
+                    synchronized(schemaDataCache) {
+                        for (Map.Entry<Integer, byte[]> schema : schemaDataCache.entrySet()) {
+                            byte[] structBytes = schema.getValue();
+                            int recordSize = 1 + 2 + 2 + structBytes.length;
+                            if (initBuf.remaining() < recordSize) {
+                                ByteBuffer newBuf = ByteBuffer.allocate(initBuf.capacity() * 2).order(ByteOrder.BIG_ENDIAN);
+                                initBuf.flip();
+                                newBuf.put(initBuf);
+                                initBuf = newBuf;
+                            }
+                            initBuf.put((byte) 2); // Data record
+                            initBuf.putShort(schema.getKey().shortValue()); // ID
+                            initBuf.putShort((short) structBytes.length);
+                            initBuf.put(structBytes);
                         }
                     }
                     
@@ -187,6 +206,23 @@ public class RlogServerBackend implements AresLoggerBackend {
         cycleBuffer.putShort((short) id);
         cycleBuffer.putShort((short) strBytes.length);
         cycleBuffer.put(strBytes);
+    }
+
+    @Override
+    public void putStruct(String key, String typeString, byte[] structBytes) {
+        int id = getOrCreateEntry(key, typeString);
+        
+        if (key.startsWith(".schema/")) {
+            synchronized(schemaDataCache) {
+                schemaDataCache.put(id, structBytes.clone());
+            }
+        }
+        
+        ensureCapacity(1 + 2 + 2 + structBytes.length);
+        cycleBuffer.put((byte) 2);
+        cycleBuffer.putShort((short) id);
+        cycleBuffer.putShort((short) structBytes.length);
+        cycleBuffer.put(structBytes);
     }
 
     @Override

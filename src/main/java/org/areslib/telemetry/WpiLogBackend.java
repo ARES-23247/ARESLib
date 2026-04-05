@@ -145,6 +145,23 @@ public class WpiLogBackend implements AresLoggerBackend {
     }
 
     @Override
+    public void putStruct(String key, String typeString, byte[] data) {
+        if (channel == null) return;
+        int id = getOrCreateEntry(key, typeString);
+        try {
+            if (encodeBuffer.capacity() < 17 + data.length) {
+                encodeBuffer = ByteBuffer.allocate(Math.max(encodeBuffer.capacity() * 2, 17 + data.length)).order(ByteOrder.LITTLE_ENDIAN);
+            }
+            writeRecordHeader(id, data.length, getTimestamp());
+            encodeBuffer.put(data);
+            encodeBuffer.flip();
+            channel.write(encodeBuffer);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
     public void update() {
         // Written synchronously; no need to flush.
     }

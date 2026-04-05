@@ -9,9 +9,10 @@ import java.util.List;
 
 public class AresTelemetry {
     private static final List<AresLoggerBackend> backends = new ArrayList<>();
-
     public static void registerBackend(AresLoggerBackend backend) {
-        backends.add(backend);
+        if (!backends.contains(backend)) {
+            backends.add(backend);
+        }
     }
 
     public static void putNumber(String key, double value) {
@@ -40,18 +41,21 @@ public class AresTelemetry {
 
     // Helper methods ported from the old AresLogger
 
+    public static void putPose2d(String key, double xMeters, double yMeters, double headingRadians) {
+        putNumberArray(key, new double[] { xMeters, yMeters, headingRadians });
+    }
+
     /**
-     * Logs exactly 4 SwerveModuleState elements as an 8-double array.
-     * Required AdvantageScope native formatting: [Angle0, Speed0, Angle1, Speed1, ...]
+     * Logs exactly 4 SwerveModuleState elements as a double array.
      */
     public static void logSwerveStates(String key, SwerveModuleState[] states) {
         if (states.length != 4) return;
-        double[] stateArray = new double[8];
+        double[] array = new double[8];
         for (int i = 0; i < 4; i++) {
-            stateArray[i * 2] = states[i].angle.getRadians();
-            stateArray[i * 2 + 1] = states[i].speedMetersPerSecond;
+            array[i * 2] = states[i].speedMetersPerSecond;
+            array[i * 2 + 1] = states[i].angle.getRadians();
         }
-        putNumberArray(key, stateArray);
+        putNumberArray(key, array);
     }
 
     public static void logDifferentialSpeeds(String key, DifferentialDriveWheelSpeeds speeds) {

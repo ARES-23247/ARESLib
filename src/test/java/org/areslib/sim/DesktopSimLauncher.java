@@ -33,14 +33,13 @@ public class DesktopSimLauncher {
             new SwerveModuleIOSim()
         );
 
-        ArrayLidarIOSim lidarSim = new ArrayLidarIOSim(); 
-        org.areslib.hardware.sensors.ArrayLidarIO.ArrayLidarInputs lidarInputs = new org.areslib.hardware.sensors.ArrayLidarIO.ArrayLidarInputs();
-
-        CommandScheduler.getInstance().registerSubsystem(driveSubsystem);
-        
         OdometryIO.OdometryInputs odometryInputs = new OdometryIO.OdometryInputs();
         AresFollower aresFollower = new AresFollower(driveSubsystem, odometryInputs);
         CommandScheduler.getInstance().registerSubsystem(aresFollower);
+        CommandScheduler.getInstance().registerSubsystem(driveSubsystem);
+
+        ArrayLidarIOSim lidarSim = new ArrayLidarIOSim(() -> odometryInputs); 
+        org.areslib.hardware.sensors.ArrayLidarIO.ArrayLidarInputs lidarInputs = new org.areslib.hardware.sensors.ArrayLidarIO.ArrayLidarInputs();
 
         Path testPath = new Path(new BezierLine(
             new Pose(0, 0, 0), 
@@ -68,29 +67,28 @@ public class DesktopSimLauncher {
                 double vy = driveSubsystem.getCommandedVy();      // Robot-centric left (m/s)
                 double omega = driveSubsystem.getCommandedOmega(); // rad/s
                 
-                double currentHeadingRad = Math.toRadians(odometryInputs.headingDegrees);
+                double currentHeadingRad = odometryInputs.headingRadians;
                 
                 // Convert to field-centric
                 double vXField = vx * Math.cos(currentHeadingRad) - vy * Math.sin(currentHeadingRad);
                 double vYField = vx * Math.sin(currentHeadingRad) + vy * Math.cos(currentHeadingRad);
                 
                 // Integrate
-                odometryInputs.headingDegrees += Math.toDegrees(omega * loopSecs);
-                odometryInputs.xInches += (vXField * loopSecs) * (100.0 / 2.54);
-                odometryInputs.yInches += (vYField * loopSecs) * (100.0 / 2.54);
+                odometryInputs.headingRadians += omega * loopSecs;
+                odometryInputs.xMeters += vXField * loopSecs;
+                odometryInputs.yMeters += vYField * loopSecs;
 
                 // Lidar Update
                 lidarSim.updateInputs(lidarInputs);
                 org.areslib.telemetry.AresAutoLogger.processInputs("Sensors/LiDAR", lidarInputs);
                 org.areslib.telemetry.AresAutoLogger.processInputs("Pedro/Odometry", odometryInputs);
                 
-                // Publish Pose2d double array for AdvantageScope Field2d support
-                // AdvantageScope expects: double[] { xMeters, yMeters, rotationRadians }
-                AresTelemetry.getInstance().putNumberArray("Robot/Pose", new double[] { 
-                    odometryInputs.xInches * 0.0254, 
-                    odometryInputs.yInches * 0.0254, 
-                    Math.toRadians(odometryInputs.headingDegrees) 
-                });
+                // Publish Pose2d using the modern struct format to avoid deprecation warnings
+                AresTelemetry.putPose2d("Robot/Pose", 
+                    odometryInputs.xMeters, 
+                    odometryInputs.yMeters, 
+                    odometryInputs.headingRadians 
+                );
 
                 // Telemetry Event Push
                 AresTelemetry.update();
