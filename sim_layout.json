@@ -1,0 +1,56 @@
+{
+  "version": "26.0.0",
+  "hubs": [
+    {
+      "x": 0,
+      "y": 0,
+      "width": 1280,
+      "height": 720,
+      "state": {
+        "sidebar": {
+          "width": 160,
+          "expanded": []
+        },
+        "tabs": {
+          "selected": 0,
+          "tabs": [
+            {
+              "type": 0,
+              "title": "",
+              "controller": null,
+              "controllerUUID": "mta83gpylnw3ywiugfbakcawvg6x7b1p",
+              "renderer": null,
+              "controlsHeight": 0
+            },
+            {
+              "type": 3,
+              "title": "Field Simulation",
+              "controller": {
+                "sources": [
+                  {
+                    "type": "gamePiece",
+                    "logKey": "/Field/Samples",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {}
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "/Debug/IntakePoint",
+                    "logType": "Pose3d",
+                    "visible": true,
+                    "options": {}
+                  }
+                ]
+              },
+              "controllerUUID": "isrzg8p5ojurxpy68iknv9tsq4uhfqjq",
+              "renderer": null,
+              "controlsHeight": 0
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "satellites": []
+}

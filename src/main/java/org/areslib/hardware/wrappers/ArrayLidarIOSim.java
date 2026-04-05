@@ -1,27 +1,31 @@
 package org.areslib.hardware.wrappers;
 
 import org.areslib.hardware.sensors.ArrayLidarIO;
+import org.dyn4j.dynamics.Body;
+import org.dyn4j.geometry.Vector2;
+import org.dyn4j.world.World;
 
 public class ArrayLidarIOSim implements ArrayLidarIO {
 
     private final int resolution;
     private final java.util.function.Supplier<org.areslib.hardware.interfaces.OdometryIO.OdometryInputs> odometrySupplier;
+    private final World<Body> world;
 
-    // Standard FTC field dimensions (144 inches = ~3.6576 meters)
-    private static final double FIELD_SIZE_METERS = 3.6576;
     private static final double FIELD_FOV_RADIANS = Math.toRadians(45.0);
-    private static final double MAX_RANGE_MM = 4000.0; // 4 meters max range typical for VL53L5CX
+    private static final double MAX_RANGE_METERS = 4.0; 
 
     /** Create a simulation configured for 16 (4x4) or 64 (8x8) resolution */
-    public ArrayLidarIOSim(int resolution, java.util.function.Supplier<org.areslib.hardware.interfaces.OdometryIO.OdometryInputs> odometrySupplier) {
+    public ArrayLidarIOSim(int resolution, java.util.function.Supplier<org.areslib.hardware.interfaces.OdometryIO.OdometryInputs> odometrySupplier, World<Body> world) {
         this.resolution = resolution;
         this.odometrySupplier = odometrySupplier;
+        this.world = world;
     }
 
     /** Defaults to standard full 64 (8x8) resolution */
-    public ArrayLidarIOSim(java.util.function.Supplier<org.areslib.hardware.interfaces.OdometryIO.OdometryInputs> odometrySupplier) {
+    public ArrayLidarIOSim(java.util.function.Supplier<org.areslib.hardware.interfaces.OdometryIO.OdometryInputs> odometrySupplier, World<Body> world) {
         this.resolution = 64;
         this.odometrySupplier = odometrySupplier;
+        this.world = world;
     }
 
     @Override
@@ -30,16 +34,14 @@ public class ArrayLidarIOSim implements ArrayLidarIO {
             inputs.distanceZonesMm = new double[resolution];
         }
 
-        // Get actual robot position from supplier
         org.areslib.hardware.interfaces.OdometryIO.OdometryInputs odo = null;
         if (odometrySupplier != null) {
             odo = odometrySupplier.get();
         }
 
-        if (odo == null) {
-            // Null fallback
+        if (odo == null || world == null) {
             for (int i = 0; i < resolution; i++) {
-                inputs.distanceZonesMm[i] = MAX_RANGE_MM;
+                inputs.distanceZonesMm[i] = MAX_RANGE_METERS * 1000.0;
             }
             return;
         }
@@ -49,48 +51,50 @@ public class ArrayLidarIOSim implements ArrayLidarIO {
         double heading = odo.headingRadians;
 
         int gridDim = (int) Math.sqrt(resolution);
+        double rayStepSize = 0.05; // 5cm check increments
+        int maxSteps = (int) (MAX_RANGE_METERS / rayStepSize);
 
         for (int row = 0; row < gridDim; row++) {
             for (int col = 0; col < gridDim; col++) {
-                // Calculate angular offsets in the sensor's local frame
-                // Mapping col to horizontal angle (yaw)
-                double colFraction = (col + 0.5) / gridDim - 0.5; // -0.5 to 0.5
+                double colFraction = (col + 0.5) / gridDim - 0.5; 
                 double yawOffset = colFraction * FIELD_FOV_RADIANS;
 
-                // Mapping row to vertical angle (pitch)
-                double rowFraction = (row + 0.5) / gridDim - 0.5; // -0.5 to 0.5
+                double rowFraction = (row + 0.5) / gridDim - 0.5; 
                 double pitchOffset = rowFraction * FIELD_FOV_RADIANS;
 
-                // 2D Raycast in field space
                 double rayAngle = heading + yawOffset;
                 double cosRay = Math.cos(rayAngle);
                 double sinRay = Math.sin(rayAngle);
 
-                // Distance to vertical walls (x = 0 or x = FIELD_SIZE_METERS)
-                double distX = Double.MAX_VALUE;
-                if (Math.abs(cosRay) > 1e-6) {
-                    double targetX = (cosRay > 0) ? FIELD_SIZE_METERS : 0.0;
-                    distX = (targetX - rx) / cosRay;
+                double dist2D = MAX_RANGE_METERS;
+
+                // Simple Ray Marching
+                for(int step = 1; step <= maxSteps; step++) {
+                    double currentDist = step * rayStepSize;
+                    double checkX = rx + (cosRay * currentDist);
+                    double checkY = ry + (sinRay * currentDist);
+                    
+                    Vector2 point = new Vector2(checkX, checkY);
+                    
+                    boolean hit = false;
+                    for (Body b : world.getBodies()) {
+                        // Skip the robot's own body (it sits exactly at the origin of the ray)
+                        if (b.getMass().getType() == org.dyn4j.geometry.MassType.NORMAL && currentDist < 0.2) continue;
+                        
+                        if (b.contains(point)) {
+                            hit = true;
+                            break;
+                        }
+                    }
+                    if (hit) {
+                        dist2D = currentDist;
+                        break;
+                    }
                 }
 
-                // Distance to horizontal walls (y = 0 or y = FIELD_SIZE_METERS)
-                double distY = Double.MAX_VALUE;
-                if (Math.abs(sinRay) > 1e-6) {
-                    double targetY = (sinRay > 0) ? FIELD_SIZE_METERS : 0.0;
-                    distY = (targetY - ry) / sinRay;
-                }
-
-                // Minimum valid positive distance in 2D plane
-                double dist2D = Double.MAX_VALUE;
-                if (distX >= 0 && distX < dist2D) dist2D = distX;
-                if (distY >= 0 && distY < dist2D) dist2D = distY;
-
-                // Convert 2D flat distance to true 3D hypotenuse using pitch
                 double dist3D_mm = (dist2D / Math.cos(pitchOffset)) * 1000.0;
-
-                // Cap to max sensor range
                 int index = (row * gridDim) + col;
-                inputs.distanceZonesMm[index] = Math.min(dist3D_mm, MAX_RANGE_MM);
+                inputs.distanceZonesMm[index] = Math.min(dist3D_mm, MAX_RANGE_METERS * 1000.0);
             }
         }
     }

@@ -26,12 +26,12 @@ public abstract class AresCommandOpMode extends LinearOpMode {
         // Enable extensions automatically
         // pre-flight hooks go here.
         // Enable locally-vendored SolversLib PhotonCore for extreme I2C loop bypass efficiency
-        try {
-            org.areslib.hardware.coprocessors.photon.PhotonCore.experimental.setMaximumParallelCommands(8);
-            org.areslib.hardware.coprocessors.photon.PhotonCore.experimental.setSinglethreadedOptimized(false);
-            org.areslib.hardware.coprocessors.photon.PhotonCore.PARALLELIZE_SERVOS = true;
-            org.areslib.hardware.coprocessors.photon.PhotonCore.enable();
-        } catch (Exception ignored) {}
+        // WARNING: This is mathematically and functionally REQUIRED for ARESlib performance modes.
+        // If your hubs are not wired or configured properly, this WILL explicitly crash. Do not remove.
+        org.areslib.hardware.coprocessors.photon.PhotonCore.experimental.setMaximumParallelCommands(8);
+        org.areslib.hardware.coprocessors.photon.PhotonCore.experimental.setSinglethreadedOptimized(false);
+        org.areslib.hardware.coprocessors.photon.PhotonCore.PARALLELIZE_SERVOS = true;
+        org.areslib.hardware.coprocessors.photon.PhotonCore.enable();
         
         allHubs = hardwareMap.getAll(LynxModule.class);
         for (LynxModule hub : allHubs) {

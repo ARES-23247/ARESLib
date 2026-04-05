@@ -2,8 +2,7 @@ package org.areslib.sim;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.geom.RoundRectangle2D;
 
 public class AresDriverStationApp extends JFrame {
 
@@ -12,7 +11,19 @@ public class AresDriverStationApp extends JFrame {
 
     private JRadioButton keyboardBtn;
     private JRadioButton gamepadBtn;
-    private JLabel statusLabel;
+    
+    // HUD Data
+    private double robotX = 0;
+    private double robotY = 0;
+    private double robotTheta = 0;
+    private int heldSamples = 0;
+
+    private float leftX, leftY, rightX, rightY;
+    private boolean lb, rb;
+    private float rt, lt;
+    private boolean aBtn, bBtn, xBtn, yBtn;
+
+    private final HudPanel hudPanel;
 
     public AresDriverStationApp() {
         super("ARES Simulation Driver Station");
@@ -20,29 +31,31 @@ public class AresDriverStationApp extends JFrame {
         this.keyboardListener = new DesktopKeyboardListener();
         this.gamepadWrapper = new VirtualGamepadWrapper(this.keyboardListener);
 
-        initComponents();
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {}
 
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setSize(400, 200);
+        this.setSize(850, 650);
         this.setLocationRelativeTo(null);
         this.setFocusable(true);
         this.addKeyListener(keyboardListener);
-        this.setVisible(true);
+        
+        // Main Container with deep dark background
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBackground(new Color(18, 18, 20)); 
+        
+        // Top Controls Panel (Glass-like theme)
+        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 15));
+        topPanel.setOpaque(false);
+        
+        JLabel titleLabel = new JLabel("ARES UNIFIED HUD");
+        titleLabel.setFont(new Font("SansSerif", Font.BOLD, 22));
+        titleLabel.setForeground(new Color(230, 230, 230));
+        topPanel.add(titleLabel);
 
-        // Required to capture inputs cleanly
-        this.requestFocusInWindow();
-    }
-
-    private void initComponents() {
-        JPanel panel = new JPanel(new GridLayout(4, 1, 10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-
-        JLabel titleLabel = new JLabel("ARES Unified Driver Station", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        panel.add(titleLabel);
-
-        keyboardBtn = new JRadioButton("Keyboard Profile (W/A/S/D + Arrows)");
-        gamepadBtn = new JRadioButton("Physical Gamepad (Jamepad SDL2)");
+        keyboardBtn = createCustomRadio("Keyboard Profile");
+        gamepadBtn = createCustomRadio("Physical Gamepad");
 
         ButtonGroup group = new ButtonGroup();
         group.add(keyboardBtn);
@@ -52,46 +65,215 @@ public class AresDriverStationApp extends JFrame {
         
         keyboardBtn.addActionListener(e -> {
             gamepadWrapper.setInputMode(VirtualGamepadWrapper.InputMode.KEYBOARD);
-            this.requestFocusInWindow(); // Return focus so keys are captured
-            updateStatus();
+            this.requestFocusInWindow(); // Return focus directly to JFrame so Swing intercepts keys
         });
 
         gamepadBtn.addActionListener(e -> {
             gamepadWrapper.setInputMode(VirtualGamepadWrapper.InputMode.PHYSICAL);
-            updateStatus();
         });
 
-        JPanel radioPanel = new JPanel(new FlowLayout());
-        radioPanel.add(keyboardBtn);
-        radioPanel.add(gamepadBtn);
-        panel.add(radioPanel);
+        topPanel.add(keyboardBtn);
+        topPanel.add(gamepadBtn);
 
-        statusLabel = new JLabel("Status: Awaiting Input", SwingConstants.CENTER);
-        panel.add(statusLabel);
+        mainPanel.add(topPanel, BorderLayout.NORTH);
 
-        this.add(panel);
-        updateStatus();
+        hudPanel = new HudPanel();
+        mainPanel.add(hudPanel, BorderLayout.CENTER);
+
+        this.setContentPane(mainPanel);
+        this.setVisible(true);
+        this.requestFocusInWindow();
     }
 
-    private void updateStatus() {
-        if (gamepadWrapper.getInputMode() == VirtualGamepadWrapper.InputMode.KEYBOARD) {
-            statusLabel.setText("Status: Keyboard Active. Keep window focused.");
-            statusLabel.setForeground(Color.BLUE);
-        } else {
-            boolean hasGamepad = (gamepadWrapper.getControllerManager() != null && 
-                                  gamepadWrapper.getControllerManager().getNumControllers() > 0);
-            
-            if (hasGamepad) {
-                statusLabel.setText("Status: Physical Gamepad Connected!");
-                statusLabel.setForeground(new Color(0, 150, 0));
-            } else {
-                statusLabel.setText("Status: No Gamepad Detected. Check USB.");
-                statusLabel.setForeground(Color.RED);
-            }
+    private JRadioButton createCustomRadio(String text) {
+        JRadioButton rb = new JRadioButton(text);
+        rb.setOpaque(false);
+        rb.setForeground(new Color(200, 200, 200));
+        rb.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        rb.setFocusPainted(false);
+        return rb;
+    }
+
+    public void updateHud(double x, double y, double heading, int samples) {
+        this.robotX = x;
+        this.robotY = y;
+        this.robotTheta = heading;
+        this.heldSamples = samples;
+    }
+
+    public void updateGamepadState(float lx, float ly, float rx, float ry, boolean lb, boolean rb, float lt, float rt, boolean a, boolean b, boolean x, boolean y) {
+        this.leftX = lx;
+        this.leftY = ly;
+        this.rightX = rx;
+        this.rightY = ry;
+        this.lb = lb;
+        this.rb = rb;
+        this.lt = lt;
+        this.rt = rt;
+        this.aBtn = a;
+        this.bBtn = b;
+        this.xBtn = x;
+        this.yBtn = y;
+        
+        if (hudPanel != null) {
+            hudPanel.repaint(); // force rapid 50hz redraws for smooth GUI
         }
     }
 
     public VirtualGamepadWrapper getGamepadWrapper() {
         return gamepadWrapper;
+    }
+
+    private class HudPanel extends JPanel {
+        public HudPanel() {
+            setOpaque(false);
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            Graphics2D g2d = (Graphics2D) g.create();
+
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+            int width = getWidth();
+            int height = getHeight();
+
+            int panelMargin = 20;
+            int panelW = (width / 2) - 30;
+            int panelH = height - 40;
+
+            // Stats Glassmorphism Panel
+            drawGlassPanel(g2d, panelMargin, panelMargin, panelW, panelH, "TELEMETRY & STATE");
+            
+            g2d.setColor(new Color(150, 255, 150));
+            g2d.setFont(new Font("Consolas", Font.BOLD, 18));
+            int startTextY = panelMargin + 70;
+            g2d.drawString(String.format("X (meters)   : %7.3f", robotX), panelMargin + 25, startTextY);
+            g2d.drawString(String.format("Y (meters)   : %7.3f", robotY), panelMargin + 25, startTextY + 30);
+            g2d.drawString(String.format("Heading (deg): %7.2f", Math.toDegrees(robotTheta)), panelMargin + 25, startTextY + 60);
+
+            // Draw Held Samples
+            g2d.setColor(new Color(255, 200, 50));
+            g2d.drawString(String.format("Held Samples : %d", heldSamples), panelMargin + 25, startTextY + 110);
+            
+            // Draw connected state
+            boolean hasGamepad = (gamepadWrapper.getControllerManager() != null && 
+                                  gamepadWrapper.getControllerManager().getNumControllers() > 0);
+            if (gamepadWrapper.getInputMode() == VirtualGamepadWrapper.InputMode.PHYSICAL) {
+                if (hasGamepad) {
+                    g2d.setColor(new Color(50, 200, 50));
+                    g2d.drawString("USB Gamepad Connected [OK]", panelMargin + 25, startTextY + 170);
+                } else {
+                    g2d.setColor(new Color(255, 50, 50));
+                    g2d.drawString("No USB Gamepad [WARN]", panelMargin + 25, startTextY + 170);
+                }
+            } else {
+                g2d.setColor(new Color(100, 150, 255));
+                g2d.drawString("Keyboard Input [ACTIVE]", panelMargin + 25, startTextY + 170);
+                
+                g2d.setColor(new Color(150, 150, 160));
+                g2d.setFont(new Font("Consolas", Font.PLAIN, 13));
+                int kbY = startTextY + 210;
+                g2d.drawString("KEYBINDINGS:", panelMargin + 25, kbY);
+                g2d.drawString("Left Stick  : W / A / S / D", panelMargin + 25, kbY + 20);
+                g2d.drawString("Right Stick : Arrow Keys", panelMargin + 25, kbY + 40);
+                g2d.drawString("A Button    : Z", panelMargin + 25, kbY + 60);
+                g2d.drawString("B Button    : X", panelMargin + 25, kbY + 80);
+                g2d.drawString("X Button    : C", panelMargin + 25, kbY + 100);
+                g2d.drawString("Y Button    : V", panelMargin + 25, kbY + 120);
+                g2d.drawString("L Bumper    : Q", panelMargin + 25, kbY + 140);
+                g2d.drawString("R Bumper    : E", panelMargin + 25, kbY + 160);
+                g2d.drawString("L Trigger   : Space", panelMargin + 25, kbY + 180);
+                g2d.drawString("R Trigger   : Shift", panelMargin + 25, kbY + 200);
+            }
+
+            // Gamepad Glassmorphism Panel
+            int rightXStart = width / 2 + 10;
+            drawGlassPanel(g2d, rightXStart, panelMargin, panelW, panelH, "GAMEPAD INPUT");
+
+            int padCenterY = panelMargin + (panelH / 2) + 20;
+            int padLx = rightXStart + panelW / 3 - 10;
+            int padRx = rightXStart + panelW * 2 / 3 + 10;
+            int joyRadius = 40;
+
+            // Draw Virtual Joysticks
+            drawJoystick(g2d, padLx, padCenterY, joyRadius, leftX, leftY);
+            drawJoystick(g2d, padRx, padCenterY, joyRadius, rightX, rightY);
+
+            // Draw Shoulder Bumpers
+            drawBumper(g2d, rightXStart + 40, panelMargin + 60, "LB", lb);
+            drawBumper(g2d, rightXStart + panelW - 90, panelMargin + 60, "RB", rb);
+            
+            // Draw Triggers
+            drawBumper(g2d, rightXStart + 40, panelMargin + 100, "LT", lt > 0.5f);
+            drawBumper(g2d, rightXStart + panelW - 90, panelMargin + 100, "RT", rt > 0.5f);
+
+            // Draw Face Buttons
+            int faceX = rightXStart + panelW / 2;
+            int faceY = panelMargin + 120;
+            drawFaceButton(g2d, faceX, faceY - 25, "Y", yBtn, new Color(255, 200, 50));
+            drawFaceButton(g2d, faceX, faceY + 25, "A", aBtn, new Color(50, 255, 100));
+            drawFaceButton(g2d, faceX - 25, faceY, "X", xBtn, new Color(50, 150, 255));
+            drawFaceButton(g2d, faceX + 25, faceY, "B", bBtn, new Color(255, 50, 50));
+
+            g2d.dispose();
+        }
+
+        private void drawGlassPanel(Graphics2D g2d, int x, int y, int w, int h, String title) {
+            RoundRectangle2D rect = new RoundRectangle2D.Float(x, y, w, h, 25, 25);
+            g2d.setColor(new Color(40, 40, 45, 180));
+            g2d.fill(rect);
+            g2d.setColor(new Color(80, 80, 90, 150));
+            g2d.setStroke(new BasicStroke(2f));
+            g2d.draw(rect);
+
+            g2d.setColor(new Color(200, 200, 220));
+            g2d.setFont(new Font("SansSerif", Font.BOLD, 16));
+            g2d.drawString(title, x + 25, y + 35);
+            
+            g2d.setColor(new Color(80, 80, 90, 150));
+            g2d.drawLine(x + 20, y + 50, x + w - 20, y + 50);
+        }
+
+        private void drawJoystick(Graphics2D g2d, int x, int y, int r, float vx, float vy) {
+            g2d.setColor(new Color(30, 30, 35));
+            g2d.fillOval(x - r, y - r, r * 2, r * 2);
+            g2d.setColor(new Color(100, 100, 110));
+            g2d.drawOval(x - r, y - r, r * 2, r * 2);
+
+            int innerX = (int) (x + vx * r);
+            int innerY = (int) (y + vy * r);
+            
+            g2d.setColor(new Color(50, 150, 255));
+            g2d.fillOval(innerX - 8, innerY - 8, 16, 16);
+            
+            g2d.setStroke(new BasicStroke(1.5f));
+            g2d.drawLine(x, y, innerX, innerY);
+        }
+
+        private void drawBumper(Graphics2D g2d, int x, int y, String label, boolean pressed) {
+            g2d.setColor(pressed ? new Color(50, 255, 100) : new Color(50, 50, 60));
+            g2d.fillRoundRect(x, y, 50, 25, 10, 10);
+            
+            g2d.setColor(pressed ? Color.BLACK : Color.WHITE);
+            g2d.setFont(new Font("SansSerif", Font.BOLD, 12));
+            g2d.drawString(label, x + 18, y + 17);
+        }
+
+        private void drawFaceButton(Graphics2D g2d, int x, int y, String label, boolean pressed, Color tint) {
+            int r = 16;
+            g2d.setColor(pressed ? tint : new Color(40, 40, 50));
+            g2d.fillOval(x - r, y - r, r * 2, r * 2);
+            
+            g2d.setColor(tint.darker());
+            g2d.setStroke(new BasicStroke(2f));
+            g2d.drawOval(x - r, y - r, r * 2, r * 2);
+
+            g2d.setColor(pressed ? new Color(18, 18, 20) : tint);
+            g2d.setFont(new Font("SansSerif", Font.BOLD, 14));
+            g2d.drawString(label, x - 5, y + 5);
+        }
     }
 }

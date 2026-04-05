@@ -2,6 +2,7 @@ package org.areslib.hardware.coprocessors.photon;
 
 import java.lang.reflect.Field;
 
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class ReflectionUtils {
     public static Field getField(Class clazz, String fieldName) {
         try {
