@@ -66,4 +66,7 @@ test {
     useJUnitPlatform()
 }
 task runSim(type: JavaExec) { mainClass = 'org.areslib.sim.DesktopSimLauncher'; classpath = sourceSets.test.runtimeClasspath; standardInput = System.in }
-dependencies { testImplementation 'com.google.code.gson:gson:2.10.1' }
+dependencies { 
+    testImplementation 'com.google.code.gson:gson:2.10.1'
+    testImplementation 'com.github.WilliamAHartman:Jamepad:1.3.2'
+}

@@ -8,12 +8,8 @@ import org.areslib.telemetry.AresTelemetry;
 import org.areslib.telemetry.DesktopLiveBackend;
 import org.areslib.telemetry.WpiLogBackend;
 import org.areslib.hardware.interfaces.OdometryIO;
-import org.areslib.core.localization.AresFollower;
-import org.areslib.command.FollowPathCommand;
-import com.pedropathing.follower.Follower;
-import com.pedropathing.paths.Path;
-import com.pedropathing.geometry.BezierLine;
-import com.pedropathing.geometry.Pose;
+
+import org.areslib.hardware.wrappers.AresGamepad;
 
 public class DesktopSimLauncher {
 
@@ -34,19 +30,14 @@ public class DesktopSimLauncher {
         );
 
         OdometryIO.OdometryInputs odometryInputs = new OdometryIO.OdometryInputs();
-        AresFollower aresFollower = new AresFollower(driveSubsystem, odometryInputs);
-        CommandScheduler.getInstance().registerSubsystem(aresFollower);
         CommandScheduler.getInstance().registerSubsystem(driveSubsystem);
 
         ArrayLidarIOSim lidarSim = new ArrayLidarIOSim(() -> odometryInputs); 
         org.areslib.hardware.sensors.ArrayLidarIO.ArrayLidarInputs lidarInputs = new org.areslib.hardware.sensors.ArrayLidarIO.ArrayLidarInputs();
 
-        Path testPath = new Path(new BezierLine(
-            new Pose(0, 0, 0), 
-            new Pose(20, 20, 0)
-        ));
-        FollowPathCommand followCmd = new FollowPathCommand(aresFollower, testPath);
-        CommandScheduler.getInstance().schedule(followCmd);
+        // Driver Station GUI Init
+        AresDriverStationApp dsApp = new AresDriverStationApp();
+        AresGamepad driverGamepad = new AresGamepad(dsApp.getGamepadWrapper().gamepad);
 
         System.out.println("Sim Started! Connect AdvantageScope to 127.0.0.1");
 
@@ -55,8 +46,20 @@ public class DesktopSimLauncher {
             while (true) {
                 long startTime = System.currentTimeMillis();
 
-                // Fake Inputs
-                // driveSubsystem.drive(0.5, 0.0, 0.2); // Pedro is driving now!
+                // 1. Update Gamepad Inputs
+                dsApp.getGamepadWrapper().update();
+
+                // 2. Fake TeleOp Control Mapping (Max 2.0 m/s and 2.0 rad/s)
+                double driveY = driverGamepad.getLeftY() * -2.0;    // Forward (FTC Y is negative when pushed up)
+                double driveX = driverGamepad.getLeftX() * -2.0;    // Strafe Left (FTC X is negative when pushed left, WPILib +Y is left)
+                double driveTurn = driverGamepad.getRightX() * -2.0; // Turn Left (CCW is positive)
+                
+                // If triggers are pulled, boost speed
+                if (dsApp.getGamepadWrapper().gamepad.right_trigger > 0.5) {
+                    driveY *= 1.5; driveX *= 1.5;
+                }
+                
+                driveSubsystem.drive(driveY, driveX, driveTurn);
 
                 // Scheduler Tick
                 CommandScheduler.getInstance().run();
