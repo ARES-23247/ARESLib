@@ -256,7 +256,7 @@ public class OctoQuadFWv3 extends I2cDeviceSynchDevice<I2cDeviceSynchSimple>
 
     /**
      * Allows reversing an encoder channel internally on the OctoQuad.
-     * This has basically the same effect as negating pos & vel in user
+     * This has basically the same effect as negating pos and vel in user
      * code, except for when using the absolute localizer, in which case
      * this must be used to inform the firmware of the tracking wheel
      * directions

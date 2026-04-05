@@ -83,6 +83,7 @@ public class LimelightVisionWrapper implements VisionIO {
     /**
      * Provide raw access to the driver if teams need Limelight-specific deep functions.
      * Use sparingly to avoid breaking simulator portability.
+     * @return the raw Limelight3A device driver
      */
     public Limelight3A getRawDriver() {
         return limelight;

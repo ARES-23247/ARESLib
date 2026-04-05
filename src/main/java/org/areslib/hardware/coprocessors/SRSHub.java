@@ -445,6 +445,9 @@ public class SRSHub extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
 
             /**
              * @param bus the bus of the command's target device
+             * @param xPosition the X position
+             * @param yPosition the Y position
+             * @param hOrientation the heading orientation
              */
             public SetPositionCommand(int bus, float xPosition, float yPosition, float hOrientation) {
                 data = new BitSet(getLength());
@@ -1483,6 +1486,7 @@ public class SRSHub extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
     /**
      * gets the current value(s) read from the specified I2C device at the specified bus
      *
+     * @param <T> the type of the I2CDevice
      * @param bus the bus from which the device is being read, from 1 to 3
      * @param deviceClass the type of device being read
      *
@@ -1525,6 +1529,7 @@ public class SRSHub extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
     /**
      * runs a command on an I2C device
      *
+     * @param command the command to run
      * @throws IllegalStateException if the SRSHub has not yet been initialized
      */
     public void runCommand(Command command) {

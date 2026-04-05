@@ -18,6 +18,9 @@ public class RevIMUWrapper implements IMUIO {
 
     /**
      * Optional secondary constructor if creating with specific IMU parameters.
+     * @param hardwareMap the hardware map to use
+     * @param deviceName the name of the IMU on the robot configuration
+     * @param parameters the initialization parameters for the IMU
      */
     public RevIMUWrapper(HardwareMap hardwareMap, String deviceName, IMU.Parameters parameters) {
         this.imu = hardwareMap.get(IMU.class, deviceName);

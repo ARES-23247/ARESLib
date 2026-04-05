@@ -38,7 +38,10 @@ public interface ElevatorIO {
      */
     void setGrabberServo(double position);
 
-    /** Enable or disable current polling. */
+    /** 
+     * Enable or disable current polling. 
+     * @param enabled true to enable, false otherwise
+     */
     default void setCurrentPolling(boolean enabled) {}
 
     /** Reset the encoder. */

@@ -14,14 +14,23 @@ public class ArrayLidarIOSim implements ArrayLidarIO {
     private static final double FIELD_FOV_RADIANS = Math.toRadians(45.0);
     private static final double MAX_RANGE_METERS = 4.0; 
 
-    /** Create a simulation configured for 16 (4x4) or 64 (8x8) resolution */
+    /** 
+     * Create a simulation configured for 16 (4x4) or 64 (8x8) resolution 
+     * @param resolution the resolution to use
+     * @param odometrySupplier the odometry supplier for the current position
+     * @param world the simulation world
+     */
     public ArrayLidarIOSim(int resolution, java.util.function.Supplier<org.areslib.hardware.interfaces.OdometryIO.OdometryInputs> odometrySupplier, World<Body> world) {
         this.resolution = resolution;
         this.odometrySupplier = odometrySupplier;
         this.world = world;
     }
 
-    /** Defaults to standard full 64 (8x8) resolution */
+    /** 
+     * Defaults to standard full 64 (8x8) resolution 
+     * @param odometrySupplier the odometry supplier for the current position
+     * @param world the simulation world
+     */
     public ArrayLidarIOSim(java.util.function.Supplier<org.areslib.hardware.interfaces.OdometryIO.OdometryInputs> odometrySupplier, World<Body> world) {
         this.resolution = 64;
         this.odometrySupplier = odometrySupplier;
