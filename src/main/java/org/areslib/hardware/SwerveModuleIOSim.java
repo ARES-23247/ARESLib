@@ -2,7 +2,7 @@ package org.areslib.hardware;
 
 public class SwerveModuleIOSim implements SwerveModuleIO {
     // Basic physics constants (Kv)
-    private static final double DRIVE_KV = 3.0; // meters per sec per volt
+    private static final double DRIVE_KV = 0.4; // meters per sec per volt (1.0 / 2.5 FF)
     private static final double TURN_KV = 5.0; // radians per sec per volt
     private static final double LOOP_PERIOD_SECS = 0.02; // 20ms
 
