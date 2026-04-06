@@ -40,6 +40,7 @@ public class MecanumStandardTeleOp extends AresCommandOpMode {
     private PinpointOdometryWrapper pinpoint;
     private OdometryIO.OdometryInputs pinpointInputs = new OdometryIO.OdometryInputs();
     private DigitalSensorWrapper floodgateSwitch;
+    private double headingOffsetRad = 0.0;
 
     @Override
     public void robotInit() {
@@ -71,8 +72,14 @@ public class MecanumStandardTeleOp extends AresCommandOpMode {
 
         CommandScheduler.getInstance().registerSubsystem(driveSubsystem);
 
-        // 4. Input Bindings
-        pilot = new AresGamepad(gamepad1);
+        pilot.y().onTrue(new Command() {
+            @Override
+            public void initialize() {
+                headingOffsetRad = pinpointInputs.headingRadians;
+            }
+            @Override
+            public boolean isFinished() { return true; }
+        });
 
         // Simple default command using lambdas for TeleOp control
         CommandScheduler.getInstance().setDefaultCommand(driveSubsystem, new Command() {
@@ -87,7 +94,7 @@ public class MecanumStandardTeleOp extends AresCommandOpMode {
                     pilot.getLeftY() * 2.5,   // Forward Velocity (m/s)
                     pilot.getLeftX() * 2.5,   // Strafe Velocity (m/s)
                     pilot.getRightX() * 3.0,  // Angular Velocity (rad/s)
-                    new org.areslib.math.geometry.Rotation2d(pinpointInputs.headingRadians)
+                    new org.areslib.math.geometry.Rotation2d(pinpointInputs.headingRadians - headingOffsetRad)
                 );
             }
 

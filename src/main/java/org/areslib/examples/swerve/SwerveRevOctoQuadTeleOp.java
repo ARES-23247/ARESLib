@@ -42,6 +42,7 @@ public class SwerveRevOctoQuadTeleOp extends AresCommandOpMode {
 
     private SwerveDriveSubsystem driveSubsystem;
     private AresGamepad pilot;
+    private double headingOffsetRad = 0.0;
 
     private PinpointOdometryWrapper pinpoint;
     private OdometryIO.OdometryInputs pinpointInputs = new OdometryIO.OdometryInputs();
@@ -98,8 +99,14 @@ public class SwerveRevOctoQuadTeleOp extends AresCommandOpMode {
         // Register the subsystem so its periodic() functions run in the CommandScheduler
         CommandScheduler.getInstance().registerSubsystem(driveSubsystem);
 
-        // 4. Input Bindings
-        pilot = new AresGamepad(gamepad1);
+        pilot.y().onTrue(new Command() {
+            @Override
+            public void initialize() {
+                headingOffsetRad = pinpointInputs.headingRadians;
+            }
+            @Override
+            public boolean isFinished() { return true; }
+        });
 
         // Simple default command using lambdas for TeleOp control
         CommandScheduler.getInstance().setDefaultCommand(driveSubsystem, new Command() {
@@ -114,7 +121,7 @@ public class SwerveRevOctoQuadTeleOp extends AresCommandOpMode {
                     pilot.getLeftY() * 3.0,   // Forward Velocity (m/s)
                     pilot.getLeftX() * 3.0,   // Strafe Velocity (m/s)
                     pilot.getRightX() * 3.0,  // Angular Velocity (rad/s)
-                    new org.areslib.math.geometry.Rotation2d(pinpointInputs.headingRadians)
+                    new org.areslib.math.geometry.Rotation2d(pinpointInputs.headingRadians - headingOffsetRad)
                 );
             }
 

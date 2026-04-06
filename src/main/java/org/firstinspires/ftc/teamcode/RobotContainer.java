@@ -133,6 +133,16 @@ public class RobotContainer {
         // Driver Align to Tag explicitly overrides manual driving while Held
         driver.a().whileTrue(new AlignToTagCommand(drive, vision, 5.0));
         
+        // Reset field-centric yaw
+        driver.y().onTrue(new Command() {
+            @Override
+            public void initialize() {
+                follower.setPose(new com.pedropathing.geometry.Pose(follower.getPose().getX(), follower.getPose().getY(), 0));
+            }
+            @Override
+            public boolean isFinished() { return true; }
+        });
+        
         // Operator Elevator Dispatch (onTrue ensures single fire execution)
         operator.dpadUp().onTrue(new ElevatorToPositionCommand(elevator, 0.8));
         operator.dpadDown().onTrue(new ElevatorToPositionCommand(elevator, 0.0));
