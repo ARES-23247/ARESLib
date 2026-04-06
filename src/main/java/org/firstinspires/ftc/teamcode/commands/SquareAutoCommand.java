@@ -6,6 +6,19 @@ import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 
+/**
+ * Demonstration autonomous routine that drives the robot in a 24-inch square pattern
+ * while rotating 360° over the course of the four segments.
+ * <p>
+ * <b>Coordinate System:</b> All poses use Pedro Pathing's coordinate frame:
+ * <ul>
+ *   <li>Units: <b>inches</b></li>
+ *   <li>Origin: <b>bottom-left corner</b> of the field (0, 0)</li>
+ *   <li>Field center: <b>(72, 72)</b> — this is {@code HALF_FIELD_INCHES} on both axes</li>
+ * </ul>
+ * The square starts at field center (72, 72), moves 24" right to (96, 72),
+ * 24" forward to (96, 96), 24" left to (72, 96), and returns to (72, 72).
+ */
 public class SquareAutoCommand extends Command {
     private final AresFollower aresFollower;
     private final PathChain[] squareSegments = new PathChain[4];
@@ -16,6 +29,7 @@ public class SquareAutoCommand extends Command {
         addRequirements(follower);
 
         // Define 4 individual segments for the square. We will command the robot to stop at the end of each.
+        // All coordinates in Pedro inches (origin = bottom-left). 72 = field center.
         squareSegments[0] = follower.getFollower().pathBuilder()
             .addPath(new BezierLine(new Pose(72, 72, 0), new Pose(96, 72, 0)))
             .setLinearHeadingInterpolation(0, Math.PI / 2)

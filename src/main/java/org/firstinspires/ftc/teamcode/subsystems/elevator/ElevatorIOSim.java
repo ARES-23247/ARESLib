@@ -8,8 +8,18 @@ package org.firstinspires.ftc.teamcode.subsystems.elevator;
  * tuned in simulation transfer to hardware.
  */
 public class ElevatorIOSim implements ElevatorIO {
-    private static final double KV = 0.5; // meters per sec per volt
-    /** Voltage required to hold against gravity — should match ElevatorConstants.kG */
+    /**
+     * Simulated velocity constant (meters/sec per volt of effective force).
+     * This approximates how fast the elevator moves per volt above the gravity hold.
+     * Not directly linked to a real-hardware constant — tune to match observed sim behavior.
+     */
+    private static final double KV = 0.5;
+
+    /**
+     * Voltage required to hold the elevator stationary against gravity.
+     * <b>Must match {@code ElevatorConstants.kG}</b> so that PID gains tuned in
+     * simulation transfer to hardware without re-tuning.
+     */
     private static final double GRAVITY_VOLTS = 0.2;
 
     private double appliedVolts = 0.0;
@@ -33,7 +43,9 @@ public class ElevatorIOSim implements ElevatorIO {
         inputs.positionMeters = positionMeters;
         inputs.velocityMetersPerSec = velocityMps;
         inputs.appliedVolts = appliedVolts;
-        inputs.currentAmps = new double[]{Math.abs(appliedVolts * 2.0)}; // Approximate current draw
+        // Approximate current draw: ~2A per volt. This is a rough linear model
+        // for telemetry visualization only — real motors have non-linear I/V curves.
+        inputs.currentAmps = new double[]{Math.abs(appliedVolts * 2.0)};
     }
 
     @Override

@@ -25,10 +25,12 @@ public class AlignToTagCommand extends Command {
             double tx = vision.getTargetXOffset();
             double ta = vision.getTargetArea();
             
-            // X offset correlates to Strafe (Left/Right)
+            // tx is in DEGREES (±29.8° FOV). ALIGN_kPx converts degrees → m/s.
+            // At max offset (29.8°): strafeCmd ≈ 29.8 * 0.05 = 1.49 m/s.
             double strafeCmd = -tx * ALIGN_kPx;
             
-            // Area discrepancy correlates to Forward/Back
+            // ta is in PERCENT of image area. ALIGN_kPy converts area-error% → m/s.
+            // At 5% target with 0% actual: forwardCmd = 5.0 * 0.15 = 0.75 m/s.
             double forwardCmd = (targetArea - ta) * ALIGN_kPy;
             
             // Send autonomous velocities to drive base, zero rotation

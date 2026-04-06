@@ -4,6 +4,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
 
+import org.areslib.core.FieldConstants;
+
 public class AresDriverStationApp extends JFrame {
 
     private final DesktopKeyboardListener keyboardListener;
@@ -12,6 +14,7 @@ public class AresDriverStationApp extends JFrame {
     private JRadioButton keyboardBtn;
     private JRadioButton gamepadBtn;
     private JToggleButton autoBtn;
+    private JToggleButton allianceBtn;
     
     // HUD Data
     private double robotX = 0;
@@ -23,6 +26,9 @@ public class AresDriverStationApp extends JFrame {
     private boolean lb, rb;
     private float rt, lt;
     private boolean aBtn, bBtn, xBtn, yBtn;
+
+    /** Current alliance — determines field-centric heading offset. */
+    private volatile FieldConstants.Alliance currentAlliance = FieldConstants.Alliance.BLUE;
 
     private final HudPanel hudPanel;
 
@@ -47,7 +53,7 @@ public class AresDriverStationApp extends JFrame {
         mainPanel.setBackground(new Color(18, 18, 20)); 
         
         // Top Controls Panel (Glass-like theme)
-        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 15));
+        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 15));
         topPanel.setOpaque(false);
         
         JLabel titleLabel = new JLabel("ARES UNIFIED HUD");
@@ -75,6 +81,28 @@ public class AresDriverStationApp extends JFrame {
 
         topPanel.add(keyboardBtn);
         topPanel.add(gamepadBtn);
+
+        // Alliance Toggle Button
+        allianceBtn = new JToggleButton("BLUE");
+        allianceBtn.setSelected(true); // Start on Blue
+        allianceBtn.setFocusPainted(false);
+        allianceBtn.setFont(new Font("SansSerif", Font.BOLD, 14));
+        allianceBtn.setForeground(new Color(50, 120, 255));
+        allianceBtn.setBackground(new Color(30, 30, 30));
+        allianceBtn.setPreferredSize(new Dimension(100, 32));
+        allianceBtn.addActionListener(e -> {
+            if (allianceBtn.isSelected()) {
+                currentAlliance = FieldConstants.Alliance.BLUE;
+                allianceBtn.setText("BLUE");
+                allianceBtn.setForeground(new Color(50, 120, 255));
+            } else {
+                currentAlliance = FieldConstants.Alliance.RED;
+                allianceBtn.setText("RED");
+                allianceBtn.setForeground(new Color(255, 60, 60));
+            }
+            this.requestFocusInWindow();
+        });
+        topPanel.add(allianceBtn);
 
         autoBtn = new JToggleButton("Run Auto Mode");
         autoBtn.setFocusPainted(false);
@@ -112,6 +140,13 @@ public class AresDriverStationApp extends JFrame {
         rb.setFont(new Font("SansSerif", Font.PLAIN, 14));
         rb.setFocusPainted(false);
         return rb;
+    }
+
+    /**
+     * @return The currently selected alliance for field-centric heading offset.
+     */
+    public FieldConstants.Alliance getAlliance() {
+        return currentAlliance;
     }
 
     public void updateHud(double x, double y, double heading, int samples) {
@@ -178,9 +213,16 @@ public class AresDriverStationApp extends JFrame {
             g2d.drawString(String.format("Y (meters)   : %7.3f", robotY), panelMargin + 25, startTextY + 30);
             g2d.drawString(String.format("Heading (deg): %7.2f", Math.toDegrees(robotTheta)), panelMargin + 25, startTextY + 60);
 
+            // Draw Alliance indicator
+            FieldConstants.Alliance alliance = currentAlliance;
+            Color allianceColor = (alliance == FieldConstants.Alliance.BLUE) ? new Color(50, 120, 255) : new Color(255, 60, 60);
+            g2d.setColor(allianceColor);
+            g2d.setFont(new Font("Consolas", Font.BOLD, 18));
+            g2d.drawString(String.format("Alliance     : %s", alliance.name()), panelMargin + 25, startTextY + 90);
+
             // Draw Held Samples
             g2d.setColor(new Color(255, 200, 50));
-            g2d.drawString(String.format("Held Samples : %d", heldSamples), panelMargin + 25, startTextY + 110);
+            g2d.drawString(String.format("Held Samples : %d", heldSamples), panelMargin + 25, startTextY + 130);
             
             // Draw connected state
             boolean hasGamepad = (gamepadWrapper.getControllerManager() != null && 
@@ -188,23 +230,23 @@ public class AresDriverStationApp extends JFrame {
             if (gamepadWrapper.getInputMode() == VirtualGamepadWrapper.InputMode.PHYSICAL) {
                 if (hasGamepad) {
                     g2d.setColor(new Color(50, 200, 50));
-                    g2d.drawString("USB Gamepad Connected [OK]", panelMargin + 25, startTextY + 170);
+                    g2d.drawString("USB Gamepad Connected [OK]", panelMargin + 25, startTextY + 190);
                 } else {
                     g2d.setColor(new Color(255, 50, 50));
-                    g2d.drawString("No USB Gamepad [WARN]", panelMargin + 25, startTextY + 170);
+                    g2d.drawString("No USB Gamepad [WARN]", panelMargin + 25, startTextY + 190);
                 }
             } else {
                 if (isAutoModeEnabled()) {
                     g2d.setColor(new Color(255, 100, 100));
-                    g2d.drawString("AUTO RUNNING [LOCKOUT]", panelMargin + 25, startTextY + 170);
+                    g2d.drawString("AUTO RUNNING [LOCKOUT]", panelMargin + 25, startTextY + 190);
                 } else {
                     g2d.setColor(new Color(100, 150, 255));
-                    g2d.drawString("Keyboard Input [ACTIVE]", panelMargin + 25, startTextY + 170);
+                    g2d.drawString("Keyboard Input [ACTIVE]", panelMargin + 25, startTextY + 190);
                 }
                 
                 g2d.setColor(new Color(150, 150, 160));
                 g2d.setFont(new Font("Consolas", Font.PLAIN, 13));
-                int kbY = startTextY + 210;
+                int kbY = startTextY + 230;
                 g2d.drawString("KEYBINDINGS:", panelMargin + 25, kbY);
                 g2d.drawString("Left Stick  : W / A / S / D", panelMargin + 25, kbY + 20);
                 g2d.drawString("Right Stick : Arrow Keys", panelMargin + 25, kbY + 40);

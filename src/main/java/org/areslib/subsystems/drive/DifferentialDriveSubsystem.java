@@ -18,6 +18,9 @@ import org.areslib.telemetry.AresAutoLogger;
  */
 public class DifferentialDriveSubsystem extends SubsystemBase implements AresDrivetrain {
 
+    /** @see SwerveDriveSubsystem#ANGULAR_ACCEL_MULTIPLIER */
+    private static final double ANGULAR_ACCEL_MULTIPLIER = 2.0;
+
     /**
      * Configuration data class for the DifferentialDriveSubsystem.
      */
@@ -73,7 +76,7 @@ public class DifferentialDriveSubsystem extends SubsystemBase implements AresDri
 
         if (config.maxAccelerationMps2 > 0.0) {
             this.fwdLimiter = new SlewRateLimiter(config.maxAccelerationMps2);
-            this.rotLimiter = new SlewRateLimiter(config.maxAccelerationMps2 * 2.0);
+            this.rotLimiter = new SlewRateLimiter(config.maxAccelerationMps2 * ANGULAR_ACCEL_MULTIPLIER);
         } else {
             this.fwdLimiter = null;
             this.rotLimiter = null;

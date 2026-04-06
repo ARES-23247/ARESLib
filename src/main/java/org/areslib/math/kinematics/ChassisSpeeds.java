@@ -51,6 +51,13 @@ public class ChassisSpeeds {
             double omegaRadiansPerSecond,
             double dtSeconds) {
         
+        // Guard: a zero or negative timestep would cause division by zero below.
+        // Return the continuous speeds unchanged, which is the mathematically correct
+        // limit as dt → 0 (the arc displacement collapses to the instantaneous velocity).
+        if (dtSeconds <= 0.0) {
+            return new ChassisSpeeds(vxMetersPerSecond, vyMetersPerSecond, omegaRadiansPerSecond);
+        }
+
         // Use the exact pose exponential mapping to calculate the arc displacement
         org.areslib.math.geometry.Pose2d desiredDeltaPose = new org.areslib.math.geometry.Pose2d(0, 0, new Rotation2d()).exp(
                 new org.areslib.math.geometry.Twist2d(

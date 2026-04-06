@@ -24,7 +24,12 @@ public class ElevatorSubsystem extends SubsystemBase {
         // Compute error
         double error = targetPositionMeters - inputs.positionMeters;
 
-        // Simple Proportional Control with Gravity Feedforward
+        // Proportional Control with constant gravity feedforward (kG).
+        // DESIGN NOTE: kG is always applied upward regardless of direction. This creates an
+        // intentionally asymmetric response: the elevator moves up at full P-speed but descends
+        // more slowly because kG opposes the downward P-output. This is a safety feature —
+        // it prevents free-fall if the P term underestimates gravity or the motor loses power.
+        // Teams tuning for faster descent should increase kP, NOT remove kG.
         double volts = (error * kP) + kG;
 
         if (inputs.positionMeters >= MAX_POSITION_METERS && volts > kG) {

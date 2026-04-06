@@ -11,12 +11,14 @@ public class ArrayVisionIOSim implements VisionIO {
     private final Random rand = new Random();
 
     // FTC Into The Deep Wall Tag Coordinates (x, y, tag_yaw_facing)
-    // Meters + Radians
+    // Meters + Radians, center-origin coordinate system.
+    // Positions approximate the center of each field wall, using the half-field size from FieldConstants.
+    private static final double WALL_TAG_OFFSET = org.areslib.core.FieldConstants.HALF_FIELD_METERS;
     private final double[][] INTO_THE_DEEP_TAGS = {
-        {1.82, 0.0, Math.PI},        // Red/Blue East Wall Tag (facing West)
-        {-1.82, 0.0, 0.0},           // Red/Blue West Wall Tag (facing East)
-        {0.0, 1.82, -Math.PI / 2.0}, // North Wall Tag (facing South)
-        {0.0, -1.82, Math.PI / 2.0}  // South Wall Tag (facing North)
+        { WALL_TAG_OFFSET, 0.0, Math.PI},        // East wall tag (facing West)
+        {-WALL_TAG_OFFSET, 0.0, 0.0},             // West wall tag (facing East)
+        {0.0,  WALL_TAG_OFFSET, -Math.PI / 2.0},  // North wall tag (facing South)
+        {0.0, -WALL_TAG_OFFSET,  Math.PI / 2.0}   // South wall tag (facing North)
     };
 
     private static final double MAX_VIEW_DISTANCE_METERS = 3.5;

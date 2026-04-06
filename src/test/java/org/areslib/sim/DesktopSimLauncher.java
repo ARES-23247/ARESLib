@@ -3,6 +3,7 @@ package org.areslib.sim;
 import java.util.ArrayList;
 import java.util.List;
 import org.areslib.command.CommandScheduler;
+import org.areslib.core.FieldConstants;
 import org.areslib.subsystems.drive.AresDrivetrain;
 import org.firstinspires.ftc.teamcode.RobotContainer;
 import org.areslib.telemetry.AresTelemetry;
@@ -56,25 +57,26 @@ public class DesktopSimLauncher {
         GameSimulation gameSim = new IntoTheDeepSim();
         gameSim.initField(world);
 
-        // Create Primary Robot Rigid Body (18x18 inches = 0.4572m square)
+        // Create Primary Robot Rigid Body using named constants from FieldConstants
         Body robotBody = new Body();
-        org.dyn4j.dynamics.BodyFixture fixture = new org.dyn4j.dynamics.BodyFixture(Geometry.createRectangle(0.4572, 0.4572));
-        double area = 0.4572 * 0.4572;
-        fixture.setDensity(org.areslib.core.localization.AresPedroConstants.mass / area); // Automatically scale dyn4j mass to match robot characterization
-        fixture.setFriction(0.2); // Inter-robot side-swiping friction
-        fixture.setRestitution(0.1); // Slight bounce off walls
+        org.dyn4j.dynamics.BodyFixture fixture = new org.dyn4j.dynamics.BodyFixture(
+            Geometry.createRectangle(FieldConstants.ROBOT_SIZE_METERS, FieldConstants.ROBOT_SIZE_METERS)
+        );
+        double area = FieldConstants.ROBOT_SIZE_METERS * FieldConstants.ROBOT_SIZE_METERS;
+        // Automatically scale dyn4j mass to match robot characterization
+        fixture.setDensity(org.areslib.core.localization.AresPedroConstants.mass / area);
+        fixture.setFriction(FieldConstants.SIM_WALL_FRICTION);
+        fixture.setRestitution(FieldConstants.SIM_WALL_RESTITUTION);
         robotBody.addFixture(fixture);
         
         robotBody.setMass(MassType.NORMAL);
         
-        // Setup synthetic floor carpet friction metrics
-        robotBody.setLinearDamping(1.0);
-        robotBody.setAngularDamping(1.0);
+        // Synthetic floor carpet friction metrics
+        robotBody.setLinearDamping(FieldConstants.SIM_LINEAR_DAMPING);
+        robotBody.setAngularDamping(FieldConstants.SIM_ANGULAR_DAMPING);
         robotBody.translate(0.0, 0.0);
         robotBody.getTransform().setRotation(0.0);
         world.addBody(robotBody);
-
-
 
         // Driver Station GUI Init
         AresDriverStationApp dsApp = new AresDriverStationApp();
@@ -123,7 +125,7 @@ public class DesktopSimLauncher {
                 }
                 wasAutoEnabled = isAutoEnabled;
 
-                // 2. Fake TeleOp Control Mapping
+                // 2. TeleOp Control Mapping
                 if (!isAutoEnabled) {
                     double driveY = driverGamepad.getLeftY() * org.areslib.core.localization.AresPedroConstants.teleOpMaxSpeedForward; // +X is Forward
                     double driveX = driverGamepad.getLeftX() * -org.areslib.core.localization.AresPedroConstants.teleOpMaxSpeedStrafe; // +Y is Left
@@ -136,12 +138,21 @@ public class DesktopSimLauncher {
                         driveTurn *= org.areslib.core.localization.AresPedroConstants.teleOpBoostMultiplier;
                     }
                     
+                    // Apply alliance-specific heading offset for field-centric driving.
+                    // RED alliance: offset = 0° (driver faces +X, forward = away from driver).
+                    // BLUE alliance: offset = 180° (driver faces -X, forward = away from driver).
+                    // The offset rotates the robot's heading reference so that "push stick forward"
+                    // always drives the robot AWAY from the driver regardless of which side they sit on.
+                    FieldConstants.Alliance currentAlliance = dsApp.getAlliance();
                     org.areslib.math.geometry.Rotation2d currentHeading = new org.areslib.math.geometry.Rotation2d(odometryInputs.headingRadians);
-                    org.areslib.math.geometry.Rotation2d standardAllianceHeading = currentHeading.rotateBy(new org.areslib.math.geometry.Rotation2d(Math.PI)); // Offset by 180 degrees mapping to match driver station POV
+                    org.areslib.math.geometry.Rotation2d allianceHeading = currentHeading.rotateBy(
+                        new org.areslib.math.geometry.Rotation2d(currentAlliance.getHeadingOffsetRadians())
+                    );
+
                     if (driveSubsystem instanceof org.areslib.subsystems.drive.SwerveDriveSubsystem) {
-                        ((org.areslib.subsystems.drive.SwerveDriveSubsystem) driveSubsystem).driveFieldCentric(driveY, driveX, driveTurn, standardAllianceHeading);
+                        ((org.areslib.subsystems.drive.SwerveDriveSubsystem) driveSubsystem).driveFieldCentric(driveY, driveX, driveTurn, allianceHeading);
                     } else if (driveSubsystem instanceof org.areslib.subsystems.drive.MecanumDriveSubsystem) {
-                        ((org.areslib.subsystems.drive.MecanumDriveSubsystem) driveSubsystem).driveFieldCentric(driveY, driveX, driveTurn, standardAllianceHeading);
+                        ((org.areslib.subsystems.drive.MecanumDriveSubsystem) driveSubsystem).driveFieldCentric(driveY, driveX, driveTurn, allianceHeading);
                     } else if (driveSubsystem instanceof org.areslib.subsystems.drive.DifferentialDriveSubsystem) {
                         ((org.areslib.subsystems.drive.DifferentialDriveSubsystem) driveSubsystem).drive(driveY, driveTurn);
                     }
@@ -205,16 +216,18 @@ public class DesktopSimLauncher {
                 );
 
                 // Publish Pedro's internally tracked odometry estimate (for divergence testing)
-                // Pedro Pathing inherently operates mathematically in INCHES and bottom-left origin.
-                // AdvantageScope expects METERS and center origin.
+                // Pedro Pathing operates in INCHES (bottom-left origin).
+                // AdvantageScope expects METERS (center origin).
+                // Convert: subtract 72" to re-center, then multiply by INCHES_TO_METERS.
                 com.pedropathing.geometry.Pose estimatedPose = robotContainer.getFollower().getPose();
                 AresTelemetry.putPose2d("Pedro/EstimatedPose", 
-                    (estimatedPose.getX() - 72.0) * 0.0254, 
-                    (estimatedPose.getY() - 72.0) * 0.0254, 
+                    (estimatedPose.getX() - FieldConstants.HALF_FIELD_INCHES) * FieldConstants.INCHES_TO_METERS, 
+                    (estimatedPose.getY() - FieldConstants.HALF_FIELD_INCHES) * FieldConstants.INCHES_TO_METERS, 
                     estimatedPose.getHeading()
                 );
 
-
+                // Log current alliance for telemetry
+                AresTelemetry.putString("DriverStation/Alliance", dsApp.getAlliance().name());
 
                 // Push Field States
                 gameSim.telemetryUpdate();

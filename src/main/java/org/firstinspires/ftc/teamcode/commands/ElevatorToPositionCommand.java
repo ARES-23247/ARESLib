@@ -4,6 +4,9 @@ import org.areslib.command.Command;
 import org.firstinspires.ftc.teamcode.subsystems.elevator.ElevatorSubsystem;
 
 public class ElevatorToPositionCommand extends Command {
+    /** Position tolerance in meters — command finishes when within this distance of target. */
+    private static final double POSITION_TOLERANCE_METERS = 0.05;
+
     private final ElevatorSubsystem elevator;
     private final double targetPositionMeters;
 
@@ -25,8 +28,7 @@ public class ElevatorToPositionCommand extends Command {
 
     @Override
     public boolean isFinished() {
-        // Exit command when the physical position is within 0.05 meters of target
-        return Math.abs(elevator.getPositionMeters() - targetPositionMeters) < 0.05;
+        return Math.abs(elevator.getPositionMeters() - targetPositionMeters) < POSITION_TOLERANCE_METERS;
     }
 
     @Override

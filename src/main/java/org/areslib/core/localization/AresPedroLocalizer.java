@@ -1,5 +1,6 @@
 package org.areslib.core.localization;
 
+import org.areslib.core.FieldConstants;
 import org.areslib.hardware.interfaces.OdometryIO;
 import com.pedropathing.localization.Localizer;
 import com.pedropathing.geometry.Pose;
@@ -11,6 +12,15 @@ import com.pedropathing.math.Vector;
  * This class translates ARESLib's SI-unit based {@link OdometryIO} hardware abstractions
  * (meters, radians, m/s) into the specific imperial units (inches) expected by Pedro Pathing's
  * internal tracking algorithms. It handles coordinate offsets to support mid-match pathing updates.
+ *
+ * <h3>Coordinate Systems</h3>
+ * <ul>
+ *   <li><b>ARESLib / Sensor:</b> meters, origin at field center, +X forward, +Y left.</li>
+ *   <li><b>Pedro Pathing:</b> inches, origin at bottom-left corner of the field.</li>
+ * </ul>
+ * The conversion adds {@link FieldConstants#HALF_FIELD_INCHES} (72") to shift from
+ * center-origin to bottom-left-origin. This offset is applied <em>after</em> any heading
+ * rotation so that the rotation pivot is always the sensor origin, not the shifted point.
  */
 public class AresPedroLocalizer implements Localizer {
     private final OdometryIO.OdometryInputs inputs;
@@ -31,38 +41,42 @@ public class AresPedroLocalizer implements Localizer {
 
     /**
      * Gets the current field-centric pose of the robot.
-     * Converts ARESlib meters internally into Pedro Pathing inches.
+     * <p>
+     * Converts ARESlib meters to Pedro Pathing inches, applying heading offset
+     * rotation <em>before</em> the 72-inch origin shift to avoid rotating the
+     * constant offset vector.
      *
      * @return The Cartesian coordinates and heading wrapped in a {@link Pose}.
      */
     @Override
     public Pose getPose() {
-        // ARESLib tracks odometry in SI meters with (0,0) at the physical center of the field.
-        // Pedro Pathing tracks odometry in Imperial inches with (0,0) at the bottom-left corner of the field.
-        // We must map Center-Origin to Bottom-Left Origin by adding exactly 72 inches (half an FTC field).
-        double rawXInches = (inputs.xMeters / 0.0254) + 72.0;
-        double rawYInches = (inputs.yMeters / 0.0254) + 72.0;
-        
+        // Step 1: Convert raw sensor meters → inches (still centered at origin)
+        double rawXInches = inputs.xMeters * FieldConstants.METERS_TO_INCHES;
+        double rawYInches = inputs.yMeters * FieldConstants.METERS_TO_INCHES;
+
+        // Step 2: Apply heading offset rotation around the SENSOR origin (0,0).
+        // This must happen BEFORE adding the 72-inch shift to avoid rotating the constant offset.
         double rotatedX = rawXInches * Math.cos(offsetHeadingRadians) - rawYInches * Math.sin(offsetHeadingRadians);
         double rotatedY = rawXInches * Math.sin(offsetHeadingRadians) + rawYInches * Math.cos(offsetHeadingRadians);
-        
+
+        // Step 3: Shift from center-origin to Pedro bottom-left-origin, then apply position offsets
         return new Pose(
-            rotatedX + offsetXInches,
-            rotatedY + offsetYInches,
+            rotatedX + FieldConstants.HALF_FIELD_INCHES + offsetXInches,
+            rotatedY + FieldConstants.HALF_FIELD_INCHES + offsetYInches,
             inputs.headingRadians + offsetHeadingRadians
         );
     }
 
     /**
      * Gets the current velocity vector of the robot.
-     * Conversions applied mapping m/s to in/s.
+     * Conversions applied mapping m/s to in/s, with heading offset rotation.
      *
      * @return A {@link Pose} where X = xVelocity, Y = yVelocity, and Heading = angularVelocity.
      */
     @Override
     public Pose getVelocity() {
-        double rawVx = inputs.xVelocityMetersPerSecond / 0.0254;
-        double rawVy = inputs.yVelocityMetersPerSecond / 0.0254;
+        double rawVx = inputs.xVelocityMetersPerSecond * FieldConstants.METERS_TO_INCHES;
+        double rawVy = inputs.yVelocityMetersPerSecond * FieldConstants.METERS_TO_INCHES;
         
         double rotatedVx = rawVx * Math.cos(offsetHeadingRadians) - rawVy * Math.sin(offsetHeadingRadians);
         double rotatedVy = rawVx * Math.sin(offsetHeadingRadians) + rawVy * Math.cos(offsetHeadingRadians);
@@ -97,24 +111,29 @@ public class AresPedroLocalizer implements Localizer {
 
     /**
      * Injects a specific absolute pose onto the robot.
-     * Handled by calculating an integer offset over the raw hardware data returned by sensors.
+     * <p>
+     * Calculates the offset delta between the requested pose and the current raw
+     * sensor reading so that subsequent {@link #getPose()} calls return the injected
+     * value without modifying the underlying hardware state.
      *
-     * @param setPose The desired global coordinate pose.
+     * @param setPose The desired global coordinate pose (in Pedro inches, bottom-left origin).
      */
     @Override
     public void setPose(Pose setPose) {
-        double currentRawX = (inputs.xMeters / 0.0254) + 72.0;
-        double currentRawY = (inputs.yMeters / 0.0254) + 72.0;
-        
+        // Step 1: Get raw sensor position in inches (center-origin, no offset applied)
+        double currentRawX = inputs.xMeters * FieldConstants.METERS_TO_INCHES;
+        double currentRawY = inputs.yMeters * FieldConstants.METERS_TO_INCHES;
+
+        // Step 2: Compute heading offset
         offsetHeadingRadians = setPose.getHeading() - inputs.headingRadians;
-        
-        // We need to rotate the current raw coordinates into the new global frame
+
+        // Step 3: Rotate raw sensor readings by the new heading offset
         double rotatedRawX = currentRawX * Math.cos(offsetHeadingRadians) - currentRawY * Math.sin(offsetHeadingRadians);
         double rotatedRawY = currentRawX * Math.sin(offsetHeadingRadians) + currentRawY * Math.cos(offsetHeadingRadians);
-        
-        // The offset is the difference between the requested pose and the rotated raw position
-        offsetXInches = setPose.getX() - rotatedRawX;
-        offsetYInches = setPose.getY() - rotatedRawY;
+
+        // Step 4: The offset is what remains after the rotation + 72" shift
+        offsetXInches = setPose.getX() - (rotatedRawX + FieldConstants.HALF_FIELD_INCHES);
+        offsetYInches = setPose.getY() - (rotatedRawY + FieldConstants.HALF_FIELD_INCHES);
     }
 
     /**

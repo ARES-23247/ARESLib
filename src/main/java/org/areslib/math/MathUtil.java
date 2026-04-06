@@ -68,10 +68,18 @@ public final class MathUtil {
     }
 
     /**
-     * Wraps an angle to the range -pi to pi radians.
+     * Wraps an angle to the half-open range {@code [-π, π)} radians.
+     * <p>
+     * <b>Convention note:</b> This function uses the half-open range, meaning exactly
+     * {@code +π} maps to {@code -π}. This is consistent with WPILib's convention.
+     * However, {@code Math.atan2()} returns values in the closed range {@code (-π, +π]},
+     * meaning it can return exactly {@code +π}. Feeding {@code atan2} output through
+     * this function will remap {@code +π → -π}. For most control purposes this is
+     * inconsequential, but be aware of the discontinuity if performing exact equality
+     * checks at the ±π boundary.
      *
      * @param angleRadians Angle to wrap in radians.
-     * @return The wrapped angle.
+     * @return The wrapped angle in {@code [-π, π)}.
      */
     public static double angleModulus(double angleRadians) {
         double modulus = angleRadians % (2.0 * Math.PI);

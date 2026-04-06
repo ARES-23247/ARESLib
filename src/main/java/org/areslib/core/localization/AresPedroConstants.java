@@ -19,13 +19,13 @@ public class AresPedroConstants {
     public static double mass = 12.0;
 
     /** Drive PIDF Coefficients: [kP, kI, kD, kF]. Used to control the drive axis vector. */
-    public static double drivePIDFCoefficients[] = {0.0, 0.0, 0.0, 0.0};
+    public static double drivePIDFCoefficients[] = {0.025, 0.0, 0.00001, 0.6};
     
     /** Heading PIDF Coefficients: [kP, kI, kD, kF]. Used to control the rotation state towards the target angle. */
-    public static double headingPIDFCoefficients[] = {0.0, 0.0, 0.0, 0.0};
+    public static double headingPIDFCoefficients[] = {1.0, 0.0, 0.0, 0.01};
 
     /** Translation PIDF Coefficients: [kP, kI, kD, kF]. Used to correct spatial X/Y errors. */
-    public static double translationalPIDFCoefficients[] = {0.0, 0.0, 0.0, 0.0};
+    public static double translationalPIDFCoefficients[] = {0.1, 0.0, 0.0, 0.015};
 
     // TeleOp Telemetry & Sim Tuning Variables
     /** Maximum forward/backward speed limit for teleop execution in m/s. */
@@ -47,8 +47,9 @@ public class AresPedroConstants {
      * Instantiates and configures a standard Pedro {@link FollowerConstants} object
      * by injecting the live tuning variables maintained within this static class.
      * <p>
-     * Call this in the user's autonomous init to inject custom PID tuned values
-     * into Pedro's environment gracefully.
+     * The PIDF coefficient arrays defined above are read here, so changes made via
+     * FTC Dashboard or static initialization blocks will take effect when this method
+     * is called (typically during autonomous init).
      *
      * @return A newly constructed {@link FollowerConstants} populated with the configured tuning data.
      */
@@ -56,12 +57,18 @@ public class AresPedroConstants {
         FollowerConstants constants = new FollowerConstants();
         constants.mass = mass;
         
-        // For simulation, inject reasonable baseline values so the robot tracks visually
-        // These can be overridden natively by teams, but we must populate them here
-        // so the `SquareAutoCommand` behaves correctly out of the box.
-        constants.coefficientsHeadingPIDF.setCoefficients(1.0, 0, 0, 0.01);
-        constants.coefficientsTranslationalPIDF.setCoefficients(0.1, 0, 0, 0.015);
-        constants.coefficientsDrivePIDF.setCoefficients(0.025, 0, 0.00001, 0.6, 0.01);
+        // Inject the Dashboard-tunable PIDF arrays into Pedro's follower.
+        // These arrays are populated with functional defaults above, and can be
+        // overridden at runtime via FTC Dashboard or in a static {} block.
+        constants.coefficientsHeadingPIDF.setCoefficients(
+            headingPIDFCoefficients[0], headingPIDFCoefficients[1],
+            headingPIDFCoefficients[2], headingPIDFCoefficients[3]);
+        constants.coefficientsTranslationalPIDF.setCoefficients(
+            translationalPIDFCoefficients[0], translationalPIDFCoefficients[1],
+            translationalPIDFCoefficients[2], translationalPIDFCoefficients[3]);
+        constants.coefficientsDrivePIDF.setCoefficients(
+            drivePIDFCoefficients[0], drivePIDFCoefficients[1],
+            drivePIDFCoefficients[2], drivePIDFCoefficients[3], 0.01);
 
         return constants;
     }

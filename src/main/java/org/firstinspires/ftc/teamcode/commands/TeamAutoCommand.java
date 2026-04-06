@@ -10,6 +10,17 @@ import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 
+/**
+ * Example match autonomous command demonstrating a 3-state sequence:
+ * drive to scoring position → raise elevator → drive to park.
+ * <p>
+ * <b>Important:</b> Path geometry is computed at construction time using fixed waypoints.
+ * The {@link #initialize()} method sets the starting pose to (0, 0, 0°) which must match
+ * the first waypoint in the path chains. If the robot starts elsewhere, it will jump.
+ * For dynamic starting positions, build paths inside {@code initialize()} instead.
+ * <p>
+ * <b>Coordinate System:</b> Pedro Pathing inches, bottom-left origin.
+ */
 public class TeamAutoCommand extends Command {
     private final AresFollower follower;
     private final ElevatorSubsystem elevator;
@@ -26,7 +37,10 @@ public class TeamAutoCommand extends Command {
         this.elevator = elevator;
         addRequirements(follower); // Only claim follower — elevator is scheduled separately
         
-        // Define poses (X, Y, Heading radians)
+        // Path waypoints in Pedro Pathing coordinates (inches, bottom-left origin).
+        // NOTE: These paths are built once at construction. They define FIXED geometry
+        // relative to the starting pose set in initialize(). If the robot's actual
+        // position differs from startPose, the follower will try to correct live.
         Pose startPose = new Pose(0, 0, Math.toRadians(0));
         Pose scorePose = new Pose(24, 0, Math.toRadians(0)); 
         Pose parkPose = new Pose(24, 24, Math.toRadians(90)); 

@@ -23,6 +23,14 @@ import org.areslib.telemetry.AresTelemetry;
 public class SwerveDriveSubsystem extends SubsystemBase implements AresDrivetrain {
 
     /**
+     * Angular acceleration is allowed to be faster than linear acceleration because
+     * rotational inertia is significantly lower than translational inertia for typical
+     * FTC-sized robots. This multiplier is applied to {@code maxAccelerationMps2}
+     * when constructing the rotation slew rate limiter.
+     */
+    private static final double ANGULAR_ACCEL_MULTIPLIER = 2.0;
+
+    /**
      * Configuration data class for the SwerveDriveSubsystem.
      * <p>
      * Contains physics and tuning parameters specific to a robot's physical construction.
@@ -128,7 +136,7 @@ public class SwerveDriveSubsystem extends SubsystemBase implements AresDrivetrai
         if (config.maxAccelerationMps2 > 0.0) {
             this.fwdLimiter = new SlewRateLimiter(config.maxAccelerationMps2);
             this.strLimiter = new SlewRateLimiter(config.maxAccelerationMps2);
-            this.rotLimiter = new SlewRateLimiter(config.maxAccelerationMps2 * 2.0);
+            this.rotLimiter = new SlewRateLimiter(config.maxAccelerationMps2 * ANGULAR_ACCEL_MULTIPLIER);
         } else {
             this.fwdLimiter = null;
             this.strLimiter = null;

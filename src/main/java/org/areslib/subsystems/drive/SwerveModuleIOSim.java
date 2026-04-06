@@ -10,9 +10,23 @@ import org.areslib.math.MathUtil;
  * Heading wrap-around is automatically handled via {@link MathUtil#angleModulus}.
  */
 public class SwerveModuleIOSim implements SwerveModuleIO {
-    // Basic physics constants (Kv)
-    private static final double DRIVE_KV = 0.4; // meters per sec per volt (1.0 / 2.5 FF)
-    private static final double TURN_KV = 5.0;     // rad/s per volt
+    /**
+     * Simulated motor velocity gain for drive motors (meters/sec per volt).
+     * This is the reciprocal of the drive feedforward Kv: {@code 1.0 / Config.driveKv}.
+     * The default driveKv is 2.5 V·s/m, so DRIVE_KV = 1/2.5 = 0.4 m/s/V.
+     * <p>
+     * <b>If you change {@code Config.driveKv}, update this value to match.</b>
+     * Ideally this would be injected from Config, but the IO layer is intentionally
+     * decoupled from Config to keep the hardware abstraction clean.
+     */
+    private static final double DRIVE_KV = 0.4;   // = 1.0 / 2.5 (default driveKv)
+
+    /**
+     * Simulated motor velocity gain for turn motors (rad/s per volt).
+     * This determines how responsive the steering axis is in simulation.
+     * Higher values = faster steering response.
+     */
+    private static final double TURN_KV = 5.0;
 
     private double driveAppliedVolts = 0.0;
     private double turnAppliedVolts = 0.0;
