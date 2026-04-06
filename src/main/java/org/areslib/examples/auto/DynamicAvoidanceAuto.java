@@ -3,7 +3,7 @@ package org.areslib.examples.auto;
 import org.areslib.command.Command;
 import org.areslib.core.localization.AresFollower;
 import org.areslib.hardware.interfaces.ArrayLidarIO;
-import org.areslib.subsystems.drive.DriveSubsystem;
+import org.areslib.subsystems.drive.SwerveDriveSubsystem;
 
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.Pose;
@@ -28,7 +28,7 @@ public class DynamicAvoidanceAuto extends Command {
      * @param follower The robot's path follower.
      * @param lidarInputs The array LiDAR inputs.
      */
-    public DynamicAvoidanceAuto(DriveSubsystem drive, AresFollower follower, ArrayLidarIO.ArrayLidarInputs lidarInputs) {
+    public DynamicAvoidanceAuto(SwerveDriveSubsystem drive, AresFollower follower, ArrayLidarIO.ArrayLidarInputs lidarInputs) {
         this.follower = follower;
         this.lidarInputs = lidarInputs;
         

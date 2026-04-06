@@ -13,7 +13,7 @@ import org.areslib.hardware.wrappers.AresOctoQuadSensor;
 import org.areslib.hardware.wrappers.CRServoWrapper;
 import org.areslib.hardware.wrappers.DcMotorExWrapper;
 import org.areslib.hardware.coprocessors.OctoMode;
-import org.areslib.subsystems.drive.DriveSubsystem;
+import org.areslib.subsystems.drive.SwerveDriveSubsystem;
 import org.areslib.subsystems.drive.SwerveModuleIOReal;
 import org.areslib.telemetry.AresTelemetry;
 import org.areslib.telemetry.AndroidDashboardBackend;
@@ -33,7 +33,7 @@ import java.util.Arrays;
 @TeleOp(name = "Example: OctoQuad Rev Swerve", group = "ARES Examples")
 public class SwerveRevOctoQuadTeleOp extends AresCommandOpMode {
 
-    private DriveSubsystem driveSubsystem;
+    private SwerveDriveSubsystem driveSubsystem;
     private AresGamepad pilot;
 
     @Override
@@ -47,7 +47,7 @@ public class SwerveRevOctoQuadTeleOp extends AresCommandOpMode {
         AresHardwareManager.initHardware(hardwareMap);
 
         // 3. Initialize Swerve Drive Subsystem wrapping mixed hardware seamlessly
-        driveSubsystem = new DriveSubsystem(
+        driveSubsystem = new SwerveDriveSubsystem(
             // Front Left Module
             new SwerveModuleIOReal(
                 new DcMotorExWrapper(hardwareMap.get(DcMotorEx.class, "flDrive")), // Main Hub Motor

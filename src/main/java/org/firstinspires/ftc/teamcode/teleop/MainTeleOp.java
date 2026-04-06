@@ -10,7 +10,7 @@ import org.areslib.hardware.AresHardwareManager;
 import org.areslib.subsystems.drive.SwerveModuleIOReal;
 import org.areslib.hardware.wrappers.AresGamepad;
 import org.areslib.hardware.wrappers.DcMotorExWrapper;
-import org.areslib.subsystems.drive.DriveSubsystem;
+import org.areslib.subsystems.drive.SwerveDriveSubsystem;
 import org.areslib.telemetry.AresTelemetry;
 import org.areslib.telemetry.AndroidDashboardBackend;
 import org.areslib.telemetry.WpiLogBackend;
@@ -20,7 +20,7 @@ import java.util.Arrays;
 @TeleOp(name = "ARES Main TeleOp", group = "ARES")
 public class MainTeleOp extends AresCommandOpMode {
 
-    private DriveSubsystem driveSubsystem;
+    private SwerveDriveSubsystem driveSubsystem;
     private AresGamepad pilot;
 
     @Override
@@ -34,7 +34,7 @@ public class MainTeleOp extends AresCommandOpMode {
         AresHardwareManager.initHardware(hardwareMap);
 
         // 3. Initialize Drive Subsystem wrapping mixed hardware seamlessly
-        driveSubsystem = new DriveSubsystem(
+        driveSubsystem = new SwerveDriveSubsystem(
             // Front Left
             new SwerveModuleIOReal(
                 new DcMotorExWrapper(hardwareMap.get(DcMotorEx.class, "flDrive")),

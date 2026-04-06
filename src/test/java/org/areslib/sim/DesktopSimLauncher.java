@@ -5,7 +5,7 @@ import java.util.List;
 import org.areslib.command.CommandScheduler;
 import org.areslib.subsystems.drive.SwerveModuleIOSim;
 import org.areslib.hardware.wrappers.ArrayLidarIOSim;
-import org.areslib.subsystems.drive.DriveSubsystem;
+import org.areslib.subsystems.drive.SwerveDriveSubsystem;
 import org.areslib.telemetry.AresTelemetry;
 import org.areslib.telemetry.DesktopLiveBackend;
 import org.areslib.telemetry.WpiLogBackend;
@@ -29,7 +29,7 @@ public class DesktopSimLauncher {
         AresTelemetry.registerBackend(new org.areslib.telemetry.RlogServerBackend(5800));
 
         // 2. Mock Hardware Layer
-        DriveSubsystem driveSubsystem = new DriveSubsystem(
+        SwerveDriveSubsystem driveSubsystem = new SwerveDriveSubsystem(
             new SwerveModuleIOSim(),
             new SwerveModuleIOSim(),
             new SwerveModuleIOSim(),

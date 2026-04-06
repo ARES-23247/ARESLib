@@ -2,7 +2,7 @@ package org.areslib.core.localization;
 
 import org.areslib.command.SubsystemBase;
 import org.areslib.hardware.interfaces.OdometryIO;
-import org.areslib.subsystems.drive.DriveSubsystem;
+import org.areslib.subsystems.drive.SwerveDriveSubsystem;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.FollowerConstants;
@@ -26,7 +26,7 @@ public class AresFollower extends SubsystemBase {
      * @param driveSubsystem The ARES drivetrain subsystem used to actuate the robot.
      * @param odometryInputs The odometry hardware inputs used for pose estimation.
      */
-    public AresFollower(DriveSubsystem driveSubsystem, OdometryIO.OdometryInputs odometryInputs) {
+    public AresFollower(SwerveDriveSubsystem driveSubsystem, OdometryIO.OdometryInputs odometryInputs) {
         // Build dependencies for the Pedro Follower
         AresPedroLocalizer localizer = new AresPedroLocalizer(odometryInputs);
         AresPedroDrivetrain drivetrain = new AresPedroDrivetrain(driveSubsystem);

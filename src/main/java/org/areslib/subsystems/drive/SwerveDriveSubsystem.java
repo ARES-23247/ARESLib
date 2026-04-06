@@ -6,7 +6,7 @@ import org.areslib.command.SubsystemBase;
  * AdvantageKit-style Swerve Drive Subsystem.
  * Acts as the structural controller for handling physics logic across four modules.
  */
-public class DriveSubsystem extends SubsystemBase {
+public class SwerveDriveSubsystem extends SubsystemBase {
 
     private final SwerveModuleIO frontLeft;
     private final SwerveModuleIO frontRight;
@@ -35,13 +35,13 @@ public class DriveSubsystem extends SubsystemBase {
     private final org.areslib.math.controller.SimpleMotorFeedforward driveFeedforward = new org.areslib.math.controller.SimpleMotorFeedforward(0.1, 2.5);
 
     /**
-     * Constructs the DriveSubsystem.
+     * Constructs the SwerveDriveSubsystem.
      * @param frontLeft The front left module IO.
      * @param frontRight The front right module IO.
      * @param backLeft The back left module IO.
      * @param backRight The back right module IO.
      */
-    public DriveSubsystem(
+    public SwerveDriveSubsystem(
             SwerveModuleIO frontLeft, 
             SwerveModuleIO frontRight, 
             SwerveModuleIO backLeft, 
