@@ -182,11 +182,20 @@ public class DesktopSimLauncher {
                 org.areslib.telemetry.AresAutoLogger.processInputs("Sensors/LiDAR", lidarInputs);
                 org.areslib.telemetry.AresAutoLogger.processInputs("Pedro/Odometry", odometryInputs);
                 
-                // Publish Pose2d for the Robot
+                // Publish true physics state as the main robot
                 AresTelemetry.putPose2d("Robot/Pose", 
                     odometryInputs.xMeters, 
                     odometryInputs.yMeters, 
                     odometryInputs.headingRadians
+                );
+
+                // Publish Pedro's internally tracked odometry estimate (for divergence testing)
+                // Pedro Pathing inherently operates mathematically in INCHES, but AdvantageScope expects METERS.
+                com.pedropathing.geometry.Pose estimatedPose = robotContainer.getFollower().getPose();
+                AresTelemetry.putPose2d("Pedro/EstimatedPose", 
+                    estimatedPose.getX() * 0.0254, 
+                    estimatedPose.getY() * 0.0254, 
+                    estimatedPose.getHeading()
                 );
 
 

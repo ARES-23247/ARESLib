@@ -3,7 +3,7 @@ package org.areslib.core;
 /**
  * Centralized field boundary constants for the FTC competition environment.
  * <p>
- * Pedro Pathing operates in inches with origin at bottom-left corner.
+ * Pedro Pathing operates in inches with origin at field center.
  * Vision systems (Limelight) operate in meters with origin at field center.
  * Both coordinate systems are defined here to ensure consistency across
  * bounds-checking in {@code AresFollower} and {@code VisionSubsystem}.
@@ -12,19 +12,22 @@ public final class FieldConstants {
 
     private FieldConstants() {} // Utility class — no instantiation
 
-    // ========== Pedro Pathing Coordinates (inches, origin = bottom-left) ==========
+    // ========== Pedro Pathing Coordinates (inches, origin = field center) ==========
 
     /** Field width/height in inches (12 feet = 144 inches). */
     public static final double FIELD_SIZE_INCHES = 144.0;
 
+    /** Half-field size in inches. */
+    public static final double HALF_FIELD_INCHES = FIELD_SIZE_INCHES / 2.0;
+
     /** Tolerance padding in inches for robot overhang beyond field walls. */
     public static final double WALL_PADDING_INCHES = 12.0;
 
-    /** Minimum valid X/Y in Pedro coordinates. */
-    public static final double MIN_POSITION_INCHES = -WALL_PADDING_INCHES;
+    /** Minimum valid X/Y in Pedro coordinates (center-origin). */
+    public static final double MIN_POSITION_INCHES = -HALF_FIELD_INCHES - WALL_PADDING_INCHES;
 
-    /** Maximum valid X/Y in Pedro coordinates. */
-    public static final double MAX_POSITION_INCHES = FIELD_SIZE_INCHES + WALL_PADDING_INCHES;
+    /** Maximum valid X/Y in Pedro coordinates (center-origin). */
+    public static final double MAX_POSITION_INCHES = HALF_FIELD_INCHES + WALL_PADDING_INCHES;
 
     // ========== Vision Coordinates (meters, origin = field center) ==========
 
