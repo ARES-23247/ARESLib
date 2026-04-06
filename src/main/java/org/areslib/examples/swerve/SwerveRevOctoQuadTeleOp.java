@@ -20,8 +20,9 @@ import org.areslib.telemetry.AndroidDashboardBackend;
 import org.areslib.telemetry.WpiLogBackend;
 
 import org.areslib.hardware.wrappers.PinpointOdometryWrapper;
-import org.areslib.hardware.wrappers.DigitalSensorWrapper;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
+import org.areslib.hardware.interfaces.AresDigitalSensor;
+import org.areslib.hardware.wrappers.AresSrsSensor;
+import org.areslib.hardware.wrappers.SrsMode;
 import org.areslib.hardware.interfaces.OdometryIO;
 import org.areslib.telemetry.AresAutoLogger;
 
@@ -44,7 +45,7 @@ public class SwerveRevOctoQuadTeleOp extends AresCommandOpMode {
 
     private PinpointOdometryWrapper pinpoint;
     private OdometryIO.OdometryInputs pinpointInputs = new OdometryIO.OdometryInputs();
-    private DigitalSensorWrapper floodgateSwitch;
+    private AresDigitalSensor floodgateSwitch;
 
     @Override
     public void robotInit() {
@@ -56,11 +57,11 @@ public class SwerveRevOctoQuadTeleOp extends AresCommandOpMode {
         // This will automatically find and instantiate the "octoquad" from the FTC Hardware Map
         AresHardwareManager.initHardware(hardwareMap);
 
-        // Map the goBILDA pinpoint hardware
+        // Map the goBILDA pinpoint hardware (Physically connected to an SRS Hub I2C port)
         pinpoint = new PinpointOdometryWrapper(hardwareMap, "pinpoint");
         
-        // Map the goBILDA floodgate switch
-        floodgateSwitch = new DigitalSensorWrapper(hardwareMap.get(DigitalChannel.class, "floodgate"));
+        // Map the goBILDA floodgate switch (Physically connected to SRS Hub digital port 0)
+        floodgateSwitch = new AresSrsSensor(0, SrsMode.DIGITAL);
 
         // 3. Initialize Swerve Drive Subsystem wrapping mixed hardware seamlessly
         driveSubsystem = new SwerveDriveSubsystem(
