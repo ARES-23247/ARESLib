@@ -20,7 +20,20 @@ public class MainAuto extends AresCommandOpMode {
         // 2. Initialize Hardware map state via the core architectural container
         robot = new RobotContainer(hardwareMap, gamepad1, gamepad2);
 
-        // 3. Schedule the autonomous routine!
+        // 3. Pre-Match Initialization Loop
+        // Commonly used for identifying randomized game elements via computer vision
+        while (!isStarted() && !isStopRequested()) {
+            // Actively poll the camera pipeline while waiting
+            robot.getVision().periodic();
+
+            AresTelemetry.putString("Match Info", "Waiting for match start...");
+            AresTelemetry.putString("Vision Locked", String.valueOf(robot.getVision().hasTarget()));
+            AresTelemetry.putString("Auto Selection", "TeamAutoCommand");
+            AresTelemetry.update();
+            sleep(20);
+        }
+
+        // 4. Match Started: Schedule the autonomous routine!
         CommandScheduler.getInstance().schedule(robot.getAutonomousCommand());
     }
 }

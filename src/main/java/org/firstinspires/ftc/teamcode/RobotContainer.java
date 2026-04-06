@@ -168,4 +168,18 @@ public class RobotContainer {
         // You can substitute this with any other chain via a smart dashboard selector!
         return new TeamAutoCommand(follower, elevator);
     }
+    
+    /**
+     * Expose odometry interfaces to the OpMode launcher for manual resets.
+     */
+    public AresFollower getFollower() {
+        return follower;
+    }
+
+    /**
+     * Expose vision interface for pre-match target locking.
+     */
+    public VisionSubsystem getVision() {
+        return vision;
+    }
 }

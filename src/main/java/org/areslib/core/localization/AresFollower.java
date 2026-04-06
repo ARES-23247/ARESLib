@@ -44,6 +44,15 @@ public class AresFollower extends SubsystemBase {
     public com.pedropathing.geometry.Pose getPose() {
         return this.follower.getPose();
     }
+    
+    /**
+     * Overrides the current tracked pose of the underlying localizer.
+     *
+     * @param pose The new {@link com.pedropathing.geometry.Pose} to lock tracking to.
+     */
+    public void setPose(com.pedropathing.geometry.Pose pose) {
+        this.follower.setPose(pose);
+    }
 
     /**
      * Retrieves the underlying Pedro Pathing Follower instance.
