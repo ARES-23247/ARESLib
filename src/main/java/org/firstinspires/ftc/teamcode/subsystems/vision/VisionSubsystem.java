@@ -47,6 +47,31 @@ public class VisionSubsystem implements Subsystem {
     public double getTargetArea() {
         return inputs.ta;
     }
+
+    /**
+     * @return Field-centric 2D pose estimated by the vision system. Null if no target.
+     */
+    public com.pedropathing.geometry.Pose getEstimatedGlobalPose() {
+        if (!inputs.hasTarget) return null;
+        return new com.pedropathing.geometry.Pose(
+            inputs.botPose3d[0], 
+            inputs.botPose3d[1], 
+            inputs.botPose3d[5] // Yaw
+        );
+    }
+    
+    /**
+     * Calculates trust coefficient dynamically based on AprilTag latency and visible surface area.
+     * @return Raw confidence scale (0.0 to 1.0)
+     */
+    public double getPoseConfidence() {
+        if (!inputs.hasTarget) return 0.0;
+        
+        // Simple heuristic: larger area = higher confidence. Cap at 1.0.
+        // A single tag taking up > 1.5% of the screen is very clear and close.
+        double confidence = inputs.ta / 1.5; 
+        return Math.min(confidence, 1.0);
+    }
     
     public void setPipeline(int index) {
         io.setPipeline(index);

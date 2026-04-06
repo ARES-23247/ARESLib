@@ -114,6 +114,11 @@ public class RobotContainer {
         follower = new AresFollower(drive, pinpointInputs);
         CommandScheduler.getInstance().registerSubsystem(follower);
 
+        // Register the background asynchronous sensor fusion algorithms
+        CommandScheduler.getInstance().registerSubsystem(
+            new org.firstinspires.ftc.teamcode.subsystems.SensorFusionSubsystem(follower, vision)
+        );
+
         // 2. Map Gamepads (OpModes pass real gamepads or null context)
         if (gamepad1 != null && gamepad2 != null) {
             driver = new AresGamepad(gamepad1);
