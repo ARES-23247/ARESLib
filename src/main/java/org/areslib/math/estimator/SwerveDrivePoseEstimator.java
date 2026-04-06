@@ -107,7 +107,7 @@ public class SwerveDrivePoseEstimator {
         Twist2d replayTwist = sample.log(m_estimatedPose);
         m_estimatedPose = correctedRetroPose.exp(replayTwist);
         
-        // Technically WPILib forces an explicit rebuild of Odometry's internal Pose, we do this:
-        m_odometry.resetPosition(m_odometry.getPose().getRotation(), new SwerveModulePosition[4], m_estimatedPose); // The odometry class will ignore position arrays for position resetting inside WPILib
+        // Technically WPILib forces an explicit rebuild of Odometry's internal Pose, we do this without destroying wheel buffers:
+        m_odometry.resetTranslation(m_estimatedPose);
     }
 }

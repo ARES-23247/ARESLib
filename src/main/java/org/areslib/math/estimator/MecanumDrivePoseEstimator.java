@@ -106,6 +106,6 @@ public class MecanumDrivePoseEstimator {
         Twist2d replayTwist = sample.log(m_estimatedPose);
         m_estimatedPose = correctedRetroPose.exp(replayTwist);
         
-        m_odometry.resetPosition(m_odometry.getPose().getRotation(), new MecanumDriveWheelPositions(0,0,0,0), m_estimatedPose); 
+        m_odometry.resetTranslation(m_estimatedPose);
     }
 }

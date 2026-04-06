@@ -61,6 +61,15 @@ public class SwerveDriveOdometry {
     }
 
     /**
+     * Resets the robot's pose translation without disrupting internal kinematic wheel buffers.
+     * Necessary for Vision Estimators.
+     * @param pose The new pose of the robot.
+     */
+    public void resetTranslation(Pose2d pose) {
+        m_pose = pose;
+    }
+
+    /**
      * Retrieves the estimated pose of the robot.
      */
     public Pose2d getPose() {
