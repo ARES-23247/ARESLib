@@ -1,0 +1,94 @@
+package org.firstinspires.ftc.teamcode.commands;
+
+import org.areslib.command.Command;
+import org.areslib.core.localization.AresFollower;
+import org.firstinspires.ftc.teamcode.subsystems.elevator.ElevatorSubsystem;
+
+import com.pedropathing.geometry.BezierCurve;
+import com.pedropathing.geometry.Pose;
+import com.pedropathing.paths.PathChain;
+
+public class TeamAutoCommand extends Command {
+    private final AresFollower follower;
+    private final ElevatorSubsystem elevator;
+    private int state = 0;
+    
+    private final PathChain toScore;
+    private final PathChain toPark;
+    
+    private ElevatorToPositionCommand elevatorScore;
+
+    public TeamAutoCommand(AresFollower follower, ElevatorSubsystem elevator) {
+        this.follower = follower;
+        this.elevator = elevator;
+        addRequirements(follower, elevator); // Claim ownership of subsystems
+        
+        // Define poses (X, Y, Heading radians)
+        Pose startPose = new Pose(0, 0, Math.toRadians(0));
+        Pose scorePose = new Pose(24, 0, Math.toRadians(0)); 
+        Pose parkPose = new Pose(24, 24, Math.toRadians(90)); 
+        
+        // Build path chains using Bezier Curves (2 points = straight line)
+        toScore = follower.getFollower().pathBuilder()
+            .addPath(new BezierCurve(startPose, scorePose))
+            .setLinearHeadingInterpolation(startPose.getHeading(), scorePose.getHeading())
+            .build();
+            
+        toPark = follower.getFollower().pathBuilder()
+            .addPath(new BezierCurve(scorePose, parkPose))
+            .setLinearHeadingInterpolation(scorePose.getHeading(), parkPose.getHeading())
+            .build();
+            
+        follower.getFollower().setStartingPose(startPose);
+    }
+
+    @Override
+    public void initialize() {
+        state = 0;
+    }
+
+    @Override
+    public void execute() {
+        switch(state) {
+            case 0:
+                follower.followPath(toScore, true); // Hold end position
+                state = 1;
+                break;
+            case 1:
+                if (!follower.isBusy()) {
+                    // Reached target, run elevator to 0.8 meters
+                    elevatorScore = new ElevatorToPositionCommand(elevator, 0.8);
+                    elevatorScore.initialize();
+                    state = 2;
+                }
+                break;
+            case 2:
+                elevatorScore.execute();
+                if (elevatorScore.isFinished()) {
+                    elevatorScore.end(false);
+                    // Elevator is up, move to park
+                    follower.followPath(toPark, false);
+                    state = 3;
+                }
+                break;
+            case 3:
+                if (!follower.isBusy()) {
+                    // Reached park position
+                    state = 4;
+                }
+                break;
+        }
+    }
+
+    @Override
+    public boolean isFinished() {
+        return state == 4;
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+        if (interrupted) {
+            follower.breakFollowing();
+        }
+    }
+}
