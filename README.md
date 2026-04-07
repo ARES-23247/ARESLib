@@ -18,6 +18,21 @@ A professional-grade, Command-Based FTC robot framework with AdvantageKit-style 
 
 ---
 
+## Where to Start (Students)
+
+You don't need to understand the whole framework. Here are the 4 things that matter:
+
+| # | Concept | What to Read | Key File |
+|:--|:--------|:-------------|:---------|
+| 1 | **Commands** — How robot actions are structured | `.agents/skills/areslib-commands/SKILL.md` | `src/.../command/Command.java` |
+| 2 | **Architecture** — IO pattern + coordinate systems | `.agents/skills/areslib-architecture/SKILL.md` | `src/.../core/CoordinateUtil.java` |
+| 3 | **Faults** — What happens when hardware breaks | `.agents/skills/areslib-faults/SKILL.md` | `src/.../faults/AresFaultManager.java` |
+| 4 | **Testing** — How to verify your code works | `.agents/skills/areslib-testing/SKILL.md` | `src/test/java/org/areslib/` |
+
+**When something breaks at competition**, open [`docs/PIT_DEBUGGING.md`](docs/PIT_DEBUGGING.md) — it has a flowchart from controller LED color to the exact AdvantageScope key to check.
+
+---
+
 ## Elite Features
 
 | Feature | Description |
