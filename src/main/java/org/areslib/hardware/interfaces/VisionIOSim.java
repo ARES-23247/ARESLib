@@ -12,7 +12,8 @@ import java.util.Random;
  * This class generates synthetic vision data based on the robot's known position
  * in the dyn4j physics world. It simulates:
  * <ul>
- *   <li>AprilTag positions matching the DECODE (2025-2026) field layout</li>
+ *   <li>2 AprilTag positions matching the DECODE (2025-2026) field layout
+ *       (Tag 20: Blue Goal, Tag 24: Red Goal)</li>
  *   <li>Camera field-of-view cone filtering</li>
  *   <li>Distance-based confidence (area) scaling</li>
  *   <li>Gaussian noise on position measurements</li>
@@ -73,29 +74,21 @@ public class VisionIOSim implements VisionIO {
     }
 
     // ========== DECODE 2025-2026 AprilTag Layout ==========
-    // Tags are mounted on the perimeter walls at ~6 inches (0.1524m) height.
-    // Coordinates are in meters, field-center origin.
-    // Wall positions: ±1.83m (half of 3.66m field)
+    // DECODE has only 2 AprilTags usable for robot localization:
+    //   - Tag 20: Blue Alliance Goal (corner at approx -1.5, -1.5)
+    //   - Tag 24: Red Alliance Goal  (corner at approx +1.5, +1.5)
+    //
+    // The Obelisk (Tags 21-23) is placed OUTSIDE the field perimeter
+    // and is NOT intended for navigation per the game manual.
+    //
+    // Coordinates are in meters, field-center origin, matching DecodeFieldSim.
+    // Goal tags face inward toward field center.
     private static final AprilTagPose[] FIELD_TAGS = {
-        // +Y wall (Blue driver station side), tags face -Y
-        new AprilTagPose(1,  -0.9, 1.83, 0.15, -Math.PI / 2.0),
-        new AprilTagPose(2,   0.0, 1.83, 0.15, -Math.PI / 2.0),
-        new AprilTagPose(3,   0.9, 1.83, 0.15, -Math.PI / 2.0),
+        // Blue Goal — opposite corner from Red, faces toward field center (+X, +Y direction)
+        new AprilTagPose(20, -1.5, -1.5, 0.20, Math.PI / 4.0),
 
-        // -Y wall (Red driver station side), tags face +Y
-        new AprilTagPose(4,   0.9, -1.83, 0.15, Math.PI / 2.0),
-        new AprilTagPose(5,   0.0, -1.83, 0.15, Math.PI / 2.0),
-        new AprilTagPose(6,  -0.9, -1.83, 0.15, Math.PI / 2.0),
-
-        // +X wall (right side), tags face -X
-        new AprilTagPose(7,  1.83,  0.9, 0.15, Math.PI),
-        new AprilTagPose(8,  1.83,  0.0, 0.15, Math.PI),
-        new AprilTagPose(9,  1.83, -0.9, 0.15, Math.PI),
-
-        // -X wall (left side), tags face +X
-        new AprilTagPose(10, -1.83, -0.9, 0.15, 0.0),
-        new AprilTagPose(11, -1.83,  0.0, 0.15, 0.0),
-        new AprilTagPose(12, -1.83,  0.9, 0.15, 0.0),
+        // Red Goal — faces toward field center (-X, -Y direction)
+        new AprilTagPose(24,  1.5,  1.5, 0.20, -3.0 * Math.PI / 4.0),
     };
 
     private final Config config;
