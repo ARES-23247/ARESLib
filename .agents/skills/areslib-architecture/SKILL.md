@@ -129,25 +129,4 @@ In high-fidelity simulation, encoder distance and field translation will never p
 ### Pedro Pathing Static Configuration
 `AresPedroConstants.configure()` may throw if called twice (e.g., across JUnit tests). Always wrap in try/catch or guard with a static `configured` flag.
 
-## 10. Skill Cross-Reference
-
-| Need | Skill |
-|:---|:---|
-| Drive subsystems & kinematics | `areslib-drivetrain` |
-| Path following & autonomous | `areslib-autonomous` |
-| Pedro Pathing API | `pedro-pathing` |
-| Physics simulation | `areslib-simulation` |
-| PID/feedforward/filters | `areslib-math` |
-| Vision pipelines | `areslib-vision` |
-| Hardware abstractions | `areslib-hardware` |
-| Commands & buttons | `areslib-commands` |
-| State machines | `areslib-statemachine` |
-| Fault management | `areslib-faults` |
-| Telemetry & logging | `areslib-telemetry` |
-| Testing patterns | `areslib-testing` |
-| AdvantageScope layouts | `advantagescope-layouts` |
-| HUD & simulation viz | `advantagescope-hud-sim` |
-| Build system | `gradle-ftc-desktop` |
-| CI/CD pipeline | `areslib-ci` |
-| Robot deployment | `robot-dev` |
-| Creating new skills | `skill-authoring` |
+For the full skill routing table, see the `areslib` skill.
