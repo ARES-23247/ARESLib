@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "name": "robot-dev",
+  "owner": "ncssm-robotics",
+  "repo": "ftc-claude",
+  "path": "plugins/robot-dev/skills/robot-dev",
+  "branch": "develop",
+  "sha": "504d114d4d1278b396d68e19d6c8474a50cc2084",
+  "source": "manual"
+}

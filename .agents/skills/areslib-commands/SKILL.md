@@ -1,0 +1,155 @@
+---
+name: areslib-commands
+description: Helps construct custom ARESLib2 WPILib-style commands, subsystem bases, and integration hooks with PedroPathing natively avoiding FTClib overlaps.
+license: MIT
+compatibility: Claude Code, Codex CLI, VS Code Copilot, Cursor
+metadata:
+  author: areslib-agent
+  version: "2.0.0"
+  category: library
+---
+
+# ARESLib Native Command Architecture
+
+ARESLib explicitly completely bypasses the legacy `FTCLib` library, shipping with a completely custom `org.areslib.command` WPILib-ported architecture. Do NOT use `com.arcrobotics.ftclib`. 
+
+## 1. Subsystem Configuration
+When generating subsystems:
+- Extend `org.areslib.command.SubsystemBase`.
+- Use standard `public void periodic()` loops to execute AdvantageKit updates.
+- Keep state logic heavily encapsulated inside `[Subsystem]IO` components to ensure identical mock environments during Desktop Simulation.
+
+## 2. Command Types & Imports
+Always import these from `org.areslib.command`:
+- `Command`
+- `SequentialCommandGroup`, `ParallelCommandGroup`, `ParallelRaceGroup`, `ParallelDeadlineGroup`
+- `ConditionalCommand` — runs one of two commands based on a boolean supplier
+- `SelectCommand` — runs one command from a map based on a key supplier
+- `InstantCommand`, `RunCommand`, `WaitCommand`, `PrintCommand`
+
+Example basic subsystem and default command pattern:
+```java
+// DriveSystem must implement `org.areslib.command.SubsystemBase`
+driveSystem.setDefaultCommand(
+    new RunCommand(() -> driveSystem.drive(0, 0, 0), driveSystem)
+);
+```
+
+## 3. CommandScheduler — The Execution Engine
+
+The `CommandScheduler` is a singleton that orchestrates ALL subsystem periodics, command execution, and button polling. Its `run()` method executes in this strict order:
+
+1. Subsystem `periodic()` methods
+2. Default commands scheduled for idle subsystems
+3. Button binding loops polled
+4. Scheduled commands' `execute()` called
+5. Finished commands removed, `end()` called
+6. Loop time logged to `Ares/LoopTime_ms`
+
+### Critical Lifecycle Methods
+```java
+CommandScheduler scheduler = CommandScheduler.getInstance();
+
+// Register subsystems (REQUIRED for periodic() to run)
+scheduler.registerSubsystem(driveSubsystem, elevatorSubsystem);
+
+// Schedule a command
+scheduler.schedule(new MyAutoCommand(drive));
+
+// Set default commands
+scheduler.setDefaultCommand(drive, new RunCommand(() -> drive.stop(), drive));
+
+// Check if a command is running
+boolean isRunning = scheduler.isScheduled(myCommand);
+
+// Cancel everything
+scheduler.cancelAll();
+
+// FULL reset between OpModes (Auto → TeleOp)
+scheduler.reset();  // Clears subsystems, defaults, buttons, and scheduled commands
+```
+
+### In your main loop:
+```java
+@Override
+public void loop() {
+    CommandScheduler.getInstance().run();  // MUST be called every loop
+    AresTelemetry.update();               // Flush telemetry
+}
+```
+
+## 4. `AresGamepad` Button Bindings
+
+The `AresGamepad` wrapper provides WPILib-style `Trigger` objects for reactive button bindings. Triggers are lazily cached — safe to call repeatedly in `configureBindings()`.
+
+### Available Trigger Accessors
+```java
+AresGamepad driver = new AresGamepad(gamepad1);
+
+driver.a()            // A / Cross button
+driver.b()            // B / Circle button  
+driver.x()            // X / Square button
+driver.y()            // Y / Triangle button
+driver.leftBumper()   // Left bumper
+driver.rightBumper()  // Right bumper
+driver.dpadUp()       // D-pad directions
+driver.dpadDown()
+driver.dpadLeft()
+driver.dpadRight()
+```
+
+### Binding Commands to Buttons
+```java
+// Runs command once when button is first pressed
+driver.a().onTrue(new InstantCommand(() -> intake.startIntake()));
+
+// Runs command continuously while held, cancels on release
+driver.rightBumper().whileTrue(new RunCommand(() -> shooter.spinUp(), shooter));
+
+// Runs command once when button is released
+driver.b().onFalse(new InstantCommand(() -> gripper.open()));
+```
+
+### Axis Accessors (pre-inverted)
+```java
+driver.getLeftX()           // Left stick X [-1, 1]
+driver.getLeftY()           // Left stick Y [-1, 1] (UP = POSITIVE, already inverted)
+driver.getRightX()          // Right stick X
+driver.getRightY()          // Right stick Y (UP = POSITIVE, already inverted)
+driver.getLeftTriggerAxis() // Left trigger [0, 1]
+driver.getRightTriggerAxis()// Right trigger [0, 1]
+```
+
+## 5. `addRequirements()` — Subsystem Exclusivity
+
+Commands MUST declare their subsystem requirements to prevent conflicts:
+```java
+public class ScoreCommand extends Command {
+    public ScoreCommand(ElevatorSubsystem elevator, ArmSubsystem arm) {
+        addRequirements(elevator, arm);  // Ensures exclusive access
+    }
+}
+```
+
+If two commands require the same subsystem, the newly scheduled command **interrupts** the existing one (calls `end(true)` on it).
+
+## 6. Pedro Pathing Command Hooks
+Do not write custom `while(!follower.isBusy())` loops in standard Command execution blocks. 
+ARESLib abstracts path following through custom sequential chains.
+
+- Use proper WPILib `isFinished()` methodologies:
+```java
+public class FollowPathCommand extends Command {
+    private final AresFollower follower;
+
+    public FollowPathCommand(AresFollower aresFollower, PathChain chain) {
+        this.follower = aresFollower;
+        addRequirements(aresFollower); // Exclusive follower access
+    }
+
+    @Override
+    public boolean isFinished() {
+        return !follower.isBusy(); // Standard Pedro finished check
+    }
+}
+```

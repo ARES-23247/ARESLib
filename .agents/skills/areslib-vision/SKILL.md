@@ -1,0 +1,96 @@
+---
+name: areslib-vision
+description: Helps write and configure Vision pipelines (PhotonVision, Limelight) inside ARESLib2. Use when injecting AprilTag 3D Odometry poses, configuring `VisionIO` interfaces, or mapping vision data properly into the AdvantageScope 3D field layout.
+license: MIT
+compatibility: Claude Code, Codex CLI, VS Code Copilot, Cursor
+metadata:
+  author: areslib-agent
+  version: "2.0.0"
+  category: vision
+---
+
+# ARESLib2 Vision Architecture
+
+The `ARESLib2` framework natively supports multi-camera sensor fusion, but strict interface implementation rules must be followed to ensure AdvantageKit logs the 3D poses natively without breaking the determinism of the simulation.
+
+## 1. IO Abstraction Requirement
+All vision target generation MUST be hidden behind a `VisionIO` layer. Three implementations exist:
+- **`VisionIO`** (`org.areslib.hardware.interfaces.VisionIO`) — Base interface
+- **`LimelightVisionWrapper`** (`org.areslib.hardware.wrappers.LimelightVisionWrapper`) — Real Limelight hardware
+- **`ArrayVisionIOSim`** (`org.areslib.hardware.wrappers.ArrayVisionIOSim`) — Simulated vision for desktop testing
+
+## 2. Actual `VisionInputs` Data Structure (from `VisionIO.java`)
+The inputs class implements `AresLoggableInputs` and contains these exact fields:
+
+```java
+class VisionInputs implements AresLoggableInputs {
+    public boolean hasTarget = false;           // True if a valid target is visible
+    public double tx = 0.0;                     // Target X offset (degrees)
+    public double ty = 0.0;                     // Target Y offset (degrees)
+    public double ta = 0.0;                     // Target area (% of image)
+    public double[] botPose3d = new double[7];  // Primary robot pose [x,y,z,w,i,j,k]
+    public double[] botPoseMegaTag2 = new double[7]; // Secondary MegaTag2 pose
+    public double latencyMs = 0.0;              // Pipeline latency in ms
+    public int pipelineIndex = 0;               // Active pipeline index
+    public int fiducialCount = 0;               // Number of visible AprilTags
+    public double[] rawCameraPoses = new double[0]; // Multi-camera packed poses (N*7)
+}
+```
+
+**Critical format note:** `botPose3d` is a 7-element quaternion array `[x, y, z, w, i, j, k]` — NOT Euler angles. See `areslib-architecture` skill for quaternion conversion formulas.
+
+## 3. Pose Estimator Injection
+Once the `VisionIO` layer processes the target, fuse it with odometry via the pose estimator:
+
+- **NEVER** overwrite the odometry `Pose2d` statically.
+- **ALWAYS** fuse with standard deviations representing distance uncertainty:
+
+```java
+// Inside DriveSubsystem periodic()
+if (visionInputs.hasTarget && visionInputs.fiducialCount > 0) {
+    poseEstimator.addVisionMeasurement(
+        visionPose2d,                                          // Extracted from botPose3d
+        Timer.getFPGATimestamp() - (visionInputs.latencyMs / 1000.0), // Latency-compensated timestamp
+        VecBuilder.fill(0.5, 0.5, Math.toRadians(10))          // Dynamic covariance
+    );
+}
+```
+
+## 4. Multi-Camera Fusion Pattern
+When using multiple Limelights, the `LimelightVisionWrapper` employs **Winner-Takes-All** logic:
+- Each camera's `Target Area (ta)` is compared
+- The camera with the LARGEST `ta` (closest to target) provides the primary `botPose3d`
+- ALL cameras' poses are packed into `rawCameraPoses` as sequential 7-element arrays for ghost visualization in AdvantageScope
+
+## 5. AdvantageScope 3D Rendering (MCP)
+When setting up `layout.json` tabs via MCP:
+- Inject `botPose3d` into a `Field3d` tab as `log_type: "Pose3d"` 
+- Inject `rawCameraPoses` as `log_type: "Pose3d[]"` to render multi-camera ghosts
+- Ensure the 7-element quaternion format is used (NOT 6-element Euler)
+
+## 6. Available Methods on `VisionIO`
+```java
+void updateInputs(VisionInputs inputs);  // Populate inputs from hardware
+void setPipeline(int index);             // Switch vision pipeline
+```
+
+## 7. Anti-Patterns
+
+### Don't: Use tx/ty for 3D pose estimation
+```java
+// BAD — tx/ty are 2D angular offsets, not positions
+double robotX = visionInputs.tx;
+
+// GOOD — use the full 3D pose array
+double robotX = visionInputs.botPose3d[0]; // X in meters
+```
+
+### Don't: Ignore latency compensation
+```java
+// BAD — stale vision data applied at current timestamp
+poseEstimator.addVisionMeasurement(pose, Timer.getFPGATimestamp(), stdDevs);
+
+// GOOD — subtract pipeline latency
+poseEstimator.addVisionMeasurement(pose, 
+    Timer.getFPGATimestamp() - (visionInputs.latencyMs / 1000.0), stdDevs);
+```
