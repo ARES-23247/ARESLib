@@ -21,18 +21,43 @@ ARESLib2 is packed with Einstein-tested capabilities that abstract complex kinem
 - **Persistent Fault Management**: `AresFaultManager` natively tracks and categorizes hardware alerts, broadcasting to AdvantageScope and automatically trigging haptic/LED feedback.
 - **Odometry & Localizer Independence**: Built-in generic hardware abstractions for modules like the GoBilda Pinpoint.
 
-## Project Structure
+## Project Structure (Directory Map)
 
-This project uses a standard FRC Command-Based structure, relying heavily on encapsulation using Hardware IO Abstraction.
+To ensure the framework remains cleanly modular, the repository strictiy separates the backend architecture from the user's specific competition code:
 
-*   `src/main/java/org/areslib/` – The core framework wrappers, physical kinematics, and telemetry trackers.
-*   `src/main/java/org/firstinspires/ftc/teamcode/` – Your actual highly-customizable robot code.
-    *   `RobotContainer.java` - The central hub where hardware implementations of subsystems are swapped dynamically via `AresRobot.isSimulation()`.
-    *   `Constants.java` - Centralized team logic.
+```text
+├── src/main/java/org/areslib/             # Protected Framework Backend
+│   ├── core/                              # Base hardware abstractions
+│   ├── math/                              # Kinematics and geometry utilities
+│   ├── subsystems/                        # Standardized, highly-tuned components
+│   └── telemetry/                         # AdvantageKit logging pipelines
+│
+└── src/main/java/org/firstinspires/ftc/teamcode/ # User Competition Footprint
+    ├── commands/                          # Autonomous and teleop routines
+    ├── Constants.java                     # Robot-specific tuning variables
+    └── RobotContainer.java                # Hardware IO dependency bindings
+```
 
-## FRC-Style Hardware Abstraction
+## FRC-Style Hardware Abstraction Interfaces
 
-ARESLib2 leverages FRC AdvantageKit's IO paradigm. `RobotContainer.java` automatically decides whether to instantiate subsystems using Real Hardware Wrappers (like `SwerveModuleIOReal`) or Sim Physics Layers (like `SwerveModuleIOSim`) based on the active simulation flag. This allows you to completely isolate logic code from hardware code!
+ARESLib2 leverages FRC AdvantageKit's IO paradigm. The secret behind instantly pivoting your code from physical motors to 2D simulations is **Dependency Injection**. The following diagram explains how logic loops remain completely isolated from hardware loops:
+
+```mermaid
+flowchart TD
+    Container[RobotContainer] --> |Instantiates| Subsystem[Subsystems]
+    
+    Subsystem --> |Constructs with| IOInterface{SubsystemIO Interface}
+    
+    IOInterface --> |Simulation Mode| IOSim[SubsystemIOSim]
+    IOInterface --> |Deploy Mode| IOReal[SubsystemIOReal]
+    
+    IOSim --> |Log Structure| AKLogger[(AdvantageKit Database)]
+    IOReal --> |Log Structure| AKLogger
+    
+    IOSim -.-> |Dyn4j Constraints| Sim[Physics Engine]
+    IOReal -.-> |CAN / I2C Limits| Hardware[Physical Control Hub]
+```
+`RobotContainer.java` implicitly constructs subsystems with either Real Hardware Wrappers (like `SwerveModuleIOReal`) or Sim Physics Layers (like `SwerveModuleIOSim`) based on the active `AresRobot.isSimulation()` configuration.
 
 ## Running the Simulator Locally
 
