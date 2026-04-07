@@ -46,7 +46,7 @@ public class ArrayLidarIOSim implements ArrayLidarIO, FaultMonitor {
             inputs.distanceZonesMm = new double[resolution];
         }
 
-        if (AresHardwareFaultInjector.simulateI2CCrash) {
+        if (org.areslib.core.AresRobot.isSimulation() && AresHardwareFaultInjector.simulateI2CCrash) {
             faultTripped = true;
             for (int i = 0; i < resolution; i++) {
                 inputs.distanceZonesMm[i] = 0.0;

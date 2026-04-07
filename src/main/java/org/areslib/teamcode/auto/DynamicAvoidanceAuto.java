@@ -69,7 +69,7 @@ public class DynamicAvoidanceAuto extends Command {
                 // Focus on the center columns (e.g. out of 8 cols, cols 3 and 4)
                 if (col == (gridDim / 2) - 1 || col == (gridDim / 2)) {
                     int index = (row * gridDim) + col;
-                    double distMeters = lidarInputs.distanceZonesMm[index] / 1000.0;
+                    double distMeters = org.areslib.core.CoordinateUtil.mmToMeters(lidarInputs.distanceZonesMm[index]);
                     if (distMeters < 0.5) {
                         obstacleAhead = true;
                         break;

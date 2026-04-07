@@ -17,7 +17,7 @@ public class OtosOdometryWrapper implements OdometryIO, FaultMonitor {
 
     @Override
     public void updateInputs(OdometryInputs inputs) {
-        if (AresHardwareFaultInjector.simulateEncoderShatter) {
+        if (org.areslib.core.AresRobot.isSimulation() && AresHardwareFaultInjector.simulateEncoderShatter) {
             faultTripped = true;
             // Overwrite with zeros to simulate severed tracking lines
             inputs.xMeters = 0.0;

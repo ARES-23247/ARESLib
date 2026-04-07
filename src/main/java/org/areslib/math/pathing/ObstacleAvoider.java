@@ -20,7 +20,10 @@ public class ObstacleAvoider {
     private static final double RESOLUTION_INCHES = 4.0;
     private static final int GRID_SIZE = (int) (FIELD_SIZE / RESOLUTION_INCHES);
 
-    private final List<Obstacle> obstacles = new ArrayList<>();
+    /** Permanent field geometry obstacles (Obelisks, walls, etc.) — never cleared by LiDAR flush. */
+    private final List<Obstacle> staticObstacles = new ArrayList<>();
+    /** Temporary sensor-detected obstacles — flushed every few seconds by LiDAR fusion. */
+    private final List<Obstacle> dynamicObstacles = new ArrayList<>();
 
     public static class Obstacle {
         public final Translation2d minBounds;
@@ -58,25 +61,28 @@ public class ObstacleAvoider {
         }
     }
 
+    /**
+     * Adds a permanent static obstacle (e.g., known field structures like Obelisks).
+     * These are never cleared by {@link #clearDynamicObstacles()}.
+     */
     public void addObstacle(Translation2d min, Translation2d max) {
-        obstacles.add(new Obstacle(min, max));
+        staticObstacles.add(new Obstacle(min, max));
     }
 
     /**
-     * Dynamically paints a point on the field as an obstacle.
-     * Treats the coordinate as a dense point bounding box so the A-Star grid will path around it.
+     * Dynamically paints a point on the field as a temporary obstacle.
+     * These are cleared periodically by {@link #clearDynamicObstacles()}.
      */
     public void addDynamicPoint(double x, double y) {
-        // Create an obstacle with a 1-inch bounding box centered on point
-        obstacles.add(new Obstacle(new Translation2d(x - 0.5, y - 0.5), new Translation2d(x + 0.5, y + 0.5)));
+        dynamicObstacles.add(new Obstacle(new Translation2d(x - 0.5, y - 0.5), new Translation2d(x + 0.5, y + 0.5)));
     }
 
     /**
-     * Flushes all obstacles from the internal memory.
-     * Useful for clearing temporal LiDAR hits every few seconds.
+     * Flushes only the dynamic (sensor-detected) obstacles.
+     * Static field geometry is preserved.
      */
     public void clearDynamicObstacles() {
-        obstacles.clear();
+        dynamicObstacles.clear();
     }
 
     public PathChain calculatePath(AresFollower follower, Pose start, Pose target) {
@@ -180,7 +186,12 @@ public class ObstacleAvoider {
         double realX = node.gridX * RESOLUTION_INCHES;
         double realY = node.gridY * RESOLUTION_INCHES;
         
-        for (Obstacle obs : obstacles) {
+        for (Obstacle obs : staticObstacles) {
+            if (obs.contains(realX, realY)) {
+                return true;
+            }
+        }
+        for (Obstacle obs : dynamicObstacles) {
             if (obs.contains(realX, realY)) {
                 return true;
             }

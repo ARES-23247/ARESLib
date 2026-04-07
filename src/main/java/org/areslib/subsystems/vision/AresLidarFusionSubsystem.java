@@ -73,7 +73,7 @@ public class AresLidarFusionSubsystem extends SubsystemBase {
         for (int row = 0; row < gridDim; row++) {
             for (int col = 0; col < gridDim; col++) {
                 int idx = row * gridDim + col;
-                double distInches = inputs.distanceZonesMm[idx] / 25.4;
+                double distInches = org.areslib.core.CoordinateUtil.mmToInches(inputs.distanceZonesMm[idx]);
 
                 // Ignore max range empty hits
                 if (distInches >= maxTrackingDistInches) continue;

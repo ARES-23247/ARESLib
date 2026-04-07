@@ -136,7 +136,7 @@ grep -r "[Name]" src/test/java/ --include="*.java" -l
 - Identify any StateMachine enums
 
 ### Step 3: Document Telemetry
-- Find all `AresTelemetry.log()` and `@AutoLog` annotations
+- Find all `AresAutoLogger.recordOutput()` and `AresTelemetry.put*()` calls
 - Map log keys to AdvantageScope visualization types
 
 ### Step 4: Write the SKILL.md

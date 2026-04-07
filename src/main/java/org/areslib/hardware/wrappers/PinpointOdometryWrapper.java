@@ -1,6 +1,7 @@
 package org.areslib.hardware.wrappers;
 
 import org.areslib.hardware.interfaces.OdometryIO;
+import org.areslib.hardware.faults.FaultMonitor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import java.lang.reflect.Method;
 
@@ -8,7 +9,7 @@ import java.lang.reflect.Method;
  * An optional wrapper for the GoBilda Pinpoint driver.
  * Uses Reflection to prevent ARESlib from having a hard dependency on the app module's teamcode. 
  */
-public class PinpointOdometryWrapper implements OdometryIO {
+public class PinpointOdometryWrapper implements OdometryIO, FaultMonitor {
 
     private final Object pinpointDevice;
     private final Method updateMethod;
@@ -18,6 +19,8 @@ public class PinpointOdometryWrapper implements OdometryIO {
     private final Method getVelXMethod;
     private final Method getVelYMethod;
     private final Method getHeadingVelocityMethod;
+    private boolean faultTripped = false;
+    private String faultDetail = "";
 
     public PinpointOdometryWrapper(HardwareMap hardwareMap, String deviceName) {
         try {
@@ -42,7 +45,8 @@ public class PinpointOdometryWrapper implements OdometryIO {
         try {
             updateMethod.invoke(pinpointDevice);
         } catch (Exception e) {
-            throw new RuntimeException("ARESlib: Pinpoint update() failed.", e);
+            faultTripped = true;
+            faultDetail = "Pinpoint update() failed: " + e.getMessage();
         }
     }
 
@@ -52,15 +56,36 @@ public class PinpointOdometryWrapper implements OdometryIO {
             updateMethod.invoke(pinpointDevice);
             
             // Assuming the Pinpoint driver's getPosX/Y returns values in millimeters
-            inputs.xMeters = ((double) getPosXMethod.invoke(pinpointDevice)) / 1000.0;
-            inputs.yMeters = ((double) getPosYMethod.invoke(pinpointDevice)) / 1000.0;
+            inputs.xMeters = org.areslib.core.CoordinateUtil.mmToMeters((double) getPosXMethod.invoke(pinpointDevice));
+            inputs.yMeters = org.areslib.core.CoordinateUtil.mmToMeters((double) getPosYMethod.invoke(pinpointDevice));
             inputs.headingRadians = (double) getHeadingMethod.invoke(pinpointDevice);
             
-            inputs.xVelocityMetersPerSecond = ((double) getVelXMethod.invoke(pinpointDevice)) / 1000.0;
-            inputs.yVelocityMetersPerSecond = ((double) getVelYMethod.invoke(pinpointDevice)) / 1000.0;
+            inputs.xVelocityMetersPerSecond = org.areslib.core.CoordinateUtil.mmToMeters((double) getVelXMethod.invoke(pinpointDevice));
+            inputs.yVelocityMetersPerSecond = org.areslib.core.CoordinateUtil.mmToMeters((double) getVelYMethod.invoke(pinpointDevice));
             inputs.angularVelocityRadiansPerSecond = (double) getHeadingVelocityMethod.invoke(pinpointDevice);
+            
+            // If we get here, communications are healthy
+            faultTripped = false;
         } catch (Exception e) {
-            throw new RuntimeException("ARESlib: Pinpoint getPose() failed.", e);
+            faultTripped = true;
+            faultDetail = "Pinpoint I2C read failed: " + e.getMessage();
+            // Gracefully zero out instead of crashing the scheduler
+            inputs.xMeters = 0.0;
+            inputs.yMeters = 0.0;
+            inputs.headingRadians = 0.0;
+            inputs.xVelocityMetersPerSecond = 0.0;
+            inputs.yVelocityMetersPerSecond = 0.0;
+            inputs.angularVelocityRadiansPerSecond = 0.0;
         }
+    }
+
+    @Override
+    public boolean hasHardwareFault() {
+        return faultTripped;
+    }
+
+    @Override
+    public String getFaultMessage() {
+        return "CRITICAL: GoBilda Pinpoint Odometry Offline — " + faultDetail;
     }
 }

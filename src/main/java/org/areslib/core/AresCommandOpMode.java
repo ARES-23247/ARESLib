@@ -73,6 +73,10 @@ public abstract class AresCommandOpMode extends LinearOpMode {
 
         // Run user-provided initialization code
         robotInit();
+
+        // Register the global health tracker so its periodic() runs every loop
+        CommandScheduler.getInstance().registerSubsystem(
+            org.areslib.hardware.faults.RobotHealthTracker.getInstance());
         
         // Start any registered background calculating threads
         AresAsyncExecutor.start();
@@ -105,5 +109,6 @@ public abstract class AresCommandOpMode extends LinearOpMode {
         AresAsyncExecutor.stop();
         CommandScheduler.getInstance().reset();
         org.areslib.faults.AresFaultManager.reset();
+        org.areslib.hardware.faults.RobotHealthTracker.reset();
     }
 }

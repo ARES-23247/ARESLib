@@ -26,13 +26,13 @@ public class ElevatorSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         io.updateInputs(inputs);
-        AresTelemetry.log("Elevator", inputs);
+        AresAutoLogger.recordOutput("Elevator/PositionMeters", inputs.positionMeters);
     }
 }
 ```
 
-Periodically perform `io.updateInputs(inputs)` and log via `AresTelemetry.log()`.
-Do NOT use raw `telemetry.addData()`; use `AresTelemetry`. See the `areslib-telemetry` skill.
+Periodically perform `io.updateInputs(inputs)` and log via `AresAutoLogger.recordOutput()`.
+Do NOT use raw `telemetry.addData()`; use `AresAutoLogger` / `AresTelemetry`. See the `areslib-telemetry` skill.
 
 ## 2. Coordinate System Mapping (CRITICAL)
 
@@ -45,17 +45,19 @@ ARESLib2 bridges three coordinate systems:
 | **AdvantageScope** | Field center (0, 0) | Meters, Radians | WPILib convention |
 
 ### Conversion Rules
+
+**ALWAYS use `CoordinateUtil`** (in `org.areslib.core`) for all conversions. Never write raw `* 0.0254` or `+ 72.0` in application code.
+
 ```java
 // Pedro → WPILib
-wpilibX = pedroY;
-wpilibY = -pedroX;
+Pose2d wpiPose = CoordinateUtil.pedroToWpi(pedroPose);
 
 // WPILib → Pedro  
-pedroX = -wpilibY;
-pedroY = wpilibX;
+com.pedropathing.geometry.Pose pedroPose = CoordinateUtil.wpiToPedro(wpiPose);
 
-// Meters → Pedro inches (with origin shift)
-pedroInches = (meters / 0.0254) + 72.0;
+// Raw inch/meter conversions
+double meters = CoordinateUtil.inchesToMeters(inches);
+double inches = CoordinateUtil.metersToInches(meters);
 ```
 
 All hardware IO wrappers (`OdometryIO`, `VisionIO`) **always emit SI units (meters/radians) with center origin**. The `AresPedroLocalizer` handles conversion to Pedro's coordinate system automatically.

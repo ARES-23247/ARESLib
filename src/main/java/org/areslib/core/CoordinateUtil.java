@@ -36,6 +36,22 @@ public final class CoordinateUtil {
         return inches * FieldConstants.INCHES_TO_METERS;
     }
 
+    /**
+     * Converts millimeters to inches.
+     * Use instead of raw {@code / 25.4} in LiDAR and sensor code.
+     */
+    public static double mmToInches(double mm) {
+        return mm / 25.4;
+    }
+
+    /**
+     * Converts millimeters to meters.
+     * Use instead of raw {@code / 1000.0} in driver-level IO code.
+     */
+    public static double mmToMeters(double mm) {
+        return mm / 1000.0;
+    }
+
     // ===== Origin Shifts =====
 
     /**

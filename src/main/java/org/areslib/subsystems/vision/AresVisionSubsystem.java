@@ -75,6 +75,14 @@ public class AresVisionSubsystem extends SubsystemBase {
     }
 
     /**
+     * Calculates trust coefficient dynamically based on AprilTag latency and visible surface area.
+     * <p>
+     * <b>IMPORTANT: Coordinate Frame Assumption</b>: This subsystem and its consumer
+     * {@link AresSensorFusionSubsystem} assume the vision system's botPose3d X/Y axes
+     * are pre-aligned to the Pedro Pathing frame (no axis swap). If using a WPILib-standard
+     * Limelight with MegaTag2, this is typically true. If using a custom PhotonVision setup
+     * where X=forward and Y=left, the axes must be swapped before fusion blending.
+     *
      * @return Field-centric 2D pose estimated by the vision system. Null if target isn't trustworthy.
      */
     public com.pedropathing.geometry.Pose getEstimatedGlobalPose() {
