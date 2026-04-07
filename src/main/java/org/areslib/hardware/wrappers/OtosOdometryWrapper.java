@@ -33,12 +33,12 @@ public class OtosOdometryWrapper implements OdometryIO, FaultMonitor {
         SparkFunOTOS.Pose2D otosVel = otos.getVelocity();
 
         // OTOS natively uses inches and degrees. Convert to meters and radians.
-        inputs.xMeters = otosPose.x * 0.0254;
-        inputs.yMeters = otosPose.y * 0.0254;
+        inputs.xMeters = org.areslib.core.CoordinateUtil.inchesToMeters(otosPose.x);
+        inputs.yMeters = org.areslib.core.CoordinateUtil.inchesToMeters(otosPose.y);
         inputs.headingRadians = Math.toRadians(otosPose.h);
 
-        inputs.xVelocityMetersPerSecond = otosVel.x * 0.0254;
-        inputs.yVelocityMetersPerSecond = otosVel.y * 0.0254;
+        inputs.xVelocityMetersPerSecond = org.areslib.core.CoordinateUtil.inchesToMeters(otosVel.x);
+        inputs.yVelocityMetersPerSecond = org.areslib.core.CoordinateUtil.inchesToMeters(otosVel.y);
         inputs.angularVelocityRadiansPerSecond = Math.toRadians(otosVel.h);
     }
 

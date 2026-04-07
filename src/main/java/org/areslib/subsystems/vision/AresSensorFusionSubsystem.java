@@ -43,9 +43,8 @@ public class AresSensorFusionSubsystem extends SubsystemBase {
 
         // CRITICAL: Vision outputs meters (Center Origin), but Pedro Pathing operates in inches (Bottom-Left Origin).
         // Convert vision coordinates to inches, and shift to Bottom-Left origin before blending.
-        // Uses centralized constants to avoid magic-number drift across the codebase.
-        double visionXInches = (visionPose.getX() * org.areslib.core.FieldConstants.METERS_TO_INCHES) + org.areslib.core.FieldConstants.HALF_FIELD_INCHES;
-        double visionYInches = (visionPose.getY() * org.areslib.core.FieldConstants.METERS_TO_INCHES) + org.areslib.core.FieldConstants.HALF_FIELD_INCHES;
+        double visionXInches = org.areslib.core.CoordinateUtil.centerMetersToBottomLeftInches(visionPose.getX());
+        double visionYInches = org.areslib.core.CoordinateUtil.centerMetersToBottomLeftInches(visionPose.getY());
         double visionHeading = visionPose.getHeading(); // Radians are unit-agnostic
 
         // Calculate Kalman-inspired standard deviations

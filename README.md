@@ -3,12 +3,18 @@
 
 A professional-grade, Command-Based FTC robot framework with AdvantageKit-style telemetry, dyn4j physics simulation, and Pedro Pathing integration — built for Einstein.
 
-## How to Use this Template
+## Quick Start (Mecanum)
 
 1. Click **"Use this template"** on GitHub to create your team's copy.
 2. Clone your new repository onto your local machine.
 3. Open in your IDE (VS Code or Android Studio).
 4. Wait for Gradle sync to complete.
+5. Check the **starter templates** in `src/main/java/org/areslib/templates/`:
+   - `SimpleIntakeSubsystem.java` — IO pattern + motor + sensor in one file
+   - `BasicMecanumAuto.java` — Pedro Pathing + 3 waypoints
+6. Copy a template into your `teamcode/` package and start editing.
+
+> **Recommended:** Start with **Mecanum drive** (`MecanumDriveSubsystem`). It's proven, reliable, and covers 90% of FTC competition needs. Swerve support is available for advanced teams.
 
 ---
 
@@ -33,7 +39,7 @@ A professional-grade, Command-Based FTC robot framework with AdvantageKit-style 
 ```text
 src/main/java/org/areslib/          # Protected Framework Backend
 ├── command/                        # CommandScheduler, Command, SubsystemBase
-├── core/                           # AresCommandOpMode, AresRobot, FieldConstants
+├── core/                           # AresCommandOpMode, AresRobot, FieldConstants, CoordinateUtil
 │   ├── async/                      # AresAsyncExecutor (off-loop compute)
 │   ├── localization/               # AresFollower, AresOdometry
 │   └── simulation/                 # AresPhysicsWorld, DecodeFieldSim
@@ -41,14 +47,12 @@ src/main/java/org/areslib/          # Protected Framework Backend
 ├── hardware/                       # AresHardwareManager, motor/encoder/sensor wrappers
 │   └── interfaces/                 # VisionIO, ArrayLidarIO, AresMotor, AresEncoder
 ├── math/                           # WPILib-ported PID, feedforward, geometry, kinematics
-├── statemachine/                   # Enum-based StateMachine framework
 ├── subsystems/                     # SwerveDrive, Mecanum, Differential, Vision, LiDAR
+├── templates/                      # ★ Starter templates — copy these into your teamcode!
+│   ├── SimpleIntakeSubsystem.java  # IO pattern + motor + sensor
+│   └── BasicMecanumAuto.java       # Pedro Pathing + 3 waypoints
+├── teamcode/                       # Example robot code (mecanum, swerve, elevator, auto)
 └── telemetry/                      # AresAutoLogger, AresTelemetry backends
-
-src/main/java/org/firstinspires/ftc/teamcode/  # Your Competition Code
-├── commands/                       # Autonomous and teleop routines
-├── Constants.java                  # Robot-specific tuning values
-└── RobotContainer.java             # Hardware IO dependency bindings
 ```
 
 ---
@@ -122,23 +126,30 @@ All robot interactions output WPILog telemetry compatible with [AdvantageScope](
 
 ## AI Development Skills
 
-ARESLib2 ships with 13 AI-assistant skill files that constrain code generation to framework-correct patterns:
+ARESLib2 ships with **20 AI-assistant skill files** in `.agents/skills/` that constrain code generation to framework-correct patterns. Start with the routing table:
 
 | Skill | Purpose |
 |:------|:--------|
-| `areslib-architecture` | Coordinate systems, vision fusion, simulator parity |
+| **`areslib`** | **★ Start here — routing table to all 19 domain skills** |
+| `areslib-architecture` | Root rules: IO pattern, coordinate systems, engineering quirks |
+| `areslib-autonomous` | Path following, ghost replay, shoot-on-the-move, avoidance |
+| `areslib-ci` | GitHub Actions CI/CD build pipeline |
 | `areslib-commands` | CommandScheduler lifecycle, AresGamepad bindings |
+| `areslib-drivetrain` | Swerve, mecanum, differential kinematics + odometry |
 | `areslib-faults` | AresAlert, AresFaultManager, AresDiagnostics |
+| `areslib-hardware` | Motor/sensor wrappers, coprocessors, IOReal patterns |
 | `areslib-math` | PID controllers, feedforwards, motion profiles, filters |
+| `areslib-simulation` | dyn4j physics, AresPhysicsWorld, LiDAR raycasting |
 | `areslib-statemachine` | Enum-based StateMachine framework |
 | `areslib-telemetry` | AresAutoLogger, AresTelemetry backend routing |
-| `areslib-testing` | Headless JUnit 5, Mockito, CommandScheduler test stepping |
-| `areslib-vision` | VisionIO, multi-camera fusion, latency compensation |
+| `areslib-testing` | Headless JUnit 5, physics-integrated test patterns |
+| `areslib-vision` | VisionIO, multi-camera fusion, AprilTag pipelines |
 | `pedro-pathing` | Path building, heading interpolation, follower setup |
 | `advantagescope-layouts` | Layout JSON configuration via MCP tools |
 | `advantagescope-hud-sim` | Gamepad mappings, Java 2D rendering for sim |
 | `gradle-ftc-desktop` | AAR extraction for desktop simulation builds |
 | `robot-dev` | Build, deploy, ADB debugging workflow |
+| `skill-authoring` | Meta-skill for creating new AI skills |
 
 ---
 
