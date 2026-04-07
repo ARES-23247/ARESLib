@@ -113,3 +113,16 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 }
 ```
+
+## Testing
+
+```java
+@Test
+void testFaultManagerRegistersAlert() {
+    AresFaultManager.getInstance().reset();
+    AresAlert alert = new AresAlert("TestMotor", "Overcurrent detected");
+    AresFaultManager.getInstance().registerAlert(alert);
+    
+    assertTrue(AresFaultManager.getInstance().getAlerts().contains(alert));
+}
+```

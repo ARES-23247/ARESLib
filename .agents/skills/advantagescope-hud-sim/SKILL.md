@@ -1,6 +1,6 @@
 ---
 name: advantagescope-hud-sim
-description: Helps construct high-fidelity visualizers, gamepads mappings, and Java 2D Graphics environments for interacting with simulated physics (e.g., ArrayLidarIOSim, dyn4j) rendering inside AdvantageScope arrays or internal desktop windows.
+description: Helps construct high-fidelity visualizers, gamepad mappings, and Java 2D Graphics environments for interacting with simulated physics (e.g., ArrayLidarIOSim, dyn4j) rendering inside AdvantageScope arrays or internal desktop windows. Use when building HUD overlays, configuring gamepad keybindings, rendering point clouds, or wiring physics data into AdvantageScope-compatible telemetry arrays.
 license: MIT
 compatibility: Claude Code, Codex CLI, VS Code Copilot, Cursor
 metadata:
@@ -33,3 +33,37 @@ When extracting debugging telemetry that does not natively map to WPILib 3D geom
 
 1. **Raycasting**: Do not just log the `distance` double natively. Render ghost "points" around the robot based on the exact yaw angles of the hardware array. 
 2. **Point Clouds Map**: Format the data as an active `double[]` flat array containing `[x1, y1, z1, x2, y2, z2...]` structure representing each physical contact point in 3D space, and pipe it through the `updateInputs()` AdvantageKit logger. AdvantageScope can then view this array as a 3D Pointcloud!
+
+## Code Examples
+
+### Logging a Lidar Point Cloud
+```java
+// In ArrayLidarIOSim.updateInputs()
+double[] pointCloud = new double[numRays * 3];
+for (int i = 0; i < numRays; i++) {
+    pointCloud[i * 3]     = hitX;  // X meters
+    pointCloud[i * 3 + 1] = hitY;  // Y meters
+    pointCloud[i * 3 + 2] = 0.1;   // Z height
+}
+inputs.lidarPoints = pointCloud;
+```
+
+### Rendering a Glassmorphism Panel
+```java
+// In AresDriverStationApp.paintComponent()
+g2d.setColor(new Color(28, 28, 30, 200)); // Dark translucent
+g2d.fillRoundRect(x, y, width, height, 16, 16);
+g2d.setColor(Color.CYAN);
+g2d.drawString("Speed: " + speed, x + 10, y + 20);
+```
+
+## Testing
+
+```java
+@Test
+void testPointCloudArrayFormat() {
+    double[] cloud = {1.0, 2.0, 0.1, 3.0, 4.0, 0.1};
+    assertEquals(0, cloud.length % 3, "Point cloud must be multiple of 3 (x,y,z)");
+    assertEquals(2, cloud.length / 3, "Should contain 2 points");
+}
+```

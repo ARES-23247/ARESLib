@@ -116,3 +116,19 @@ public void periodic() {
     // Missing sm.update()!
 }
 ```
+
+## Testing
+
+```java
+@Test
+void testStateMachineTransitions() {
+    enum TestState { IDLE, ACTIVE, DONE }
+    StateMachine<TestState> sm = new StateMachine<>(TestState.IDLE);
+    
+    sm.setState(TestState.ACTIVE);
+    assertEquals(TestState.ACTIVE, sm.getState());
+    
+    sm.setState(TestState.DONE);
+    assertEquals(TestState.DONE, sm.getState());
+}
+```

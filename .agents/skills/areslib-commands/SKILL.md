@@ -1,6 +1,6 @@
 ---
 name: areslib-commands
-description: Helps construct custom ARESLib2 WPILib-style commands, subsystem bases, and integration hooks with PedroPathing natively avoiding FTClib overlaps.
+description: Helps construct custom ARESLib2 WPILib-style commands, subsystem bases, and integration hooks with PedroPathing natively avoiding FTClib overlaps. Use when creating new commands, configuring button bindings, scheduling autonomous sequences, or wiring subsystem requirements.
 license: MIT
 compatibility: Claude Code, Codex CLI, VS Code Copilot, Cursor
 metadata:
@@ -151,5 +151,23 @@ public class FollowPathCommand extends Command {
     public boolean isFinished() {
         return !follower.isBusy(); // Standard Pedro finished check
     }
+}
+```
+
+## 7. Testing
+
+```java
+@Test
+void testCommandSchedulerLifecycle() {
+    CommandScheduler.getInstance().reset();
+    SubsystemBase mockSub = new SubsystemBase() {};
+    CommandScheduler.getInstance().registerSubsystem(mockSub);
+    
+    InstantCommand cmd = new InstantCommand(() -> {}, mockSub);
+    CommandScheduler.getInstance().schedule(cmd);
+    assertTrue(CommandScheduler.getInstance().isScheduled(cmd));
+    
+    CommandScheduler.getInstance().run();
+    assertFalse(CommandScheduler.getInstance().isScheduled(cmd));
 }
 ```

@@ -1,9 +1,6 @@
 ---
 name: robot-dev
-description: >-
-  Helps with FTC robot development workflow including building, deploying, and debugging.
-  Use when connecting to robot, troubleshooting ADB, building code, deploying to Control Hub,
-  viewing logs, or controlling OpModes from the command line.
+description: Helps with FTC robot development workflow including building, deploying, and debugging. Use when connecting to robot, troubleshooting ADB, building code, deploying to Control Hub, viewing logs, or controlling OpModes from the command line.
 license: MIT
 compatibility: Claude Code, Codex CLI, VS Code Copilot, Cursor
 metadata:

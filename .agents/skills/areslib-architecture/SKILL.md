@@ -1,6 +1,12 @@
 ---
 name: areslib-architecture
 description: Helps write and maintain code mapped to the ARESLib2 FTC framework, detailing coordinate systems, vision fusion architectures, and simulator parity techniques. Use when modifying or adding areslib subsystems, handling Pedro Pathing conversions, injecting vision offsets, or logging 3D poses natively to AdvantageScope.
+license: MIT
+compatibility: Claude Code, Codex CLI, VS Code Copilot, Cursor
+metadata:
+  author: areslib-agent
+  version: "2.0.0"
+  category: framework
 ---
 
 # ARESLib2 System Architecture & Design Patterns

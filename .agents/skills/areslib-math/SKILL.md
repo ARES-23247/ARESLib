@@ -142,3 +142,16 @@ double voltage = simpleFF.calculate(velocity);
 // GOOD — ElevatorFeedforward adds constant gravity compensation
 double voltage = elevatorFF.calculate(velocity, acceleration);
 ```
+
+## Testing
+
+```java
+@Test
+void testPIDControllerConverges() {
+    PIDController pid = new PIDController(1.0, 0.0, 0.0);
+    pid.setSetpoint(10.0);
+    
+    double output = pid.calculate(0.0);  // Error = 10.0
+    assertEquals(10.0, output, 0.001, "P-only controller output should equal error * kP");
+}
+```

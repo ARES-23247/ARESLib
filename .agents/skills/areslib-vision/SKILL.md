@@ -94,3 +94,22 @@ poseEstimator.addVisionMeasurement(pose, Timer.getFPGATimestamp(), stdDevs);
 poseEstimator.addVisionMeasurement(pose, 
     Timer.getFPGATimestamp() - (visionInputs.latencyMs / 1000.0), stdDevs);
 ```
+
+## Testing
+
+```java
+@Test
+void testVisionIOSimDetectsTag() {
+    AresPhysicsWorld.getInstance().reset();
+    Body robot = new Body();
+    robot.addFixture(Geometry.createRectangle(0.4572, 0.4572));
+    robot.setMass(MassType.NORMAL);
+    AresPhysicsWorld.getInstance().addBody(robot);
+    
+    VisionIOSim sim = new VisionIOSim();
+    VisionIO.VisionInputs inputs = new VisionIO.VisionInputs();
+    sim.updateInputs(inputs);
+    
+    assertTrue(inputs.hasTarget, "Should detect at least one AprilTag");
+}
+```
