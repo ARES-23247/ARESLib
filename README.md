@@ -63,3 +63,11 @@ To physically deploy your code to a REV Control Hub:
 .\gradlew.bat installDebug
 ```
 Make sure you are connected to the Control Hub's Wi-Fi network before deploying.
+
+## Acknowledgements & Licensing
+
+This project is deeply indebted to several incredible open-source communities driving modern robotics forward:
+- **[WPILib](https://github.com/wpilibsuite/allwpilib)**: `ARESLib2` heavily ports and relies upon WPILib's foundational 2D kinematics, geometry, and pose estimator architectures. These specific classes are distributed under the BSD-3-Clause license. Please see [WPILIB-LICENSE.md](WPILIB-LICENSE.md) for full licensing details.
+- **[Pedro Pathing](https://github.com/Pedro-Pathing/PedroPathing)**: Underpins the highly accurate trajectory generation and bounding-box avoidance functionality.
+- **[AdvantageKit & AdvantageScope](https://github.com/Mechanical-Advantage/AdvantageKit)**: The golden standard for deterministic logging, recreated structurally within ARESLib to visualize complex coordinate spaces.
+- **[dyn4j](https://github.com/dyn4j/dyn4j)**: The 100% Java pure 2D rigid-body physics engine powering the high-fidelity Einstein-ready testbed simulations.
