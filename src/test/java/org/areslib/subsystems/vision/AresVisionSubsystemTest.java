@@ -38,6 +38,26 @@ class AresVisionSubsystemTest {
     vision = new AresVisionSubsystem(mockIO, 1.0, 10.0);
   }
 
+  private double getExpectedDistanceWeight(double distance) {
+    double closeDistance = 2.0;
+    double farDistance = 6.0;
+    double minWeight = 0.1;
+    double baseWeight =
+        minWeight
+            + (1.0 - minWeight)
+                * (1.0
+                    / (1.0
+                        + Math.exp(
+                            (distance - closeDistance) / (farDistance - closeDistance) * 4.0)));
+
+    if (distance > farDistance) {
+      double farDistancePenalty = Math.pow(0.5, (distance - farDistance) / 2.0);
+      return baseWeight * farDistancePenalty;
+    }
+
+    return baseWeight;
+  }
+
   @Test
   void testValidPoseEstimation() {
     // Valid target on the field
@@ -97,10 +117,12 @@ class AresVisionSubsystemTest {
   void testMultiTagHighlyTrusted() {
     mockIO.inputs.hasTarget = true;
     mockIO.inputs.fiducialCount = 2; // >1 tag
+    mockIO.inputs.avgTagDistanceMeters = 2.5; // Simulate distance
     vision.periodic();
 
     double[] stds = vision.getVisionMeasurementStdDevs(0.0);
-    assertArrayEquals(new double[] {0.2, 0.2, 0.1}, stds);
+    double weight = getExpectedDistanceWeight(2.5);
+    assertArrayEquals(new double[] {0.2 / weight, 0.2 / weight, 0.1 / weight}, stds, 1e-4);
   }
 
   @Test
@@ -119,13 +141,26 @@ class AresVisionSubsystemTest {
     mockIO.inputs.hasTarget = true;
     mockIO.inputs.fiducialCount = 1;
     mockIO.inputs.minTagAmbiguity = 0.1;
-    mockIO.inputs.avgTagDistanceMeters = 3.0; // test 3 meters away
+    mockIO.inputs.avgTagDistanceMeters = 2.5; // test 2.5 meters away (under 3.0 limit)
     vision.periodic();
 
     double[] stds = vision.getVisionMeasurementStdDevs(0.0);
-    // B.R.E.A.D Equation is 0.03*d^2, 0.05*d^2
-    assertEquals(0.03 * 9.0, stds[0], 1e-4);
-    assertEquals(0.05 * 9.0, stds[2], 1e-4);
+    double weight = getExpectedDistanceWeight(2.5);
+    // B.R.E.A.D Equation is 0.03*d^2, 0.05*d^2 modified by weight
+    assertEquals((0.03 * 6.25) / weight, stds[0], 1e-4);
+    assertEquals((0.05 * 6.25) / weight, stds[2], 1e-4);
+  }
+
+  @Test
+  void testSingleTagDistanceCutoff2025() {
+    mockIO.inputs.hasTarget = true;
+    mockIO.inputs.fiducialCount = 1;
+    mockIO.inputs.minTagAmbiguity = 0.1;
+    mockIO.inputs.avgTagDistanceMeters = 3.5; // Elite 2025 Cutoff is 3.0 meters
+    vision.periodic();
+
+    double[] stds = vision.getVisionMeasurementStdDevs(0.0);
+    assertNull(stds, "Single tags further than 3.0m should be rejected per B.R.E.A.D. 2025 rules.");
   }
 
   @Test
@@ -140,6 +175,7 @@ class AresVisionSubsystemTest {
     double[] stds = vision.getVisionMeasurementStdDevs(0.0);
     // Distance fallback: 3.0 / sqrt(5.0) = 1.34164
     double dist = 3.0 / Math.sqrt(5.0);
-    assertEquals(0.03 * dist * dist, stds[0], 1e-4);
+    double weight = getExpectedDistanceWeight(dist);
+    assertEquals((0.03 * dist * dist) / weight, stds[0], 1e-4);
   }
 }

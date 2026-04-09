@@ -27,6 +27,28 @@ public class AresVisionSubsystem extends SubsystemBase {
   private final double minTargetAreaPercent;
   private final double maxTrustAreaPercent;
 
+  private static final double CLOSE_DISTANCE = 2.0;
+  private static final double FAR_DISTANCE = 6.0;
+  private static final double MIN_WEIGHT = 0.1;
+  private static final double MAX_TAG_DISTANCE = 3.0;
+
+  private double calculateDistanceWeight(double distance) {
+    double baseWeight =
+        MIN_WEIGHT
+            + (1.0 - MIN_WEIGHT)
+                * (1.0
+                    / (1.0
+                        + Math.exp(
+                            (distance - CLOSE_DISTANCE) / (FAR_DISTANCE - CLOSE_DISTANCE) * 4.0)));
+
+    if (distance > FAR_DISTANCE) {
+      double farDistancePenalty = Math.pow(0.5, (distance - FAR_DISTANCE) / 2.0);
+      return baseWeight * farDistancePenalty;
+    }
+
+    return baseWeight;
+  }
+
   /**
    * Constructs a core vision subsystem, parameterized for specific game or camera heuristics.
    *
@@ -142,24 +164,30 @@ public class AresVisionSubsystem extends SubsystemBase {
     }
 
     // Elite Scaling Pattern (Team 5940 B.R.E.A.D.)
+    double distance = inputs.avgTagDistanceMeters;
+    // If distance wasn't provided by the IO layer, approximate from Tag Area inversely
+    if (distance <= 0.01) {
+      distance = inputs.ta > 0 ? 3.0 / Math.sqrt(inputs.ta) : 5.0; // Rough heuristic fallback
+    }
+
+    double distanceWeight = calculateDistanceWeight(distance);
+
     if (inputs.fiducialCount >= 2) {
       // Highly trusted multi-tag
-      return new double[] {0.2, 0.2, 0.1};
+      return new double[] {0.2 / distanceWeight, 0.2 / distanceWeight, 0.1 / distanceWeight};
     } else if (inputs.fiducialCount == 1) {
       // Single tag disambiguation & distance falloff
       if (inputs.minTagAmbiguity > 0.15) {
         return null; // Reject high ambiguity single tags
       }
 
-      double distance = inputs.avgTagDistanceMeters;
-      // If distance wasn't provided by the IO layer, approximate from Tag Area inversely
-      if (distance <= 0.01) {
-        distance = inputs.ta > 0 ? 3.0 / Math.sqrt(inputs.ta) : 5.0; // Rough heuristic fallback
+      if (distance > MAX_TAG_DISTANCE) {
+        return null; // B.R.E.A.D. 2025: Strict 3.0 meter cutoff for single tags
       }
 
       // B.R.E.A.D. Distance-Squared Polynomial fallback
-      double xyStd = 0.03 * Math.pow(distance, 2);
-      double thetaStd = 0.05 * Math.pow(distance, 2);
+      double xyStd = (0.03 * Math.pow(distance, 2)) / distanceWeight;
+      double thetaStd = (0.05 * Math.pow(distance, 2)) / distanceWeight;
       return new double[] {xyStd, xyStd, thetaStd};
     }
 

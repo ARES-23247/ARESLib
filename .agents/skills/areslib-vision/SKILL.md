@@ -35,36 +35,35 @@ class VisionInputs implements AresLoggableInputs {
 
 **Critical format note:** `botPose3d` is a 7-element quaternion array `[x, y, z, w, i, j, k]` — NOT Euler angles. See `areslib-architecture` skill for quaternion conversion formulas.
 
-## 3. Sensor Fusion (AresSensorFusionSubsystem)
+## 3. Sensor Fusion (AresSensorFusionSubsystem & Pose Estimators)
 
-The `AresSensorFusionSubsystem` handles the blending of vision and odometry poses. All math is centralized in `CoordinateUtil`:
+The `AresVisionSubsystem` dynamically calculates WPILib-compatible standard deviations using Elite FRC team heuristics (Team 5940 B.R.E.A.D. and Team 254). 
+It no longer uses simple `lerp()` blending. All math relies on the `SwerveDrivePoseEstimator` or `AresHardwarePoseEstimator` Kalman filters.
 
 ```java
-// Limelight MegaTag natively outputs FRC coordinates (+X Forward, +Y Left).
-// DO NOT swap or negate these coordinates before injecting into WPILib math!
-double visionXMeters = visionPose.getX();
-double visionYMeters = visionPose.getY();
+// 1. Get the exact angular velocity of the robot (from ChassisSpeeds or IMU)
+double currentOmegaRadPerSec = driveSubsystem.getCommandedOmega();
 
-// Coordinate conversion: vision (meters, center origin) -> if needed for legacy FTC logic
-double visionXInches = CoordinateUtil.metersToInches(visionXMeters);
-double visionYInches = CoordinateUtil.metersToInches(visionYMeters);
+// 2. Compute dynamic standard deviations 
+// (Auto-rejects poses during high-omega motion blur, scales by distance/ambiguity)
+double[] visionStdDevs = visionSubsystem.getVisionMeasurementStdDevs(currentOmegaRadPerSec);
 
-
-// Kalman gain: higher confidence = more trust in vision
-double kalmanGain = CoordinateUtil.computeVisionKalmanGain(confidence);
-double blendWeight = Math.min(kalmanGain, maxVisionTrustFactor); // Cap per-tick jump
-
-// Blend position and heading
-double fusedX = CoordinateUtil.lerp(odomX, visionXInches, blendWeight);
-double fusedY = CoordinateUtil.lerp(odomY, visionYInches, blendWeight);
-double fusedHeading = CoordinateUtil.shortestAngleLerp(odomHeading, visionHeading, blendWeight);
+// 3. Apply into the Pose Estimator (handles time-rollback latency compensation)
+if (visionStdDevs != null) {
+    Pose2d visionPose = visionSubsystem.getEstimatedGlobalPose();
+    if (visionPose != null) {
+        // Assume pipeline subtracts latency from current FPGA timestamp
+        double mapTimestamp = Timer.getFPGATimestamp() - (visionInputs.latencyMs / 1000.0);
+        poseEstimator.addVisionMeasurement(visionPose, mapTimestamp, visionStdDevs);
+    }
+}
 ```
 
 **Key rules:**
-- Confidence below 0.05 is rejected entirely (no correction applied)
-- The blend weight is capped by `maxVisionTrustFactor` to prevent teleportation
-- `shortestAngleLerp` prevents 360-degree wraparound snapping
-- **NEVER** overwrite odometry directly — always blend via fusion
+- Poses are rejected (`visionStdDevs == null`) if there's high ambiguity (`>0.15`).
+- Poses are infinity-weighted (ignored) if angular velocity is `> 1.5 rad/s`.
+- Multi-tag gives strong confidence. Single-tag uses a quadratic distance scalar (`C * distance^2`).
+- **NEVER** overwrite odometry directly — always fuse via the `<T>PoseEstimator`.
 
 ## 4. Multi-Camera Fusion Pattern
 When using multiple Limelights, the `LimelightVisionWrapper` employs **Winner-Takes-All** logic:
