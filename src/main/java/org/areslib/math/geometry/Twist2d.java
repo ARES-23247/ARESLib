@@ -49,7 +49,7 @@ public class Twist2d {
   @Override
   public boolean equals(Object obj) {
     if (this == obj) return true;
-    if (obj == null || getClass() != obj.getClass()) return false;
+    if (!(obj instanceof Twist2d)) return false;
     Twist2d other = (Twist2d) obj;
     return Math.abs(other.dx - dx) < 1e-9
         && Math.abs(other.dy - dy) < 1e-9

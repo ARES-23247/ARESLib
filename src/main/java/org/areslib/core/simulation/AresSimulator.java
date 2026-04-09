@@ -19,6 +19,7 @@ public class AresSimulator {
    * @param periodMs The length of the targeted physics tick period in milliseconds (ex: 5ms for
    *     200Hz).
    */
+  @SuppressWarnings("ThreadPriorityCheck")
   public static synchronized void startPhysicsSim(int periodMs) {
     // Prevent running if not in a simulated environment
     if (!AresRobot.isSimulation()) {

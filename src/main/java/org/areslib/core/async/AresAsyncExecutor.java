@@ -59,6 +59,7 @@ public class AresAsyncExecutor {
   }
 
   /** Starts all registered async loops. This is automatically called by AresCommandOpMode. */
+  @SuppressWarnings("FutureReturnValueIgnored")
   public static void start() {
     if (isRunning) return;
 
@@ -80,7 +81,7 @@ public class AresAsyncExecutor {
     if (executor == null || executor.isShutdown()) {
       executor = Executors.newScheduledThreadPool(4); // lazy init pool
     }
-    executor.submit(task);
+    executor.execute(task);
   }
 
   /**

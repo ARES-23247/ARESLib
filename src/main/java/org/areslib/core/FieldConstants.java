@@ -92,6 +92,8 @@ public final class FieldConstants {
     }
 
     /**
+     * Gets the heading offset to apply for this alliance.
+     *
      * @return The heading offset in radians to apply when converting field-centric inputs.
      */
     public double getHeadingOffsetRadians() {

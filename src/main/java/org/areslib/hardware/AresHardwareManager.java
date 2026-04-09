@@ -182,14 +182,7 @@ public class AresHardwareManager {
     AresAutoLogger.processInputs("Power", powerInputs);
   }
 
-  /**
-   * Gets one of the nested I2C buses on the SRS Hub.
-   *
-   * @param bus The integer ID of the bus to access.
-   * @return The bus object, currently always null due to unresolved ARES dependencies.
-   *     <p>/** Called iteratively to update odometry coprocessors or vision pipelines
-   *     asynchronously.
-   */
+  /** Called iteratively to update odometry coprocessors or vision pipelines asynchronously. */
   public static void updateCoprocessors() {
     if (activeSrsHub != null) {
       activeSrsHub.update();

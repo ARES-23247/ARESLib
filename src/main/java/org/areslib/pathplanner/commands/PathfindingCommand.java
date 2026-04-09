@@ -259,7 +259,7 @@ public class PathfindingCommand extends Command {
         // Replan the path if our heading is off
         if (onHeading || !replanningConfig.enableInitialReplanning) {
           double d = closestState1.positionMeters.getDistance(closestState2.positionMeters);
-          double t = (currentPose.getTranslation().getDistance(closestState1.positionMeters)) / d;
+          double t = currentPose.getTranslation().getDistance(closestState1.positionMeters) / d;
           t = MathUtil.clamp(t, 0.0, 1.0);
 
           timeOffset =

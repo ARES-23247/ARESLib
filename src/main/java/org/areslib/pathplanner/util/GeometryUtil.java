@@ -72,7 +72,7 @@ public class GeometryUtil {
    * @return Interpolated value
    */
   public static Translation2d translationLerp(Translation2d a, Translation2d b, double t) {
-    return a.plus((b.minus(a)).times(t));
+    return a.plus(b.minus(a).times(t));
   }
 
   /**

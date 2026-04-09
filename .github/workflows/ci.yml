@@ -1,22 +1,27 @@
-name: ARESLib2 CI
+name: ARESLib2 FTC CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [ "main" ]
+    paths-ignore:
+      - '**.md'
   pull_request:
-    branches:
-      - main
+    branches: [ "main" ]
+    paths-ignore:
+      - '**.md'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  pull-requests: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 15
-
-    # Required permissions for the jacoco-report action to comment on the PR
-    permissions:
-      contents: read
-      pull-requests: write
 
     steps:
     - uses: actions/checkout@v4
@@ -28,22 +33,49 @@ jobs:
         distribution: 'corretto'
 
     - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v3
+      uses: gradle/actions/setup-gradle@v4
 
-    - name: Build with Gradle and generate JaCoCo Coverage
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+
+    - name: Apply Code Formatting
+      run: ./gradlew spotlessApply
+      
+    - name: Commit Auto-formatted Code
+      uses: stefanzweifel/git-auto-commit-action@v5
+      with:
+        commit_message: "style: auto-format code with spotless"
+
+    - name: Run Reviewdog PMD Annotations
+      uses: reviewdog/action-pmd@v3
+      if: github.event_name == 'pull_request'
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        pmd_version: "6.55.0"
+        workdir: ./
+        reporter: github-pr-review
+        fail_on_error: false
+      
+    - name: Build with Gradle and Coverage
       run: ./gradlew build jacocoTestReport
 
-    - name: Upload Test Reports
-      uses: actions/upload-artifact@v4
+    - name: Upload Test Reports (on failure)
       if: failure()
+      uses: actions/upload-artifact@v4
       with:
-        name: test-reports
+        name: ARESLib2-Test-Reports
         path: build/reports/tests/test/
 
-    - name: Verify Code Formatting
-      run: git diff --exit-code || (echo "Code formatting is incorrect. Spotless modified files. Please format locally before pushing." && exit 1)
+    - name: Upload Compiled Jars/AARs
+      continue-on-error: true
+      uses: actions/upload-artifact@v4
+      with:
+        name: ARESLib2-Build
+        path: |
+          build/libs/*.jar
+          build/outputs/aar/*.aar
 
-    - name: Add JaCoCo coverage report to PR
+    - name: Post PR Coverage Annotations
       uses: madrapps/jacoco-report@v1.6.1
       if: github.event_name == 'pull_request'
       with:
@@ -53,3 +85,38 @@ jobs:
         min-coverage-changed-files: 60
         title: "ARESLib2 Coverage Report"
         update-comment: true
+
+    - name: Generate JaCoCo Badges
+      uses: cicirello/jacoco-badge-generator@v2
+      with:
+        jacoco-csv-file: build/reports/jacoco/test/jacocoTestReport.csv
+        generate-branches-badge: true
+        badges-directory: .github/badges
+
+    - name: Commit JaCoCo Badges
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      uses: stefanzweifel/git-auto-commit-action@v5
+      with:
+        commit_message: "docs: update jacoco coverage badges [skip ci]"
+        file_pattern: ".github/badges/*.svg"
+
+    - name: Generate Javadocs
+      continue-on-error: true
+      run: ./gradlew javadoc
+
+    - name: Upload Javadoc Artifact
+      continue-on-error: true
+      uses: actions/upload-artifact@v4
+      with:
+        name: ARESLib2-Javadocs
+        path: build/docs/javadoc/
+
+    - name: Deploy Javadocs to GitHub Pages
+      continue-on-error: true
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./build/docs/javadoc
+        destination_dir: docs
+        keep_files: false

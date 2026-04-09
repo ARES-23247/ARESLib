@@ -104,26 +104,32 @@ public class SRSHub extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
     public int green;
     public int blue;
 
+    @Override
     protected int getValue() {
       return 0;
     }
 
+    @Override
     protected int getInitLength() {
       return 0;
     }
 
+    @Override
     protected int getUpdateLength() {
       return 76;
     }
 
+    @Override
     protected int getAddress() {
       return 0x52;
     }
 
+    @Override
     protected BitSet getConfig() {
       return config;
     }
 
+    @Override
     protected void parseUpdate(BitSet data, int start) {
       int index = start;
 
@@ -203,26 +209,32 @@ public class SRSHub extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
       distances = resolution.value == 0 ? new short[16] : new short[64];
     }
 
+    @Override
     protected int getValue() {
       return 1;
     }
 
+    @Override
     protected int getInitLength() {
       return 1;
     }
 
+    @Override
     protected int getUpdateLength() {
       return config.get(0) ? 705 : 177;
     }
 
+    @Override
     protected int getAddress() {
       return 0x29;
     }
 
+    @Override
     protected BitSet getConfig() {
       return config;
     }
 
+    @Override
     protected void parseUpdate(BitSet data, int start) {
       int index = start;
 
@@ -249,26 +261,32 @@ public class SRSHub extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
 
     public float distance;
 
+    @Override
     protected int getValue() {
       return 2;
     }
 
+    @Override
     protected int getInitLength() {
       return 0;
     }
 
+    @Override
     protected int getUpdateLength() {
       return 17;
     }
 
+    @Override
     protected int getAddress() {
       return 0x29;
     }
 
+    @Override
     protected BitSet getConfig() {
       return config;
     }
 
+    @Override
     protected void parseUpdate(BitSet data, int start) {
       int index = start;
 
@@ -316,10 +334,12 @@ public class SRSHub extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
         }
       }
 
+      @Override
       protected int getLength() {
         return 10;
       }
 
+      @Override
       protected BitSet getData() {
         return data;
       }
@@ -366,10 +386,12 @@ public class SRSHub extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
         }
       }
 
+      @Override
       protected int getLength() {
         return 106;
       }
 
+      @Override
       protected BitSet getData() {
         return data;
       }
@@ -425,26 +447,32 @@ public class SRSHub extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
       config = BitSet.valueOf(buffer.array());
     }
 
+    @Override
     protected int getValue() {
       return ID;
     }
 
+    @Override
     protected int getInitLength() {
       return 98;
     }
 
+    @Override
     protected int getUpdateLength() {
       return 201;
     }
 
+    @Override
     protected int getAddress() {
       return 0x31;
     }
 
+    @Override
     protected BitSet getConfig() {
       return config;
     }
 
+    @Override
     protected void parseUpdate(BitSet data, int start) {
       int index = start;
 
@@ -644,6 +672,7 @@ public class SRSHub extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
     super.registerArmingStateCallback(false);
   }
 
+  @Override
   protected boolean doInitialize() {
     ((LynxI2cDeviceSynch) this.deviceClient).setBusSpeed(LynxI2cDeviceSynch.BusSpeed.FAST_400K);
 
@@ -654,10 +683,12 @@ public class SRSHub extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
     return true;
   }
 
+  @Override
   public Manufacturer getManufacturer() {
     return Manufacturer.Other;
   }
 
+  @Override
   public String getDeviceName() {
     return "SRSHub";
   }

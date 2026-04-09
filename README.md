@@ -1,5 +1,7 @@
 # ARESLib2 — Championship FTC Command Framework
-[![Build & Test](https://github.com/thehomelessguy/ARESLib2/actions/workflows/build.yml/badge.svg)](https://github.com/thehomelessguy/ARESLib2/actions)
+[![Build & Test](https://github.com/thehomelessguy/ARESLib2/actions/workflows/ci.yml/badge.svg)](https://github.com/thehomelessguy/ARESLib2/actions)
+[![Coverage](https://raw.githubusercontent.com/thehomelessguy/ARESLib2/main/.github/badges/jacoco.svg)](https://github.com/thehomelessguy/ARESLib2/actions/workflows/ci.yml)
+[![Branches](https://raw.githubusercontent.com/thehomelessguy/ARESLib2/main/.github/badges/branches.svg)](https://github.com/thehomelessguy/ARESLib2/actions/workflows/ci.yml)
 
 A professional-grade, Command-Based FTC robot framework with AdvantageKit-style telemetry, dyn4j physics simulation, and PathPlanner integration — built for Einstein.
 

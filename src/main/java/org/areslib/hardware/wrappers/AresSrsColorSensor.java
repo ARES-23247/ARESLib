@@ -36,7 +36,7 @@ public class AresSrsColorSensor implements AresColorSensor {
         this.getBlueMethod = clazz.getMethod("getColorBlue", int.class);
         this.getAlphaMethod = clazz.getMethod("getColorAlpha", int.class);
       } catch (Exception ignored) {
-        Thread.yield();
+        // Ignored
       }
     }
   }
@@ -47,7 +47,7 @@ public class AresSrsColorSensor implements AresColorSensor {
       try {
         return ((Number) getRedMethod.invoke(srsHub, port)).intValue();
       } catch (Exception ignored) {
-        Thread.yield();
+        // Ignored
       }
     }
     return 0;
@@ -59,7 +59,7 @@ public class AresSrsColorSensor implements AresColorSensor {
       try {
         return ((Number) getGreenMethod.invoke(srsHub, port)).intValue();
       } catch (Exception ignored) {
-        Thread.yield();
+        // Ignored
       }
     }
     return 0;
@@ -71,7 +71,7 @@ public class AresSrsColorSensor implements AresColorSensor {
       try {
         return ((Number) getBlueMethod.invoke(srsHub, port)).intValue();
       } catch (Exception ignored) {
-        Thread.yield();
+        // Ignored
       }
     }
     return 0;
@@ -83,7 +83,7 @@ public class AresSrsColorSensor implements AresColorSensor {
       try {
         return ((Number) getAlphaMethod.invoke(srsHub, port)).intValue();
       } catch (Exception ignored) {
-        Thread.yield();
+        // Ignored
       }
     }
     return 0;

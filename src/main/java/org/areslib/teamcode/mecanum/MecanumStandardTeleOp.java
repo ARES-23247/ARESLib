@@ -78,10 +78,10 @@ public class MecanumStandardTeleOp extends AresCommandOpMode {
     CommandScheduler.getInstance().registerSubsystem(driveSubsystem);
 
     // 4. Input Bindings
-    pilot = new AresGamepad(gamepad1);
+    pilot = new AresGamepad(gamepad1, "Driver");
 
     pilot
-        .y()
+        .y("Zero Odometry Heading")
         .onTrue(
             new Command() {
               @Override

@@ -55,6 +55,8 @@ public class AresVisionSubsystem extends SubsystemBase {
   }
 
   /**
+   * Gets the horizontal offset from the crosshair.
+   *
    * @return Horizontal offset from crosshair to target (Tx) in degrees.
    */
   public double getTargetXOffset() {
@@ -62,6 +64,8 @@ public class AresVisionSubsystem extends SubsystemBase {
   }
 
   /**
+   * Gets the vertical offset from the crosshair.
+   *
    * @return Vertical offset from crosshair to target (Ty) in degrees.
    */
   public double getTargetYOffset() {
@@ -69,6 +73,8 @@ public class AresVisionSubsystem extends SubsystemBase {
   }
 
   /**
+   * Gets the target area as a percentage.
+   *
    * @return Target Area (Ta) in percent of image.
    */
   public double getTargetArea() {

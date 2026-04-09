@@ -1,6 +1,6 @@
 package org.areslib.pathplanner.dummy;
 
-/** A dummy SendableChooser that operates as a standard HashMap for simulation auto dropdowns. */
+/* A dummy SendableChooser that operates as a standard HashMap for simulation auto dropdowns. */
 import java.util.HashMap;
 import java.util.Map;
 

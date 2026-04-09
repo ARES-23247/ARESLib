@@ -2,6 +2,7 @@ package org.areslib.hardware.wrappers;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
 import org.areslib.command.button.Trigger;
+import org.areslib.telemetry.AresTelemetry;
 
 /**
  * Wrapper around the FTC {@link Gamepad} providing WPILib-style {@link Trigger} bindings and
@@ -14,14 +15,24 @@ import org.areslib.command.button.Trigger;
 public class AresGamepad {
 
   private final Gamepad gamepad;
+  private final String name;
 
   // Cached Trigger instances — lazily initialized on first access
   private Trigger triggerA, triggerB, triggerX, triggerY;
   private Trigger triggerLB, triggerRB;
   private Trigger triggerDU, triggerDD, triggerDL, triggerDR;
 
-  public AresGamepad(Gamepad gamepad) {
+  public AresGamepad(Gamepad gamepad, String name) {
     this.gamepad = gamepad;
+    this.name = name;
+  }
+
+  public AresGamepad(Gamepad gamepad) {
+    this(gamepad, "Gamepad");
+  }
+
+  private void recordBinding(String button, String actionDescription) {
+    AresTelemetry.putString("ControllerMap/" + name + "/" + button, actionDescription);
   }
 
   public double getLeftX() {
@@ -54,9 +65,19 @@ public class AresGamepad {
     return triggerA;
   }
 
+  public Trigger a(String actionDescription) {
+    recordBinding("A", actionDescription);
+    return a();
+  }
+
   public Trigger b() {
     if (triggerB == null) triggerB = new Trigger(() -> gamepad.b);
     return triggerB;
+  }
+
+  public Trigger b(String actionDescription) {
+    recordBinding("B", actionDescription);
+    return b();
   }
 
   public Trigger x() {
@@ -64,9 +85,19 @@ public class AresGamepad {
     return triggerX;
   }
 
+  public Trigger x(String actionDescription) {
+    recordBinding("X", actionDescription);
+    return x();
+  }
+
   public Trigger y() {
     if (triggerY == null) triggerY = new Trigger(() -> gamepad.y);
     return triggerY;
+  }
+
+  public Trigger y(String actionDescription) {
+    recordBinding("Y", actionDescription);
+    return y();
   }
 
   public Trigger leftBumper() {
@@ -74,9 +105,19 @@ public class AresGamepad {
     return triggerLB;
   }
 
+  public Trigger leftBumper(String actionDescription) {
+    recordBinding("Left Bumper", actionDescription);
+    return leftBumper();
+  }
+
   public Trigger rightBumper() {
     if (triggerRB == null) triggerRB = new Trigger(() -> gamepad.right_bumper);
     return triggerRB;
+  }
+
+  public Trigger rightBumper(String actionDescription) {
+    recordBinding("Right Bumper", actionDescription);
+    return rightBumper();
   }
 
   public Trigger dpadUp() {
@@ -84,9 +125,19 @@ public class AresGamepad {
     return triggerDU;
   }
 
+  public Trigger dpadUp(String actionDescription) {
+    recordBinding("D-Pad Up", actionDescription);
+    return dpadUp();
+  }
+
   public Trigger dpadDown() {
     if (triggerDD == null) triggerDD = new Trigger(() -> gamepad.dpad_down);
     return triggerDD;
+  }
+
+  public Trigger dpadDown(String actionDescription) {
+    recordBinding("D-Pad Down", actionDescription);
+    return dpadDown();
   }
 
   public Trigger dpadLeft() {
@@ -94,9 +145,19 @@ public class AresGamepad {
     return triggerDL;
   }
 
+  public Trigger dpadLeft(String actionDescription) {
+    recordBinding("D-Pad Left", actionDescription);
+    return dpadLeft();
+  }
+
   public Trigger dpadRight() {
     if (triggerDR == null) triggerDR = new Trigger(() -> gamepad.dpad_right);
     return triggerDR;
+  }
+
+  public Trigger dpadRight(String actionDescription) {
+    recordBinding("D-Pad Right", actionDescription);
+    return dpadRight();
   }
 
   /**

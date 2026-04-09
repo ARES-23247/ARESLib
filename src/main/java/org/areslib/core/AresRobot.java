@@ -10,6 +10,8 @@ public class AresRobot {
   public static final double LOOP_PERIOD_SECS = 0.02;
 
   /**
+   * Gets whether the robot is running in a simulated environment.
+   *
    * @return True if the robot is currently running in a simulated environment.
    */
   public static boolean isSimulation() {

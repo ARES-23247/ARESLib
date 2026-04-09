@@ -150,8 +150,11 @@ public class LocalADStar implements Pathfinder {
     List<PathPoint> pathPoints;
 
     pathLock.readLock().lock();
-    pathPoints = new ArrayList<>(currentPathPoints);
-    pathLock.readLock().unlock();
+    try {
+      pathPoints = new ArrayList<>(currentPathPoints);
+    } finally {
+      pathLock.readLock().unlock();
+    }
 
     newPathAvailable = false;
 
@@ -175,11 +178,14 @@ public class LocalADStar implements Pathfinder {
 
     if (startPos != null && !startPos.equals(requestStart)) {
       requestLock.writeLock().lock();
-      requestStart = startPos;
-      requestRealStartPos = startPosition;
+      try {
+        requestStart = startPos;
+        requestRealStartPos = startPosition;
 
-      requestMinor = true;
-      requestLock.writeLock().unlock();
+        requestMinor = true;
+      } finally {
+        requestLock.writeLock().unlock();
+      }
     }
   }
 
@@ -195,13 +201,16 @@ public class LocalADStar implements Pathfinder {
 
     if (gridPos != null) {
       requestLock.writeLock().lock();
-      requestGoal = gridPos;
-      requestRealGoalPos = goalPosition;
+      try {
+        requestGoal = gridPos;
+        requestRealGoalPos = goalPosition;
 
-      requestMinor = true;
-      requestMajor = true;
-      requestReset = true;
-      requestLock.writeLock().unlock();
+        requestMinor = true;
+        requestMajor = true;
+        requestReset = true;
+      } finally {
+        requestLock.writeLock().unlock();
+      }
     }
   }
 
@@ -238,20 +247,26 @@ public class LocalADStar implements Pathfinder {
     dynamicObstacles.clear();
     dynamicObstacles.addAll(newObs);
     requestLock.writeLock().lock();
-    requestObstacles.clear();
-    requestObstacles.addAll(staticObstacles);
-    requestObstacles.addAll(dynamicObstacles);
-    requestLock.writeLock().unlock();
-
-    pathLock.readLock().lock();
-    boolean recalculate = false;
-    for (GridPosition pos : currentPathFull) {
-      if (requestObstacles.contains(pos)) {
-        recalculate = true;
-        break;
-      }
+    try {
+      requestObstacles.clear();
+      requestObstacles.addAll(staticObstacles);
+      requestObstacles.addAll(dynamicObstacles);
+    } finally {
+      requestLock.writeLock().unlock();
     }
-    pathLock.readLock().unlock();
+
+    boolean recalculate = false;
+    pathLock.readLock().lock();
+    try {
+      for (GridPosition pos : currentPathFull) {
+        if (requestObstacles.contains(pos)) {
+          recalculate = true;
+          break;
+        }
+      }
+    } finally {
+      pathLock.readLock().unlock();
+    }
 
     if (recalculate) {
       setStartPosition(currentRobotPos);
@@ -263,27 +278,38 @@ public class LocalADStar implements Pathfinder {
   private void runThread() {
     while (true) {
       try {
+        boolean reset;
+        boolean minor;
+        boolean major;
+        GridPosition start;
+        Translation2d realStart;
+        GridPosition goal;
+        Translation2d realGoal;
+        Set<GridPosition> obstacles;
         requestLock.readLock().lock();
-        boolean reset = requestReset;
-        boolean minor = requestMinor;
-        boolean major = requestMajor;
-        GridPosition start = requestStart;
-        Translation2d realStart = requestRealStartPos;
-        GridPosition goal = requestGoal;
-        Translation2d realGoal = requestRealGoalPos;
-        Set<GridPosition> obstacles = new HashSet<>(requestObstacles);
+        try {
+          reset = requestReset;
+          minor = requestMinor;
+          major = requestMajor;
+          start = requestStart;
+          realStart = requestRealStartPos;
+          goal = requestGoal;
+          realGoal = requestRealGoalPos;
+          obstacles = new HashSet<>(requestObstacles);
 
-        // Change the request booleans based on what will be done this loop
-        if (reset) {
-          requestReset = false;
-        }
+          // Change the request booleans based on what will be done this loop
+          if (reset) {
+            requestReset = false;
+          }
 
-        if (minor) {
-          requestMinor = false;
-        } else if (major && (eps - 0.5) <= 1.0) {
-          requestMajor = false;
+          if (minor) {
+            requestMinor = false;
+          } else if (major && (eps - 0.5) <= 1.0) {
+            requestMajor = false;
+          }
+        } finally {
+          requestLock.readLock().unlock();
         }
-        requestLock.readLock().unlock();
 
         if (reset || minor || major) {
           doWork(reset, minor, major, start, goal, realStart, realGoal, obstacles);
@@ -297,8 +323,11 @@ public class LocalADStar implements Pathfinder {
       } catch (Exception e) {
         // Something messed up. Reset and hope for the best
         requestLock.writeLock().lock();
-        requestReset = true;
-        requestLock.writeLock().unlock();
+        try {
+          requestReset = true;
+        } finally {
+          requestLock.writeLock().unlock();
+        }
       }
     }
   }
@@ -324,9 +353,12 @@ public class LocalADStar implements Pathfinder {
           createPathPoints(pathPositions, realStartPos, realGoalPos, obstacles);
 
       pathLock.writeLock().lock();
-      currentPathFull = pathPositions;
-      currentPathPoints = pathPoints;
-      pathLock.writeLock().unlock();
+      try {
+        currentPathFull = pathPositions;
+        currentPathPoints = pathPoints;
+      } finally {
+        pathLock.writeLock().unlock();
+      }
 
       newPathAvailable = true;
     } else if (doMajor) {
@@ -343,9 +375,12 @@ public class LocalADStar implements Pathfinder {
             createPathPoints(pathPositions, realStartPos, realGoalPos, obstacles);
 
         pathLock.writeLock().lock();
-        currentPathFull = pathPositions;
-        currentPathPoints = pathPoints;
-        pathLock.writeLock().unlock();
+        try {
+          currentPathFull = pathPositions;
+          currentPathPoints = pathPoints;
+        } finally {
+          pathLock.writeLock().unlock();
+        }
 
         newPathAvailable = true;
       }
@@ -489,7 +524,7 @@ public class LocalADStar implements Pathfinder {
 
     Set<GridPosition> visited = new HashSet<>();
 
-    Queue<GridPosition> queue = new LinkedList<>(getAllNeighbors(pos));
+    Queue<GridPosition> queue = new ArrayDeque<>(getAllNeighbors(pos));
 
     while (!queue.isEmpty()) {
       GridPosition check = queue.poll();

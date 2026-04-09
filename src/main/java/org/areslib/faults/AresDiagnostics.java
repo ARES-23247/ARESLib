@@ -116,6 +116,7 @@ public final class AresDiagnostics {
         }
       }
     } catch (Exception ignored) {
+      // Ignored intentionally for diagnostics
     }
     return device.getClass().getSimpleName();
   }

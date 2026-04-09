@@ -151,7 +151,8 @@ public class StateMachine<S extends Enum<S>> {
 
     // Log the transition
     org.areslib.telemetry.AresAutoLogger.recordOutput(
-        "StateMachine/" + m_currentState.getClass().getSimpleName(), m_currentState.name());
+        "StateMachine/" + m_currentState.getDeclaringClass().getSimpleName(),
+        m_currentState.name());
 
     // Run entry actions for new state
     List<Runnable> entryActions = m_entryActions.get(m_currentState);
