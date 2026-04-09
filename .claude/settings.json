@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/david/.claude/skills/**)",
+      "Read(.agents/skills/**)"
+    ]
+  },
+  "extraKnownMarketplaces": {
+    "areslib-local": {
+      "source": {
+        "source": "directory",
+        "path": ".agents/skills"
+      }
+    }
+  }
+}
