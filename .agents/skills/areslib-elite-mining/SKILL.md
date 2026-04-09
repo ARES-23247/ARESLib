@@ -17,12 +17,15 @@ When tasked with "seeing how X team solved Y problem," use the following catalog
 *   **Team 1690 (Orbit):** `https://github.com/Orbit-Robotics` - Elite *Targeting* and *Continuous Motion*. Use for shoot-on-the-move math and high-speed multi-subsystem orchestration.
 *   **Team 2910 (Jack in the Bot):** `https://github.com/FRCTeam2910` - *Swerve Architecture*. Use to analyze SDS motor/encoder geometric models.
 *   **Team 1678 (Citrus Circuits):** `https://github.com/frc1678` - *State-Machine Design*. Use for robust sequencing maps.
+*   **Team 4414 (HighTide):** `https://github.com/team4414` - Elite *System Integrations* and robust software sequencing for maximizing scoring cycle-times.
+*   **Team 5940 (B.R.E.A.D.):** `https://github.com/frc5940` - Exceptional code architecture layering and robust AprilTag odometry fusion implementations.
+*   **Team 118 (Robonauts):** `https://github.com/Robonauts118` - High-level multi-joint subsystem kinematics and advanced autonomous orchestration.
+*   **Team 3476 (Code Orange):** `https://github.com/CodeOrange3476` - Excellent source material for deep custom Vision tracking pipelines and Limelight parsing.
 
 ### FTC Elite Repositories (Game Specific & Mechanisms)
 *   **Team 14481 (Don't Blink):** `https://github.com/FTC14481` - Elite hardware mechanisms and OpMode sequences. 
 *   **Team 11115 (Gluten Free):** - Historical FTC top-tier implementations.
 *   **Team 8393 (Brain Stem):** - Consistently high-performing FTC architectures.
-*   **RoadRunner Official:** `https://github.com/acmerobotics/road-runner` - For FTC-specific kinematics and state-of-the-art motion profiling.
 
 ## 2. Ingestion Rules (Safety First)
 
