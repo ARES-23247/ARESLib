@@ -4,9 +4,9 @@ import java.util.Objects;
 
 /** A rotation in a 2D coordinate frame represented a point on the unit circle (cosine and sine). */
 public class Rotation2d implements Interpolatable<Rotation2d> {
-  private final double m_value;
-  private final double m_cos;
-  private final double m_sin;
+  private double m_value;
+  private double m_cos;
+  private double m_sin;
 
   public Rotation2d() {
     m_value = 0.0;
@@ -30,6 +30,23 @@ public class Rotation2d implements Interpolatable<Rotation2d> {
       m_cos = 1.0;
     }
     m_value = Math.atan2(m_sin, m_cos);
+  }
+
+  /**
+   * Sets the rotation in radians in-place. Useful for eliminating garbage collection overhead in
+   * tight loops.
+   */
+  public void set(double value) {
+    m_value = value;
+    m_cos = Math.cos(value);
+    m_sin = Math.sin(value);
+  }
+
+  /** Sets the rotation equal to another Rotation2d in-place. */
+  public void set(Rotation2d other) {
+    m_value = other.m_value;
+    m_cos = other.m_cos;
+    m_sin = other.m_sin;
   }
 
   public static Rotation2d fromDegrees(double degrees) {

@@ -4,8 +4,8 @@ import java.util.Objects;
 
 /** Represents a 2D pose containing translational and rotational elements. */
 public class Pose2d implements Interpolatable<Pose2d> {
-  private final Translation2d m_translation;
-  private final Rotation2d m_rotation;
+  private Translation2d m_translation;
+  private Rotation2d m_rotation;
 
   public Pose2d() {
     m_translation = new Translation2d();
@@ -20,6 +20,23 @@ public class Pose2d implements Interpolatable<Pose2d> {
   public Pose2d(double x, double y, Rotation2d rotation) {
     m_translation = new Translation2d(x, y);
     m_rotation = rotation;
+  }
+
+  /**
+   * Sets the pose to match another pose in-place. Eliminates the need to instantiate new Pose2d
+   * objects in tight odometry loops.
+   */
+  public void set(Pose2d other) {
+    // We use the underlying set() methods of Translation2d and Rotation2d
+    // to avoid creating ANY trailing orphaned objects for the GC.
+    m_translation.set(other.m_translation);
+    m_rotation.set(other.m_rotation);
+  }
+
+  /** Sets the pose components in-place. */
+  public void set(Translation2d translation, Rotation2d rotation) {
+    m_translation.set(translation);
+    m_rotation.set(rotation);
   }
 
   public Transform2d minus(Pose2d other) {

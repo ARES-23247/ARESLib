@@ -26,6 +26,8 @@ import org.areslib.pathplanner.auto.AutoBuilder;
 import org.areslib.pathplanner.util.HolonomicPathFollowerConfig;
 import org.areslib.pathplanner.util.PIDConstants;
 import org.areslib.pathplanner.util.ReplanningConfig;
+import org.areslib.subsystems.controllers.ControllerMode;
+import org.areslib.subsystems.controllers.ControllerModeManager;
 import org.areslib.subsystems.drive.AresDrivetrain;
 import org.areslib.subsystems.drive.SwerveDriveSubsystem;
 import org.areslib.subsystems.drive.SwerveModuleIOReal;
@@ -49,6 +51,9 @@ public class RobotContainer {
   private final SwerveDriveSubsystem drive;
   private final ElevatorSubsystem elevator;
   private final AresVisionSubsystem vision;
+
+  // Controller Mode Management
+  private ControllerModeManager controllerModes;
   // Hardware Integrations
   public final OdometryIO.OdometryInputs pinpointInputs = new OdometryIO.OdometryInputs();
   public final org.areslib.hardware.interfaces.VisionIO.VisionInputs visionInputs =
@@ -139,6 +144,10 @@ public class RobotContainer {
     // Odometry Tracking Loop Integration
     // Removed pinpoint and follower tracking until PathPlanner integration
 
+    // Initialize controller mode system (after gamepads are available)
+    controllerModes = new ControllerModeManager();
+    controllerModes.configure();
+
     // 2. Map Gamepads (OpModes pass real gamepads or null context)
     if (gamepad1 != null && gamepad2 != null) {
       driver = new AresGamepad(gamepad1);
@@ -190,6 +199,71 @@ public class RobotContainer {
 
   /** Use this method to define your button->command mappings. */
   private void configureButtonBindings() {
+    // Controller mode switching (Team 254-inspired architecture)
+    // Driver X button → SPEAKER mode
+    driver
+        .x()
+        .onTrue(
+            new Command() {
+              @Override
+              public void initialize() {
+                controllerModes.setMode(ControllerMode.SPEAKER);
+              }
+
+              @Override
+              public boolean isFinished() {
+                return true;
+              }
+            });
+
+    // Driver Y button → HP (Human Player) mode
+    driver
+        .y()
+        .onTrue(
+            new Command() {
+              @Override
+              public void initialize() {
+                controllerModes.setMode(ControllerMode.HP);
+              }
+
+              @Override
+              public boolean isFinished() {
+                return true;
+              }
+            });
+
+    // Operator X button → POOP (ground intake) mode
+    operator
+        .x()
+        .onTrue(
+            new Command() {
+              @Override
+              public void initialize() {
+                controllerModes.setMode(ControllerMode.POOP);
+              }
+
+              @Override
+              public boolean isFinished() {
+                return true;
+              }
+            });
+
+    // Operator Y button → CLIMB mode
+    operator
+        .y()
+        .onTrue(
+            new Command() {
+              @Override
+              public void initialize() {
+                controllerModes.setMode(ControllerMode.CLIMB);
+              }
+
+              @Override
+              public boolean isFinished() {
+                return true;
+              }
+            });
+
     // Driver Align to Tag explicitly overrides manual driving while Held
     driver.a().whileTrue(new AlignToTagCommand(drive, vision, ALIGN_TARGET_AREA_PERCENT));
 
@@ -212,6 +286,38 @@ public class RobotContainer {
     // Operator Elevator Dispatch (onTrue ensures single fire execution)
     operator.dpadUp().onTrue(new ElevatorToPositionCommand(elevator, HIGH_POSITION_METERS));
     operator.dpadDown().onTrue(new ElevatorToPositionCommand(elevator, LOW_POSITION_METERS));
+
+    // DECODE Simulator Test: Align and Shoot on the move
+    // Targets the Red Classifier goal from DecodeFieldSim (1.5, 1.5) and calculates lead
+    driver
+        .rightBumper()
+        .whileTrue(
+            new org.areslib.command.autoaim.ShootOnTheMoveCommand(
+                () ->
+                    new org.areslib.math.geometry.Translation2d(
+                        pinpointInputs.xMeters, pinpointInputs.yMeters),
+                () ->
+                    new ChassisSpeeds(
+                        drive.getCommandedVx(), drive.getCommandedVy(), drive.getCommandedOmega()),
+                new org.areslib.math.geometry.Translation2d(1.5, 1.5),
+                12.0, // 12 m/s simulated projectile velocity
+                (requiredHeading) -> {
+                  // Simple P-Controller to snap the drivetrain to the target-leading heading
+                  double error = requiredHeading.getRadians() - pinpointInputs.headingRadians;
+
+                  // Wrap error to [-PI, PI] to prevent spins
+                  while (error > Math.PI) error -= 2.0 * Math.PI;
+                  while (error < -Math.PI) error += 2.0 * Math.PI;
+
+                  double correctionOmega = error * 5.0; // P-gain
+
+                  drive.driveFieldCentric(
+                      driver.getLeftY() * MAX_FWD_SPEED,
+                      driver.getLeftX() * MAX_STR_SPEED,
+                      correctionOmega,
+                      new Rotation2d(pinpointInputs.headingRadians));
+                },
+                drive));
   }
 
   /**
@@ -264,5 +370,14 @@ public class RobotContainer {
    */
   public OdometryIO.OdometryInputs getOdometryInputs() {
     return pinpointInputs;
+  }
+
+  /**
+   * Returns the controller mode manager for mode-specific logic integration.
+   *
+   * @return The controller mode manager.
+   */
+  public ControllerModeManager getControllerModes() {
+    return controllerModes;
   }
 }

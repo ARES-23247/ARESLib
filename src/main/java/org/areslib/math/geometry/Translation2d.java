@@ -8,8 +8,8 @@ import java.util.Objects;
  * <p>This assumes that you are using standard FTC coordinate systems (x is forward, y is left).
  */
 public class Translation2d implements Interpolatable<Translation2d> {
-  private final double m_x;
-  private final double m_y;
+  private double m_x;
+  private double m_y;
 
   public Translation2d() {
     m_x = 0.0;
@@ -24,6 +24,21 @@ public class Translation2d implements Interpolatable<Translation2d> {
   public Translation2d(double distance, Rotation2d angle) {
     m_x = distance * angle.getCos();
     m_y = distance * angle.getSin();
+  }
+
+  /**
+   * Sets the coordinates of the Translation2d in-place. Useful for eliminating garbage collection
+   * overhead in tight loops.
+   */
+  public void set(double x, double y) {
+    m_x = x;
+    m_y = y;
+  }
+
+  /** Sets the coordinates equal to another Translation2d in-place. */
+  public void set(Translation2d other) {
+    m_x = other.m_x;
+    m_y = other.m_y;
   }
 
   public double getX() {
