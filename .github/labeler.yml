@@ -1,0 +1,42 @@
+devops:
+  - changed-files:
+    - any-glob-to-any-file:
+      - .github/**
+      - '**/*.gradle'
+      - gradle/**
+      - .githooks/**
+
+math:
+  - changed-files:
+    - any-glob-to-any-file: 
+      - '**/math/**'
+
+pathplanner:
+  - changed-files:
+    - any-glob-to-any-file: 
+      - '**/pathplanner/**'
+
+hardware:
+  - changed-files:
+    - any-glob-to-any-file: 
+      - '**/hardware/**'
+
+telemetry:
+  - changed-files:
+    - any-glob-to-any-file: 
+      - '**/telemetry/**'
+
+faults:
+  - changed-files:
+    - any-glob-to-any-file: 
+      - '**/faults/**'
+
+command:
+  - changed-files:
+    - any-glob-to-any-file: 
+      - '**/command/**'
+
+testing:
+  - changed-files:
+    - any-glob-to-any-file: 
+      - 'src/test/**'

@@ -20,7 +20,10 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 15
 
     steps:
@@ -39,16 +42,18 @@ jobs:
       run: chmod +x gradlew
 
     - name: Apply Code Formatting
+      if: matrix.os == 'ubuntu-latest'
       run: ./gradlew spotlessApply
       
     - name: Commit Auto-formatted Code
+      if: matrix.os == 'ubuntu-latest'
       uses: stefanzweifel/git-auto-commit-action@v5
       with:
         commit_message: "style: auto-format code with spotless"
 
     - name: Run Reviewdog PMD Annotations
       uses: reviewdog/action-pmd@v3
-      if: github.event_name == 'pull_request'
+      if: github.event_name == 'pull_request' && matrix.os == 'ubuntu-latest'
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         pmd_version: "6.55.0"
@@ -67,6 +72,7 @@ jobs:
         path: build/reports/tests/test/
 
     - name: Upload Compiled Jars/AARs
+      if: matrix.os == 'ubuntu-latest'
       continue-on-error: true
       uses: actions/upload-artifact@v4
       with:
@@ -77,7 +83,7 @@ jobs:
 
     - name: Post PR Coverage Annotations
       uses: madrapps/jacoco-report@v1.6.1
-      if: github.event_name == 'pull_request'
+      if: github.event_name == 'pull_request' && matrix.os == 'ubuntu-latest'
       with:
         paths: ${{ github.workspace }}/build/reports/jacoco/test/jacocoTestReport.xml
         token: ${{ secrets.GITHUB_TOKEN }}
@@ -87,6 +93,7 @@ jobs:
         update-comment: true
 
     - name: Generate JaCoCo Badges
+      if: matrix.os == 'ubuntu-latest'
       uses: cicirello/jacoco-badge-generator@v2
       with:
         jacoco-csv-file: build/reports/jacoco/test/jacocoTestReport.csv
@@ -94,17 +101,19 @@ jobs:
         badges-directory: .github/badges
 
     - name: Commit JaCoCo Badges
-      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push' && matrix.os == 'ubuntu-latest'
       uses: stefanzweifel/git-auto-commit-action@v5
       with:
         commit_message: "docs: update jacoco coverage badges [skip ci]"
         file_pattern: ".github/badges/*.svg"
 
     - name: Generate Javadocs
+      if: matrix.os == 'ubuntu-latest'
       continue-on-error: true
       run: ./gradlew javadoc
 
     - name: Upload Javadoc Artifact
+      if: matrix.os == 'ubuntu-latest'
       continue-on-error: true
       uses: actions/upload-artifact@v4
       with:
@@ -113,7 +122,7 @@ jobs:
 
     - name: Deploy Javadocs to GitHub Pages
       continue-on-error: true
-      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push' && matrix.os == 'ubuntu-latest'
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
