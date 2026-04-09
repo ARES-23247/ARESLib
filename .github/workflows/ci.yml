@@ -30,6 +30,9 @@ jobs:
     - name: Build with Gradle and generate JaCoCo Coverage
       run: ./gradlew build jacocoTestReport
 
+    - name: Verify Code Formatting
+      run: git diff --exit-code || (echo "Code formatting is incorrect. Spotless modified files. Please format locally before pushing." && exit 1)
+
     - name: Add JaCoCo coverage report to PR
       uses: madrapps/jacoco-report@v1.6.1
       if: github.event_name == 'pull_request'

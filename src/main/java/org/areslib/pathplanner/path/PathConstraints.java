@@ -91,7 +91,7 @@ public class PathConstraints {
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (!(o instanceof PathConstraints)) return false;
     PathConstraints that = (PathConstraints) o;
     return Math.abs(that.maxVelocityMps - maxVelocityMps) < 1E-3
         && Math.abs(that.maxAccelerationMpsSq - maxAccelerationMpsSq) < 1E-3

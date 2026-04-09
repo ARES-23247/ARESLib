@@ -60,7 +60,7 @@ public class PathPoint {
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (!(o instanceof PathPoint)) return false;
     PathPoint pathPoint = (PathPoint) o;
     return Math.abs(pathPoint.distanceAlongPath - distanceAlongPath) < 1E-3
         && Math.abs(pathPoint.maxV - maxV) < 1E-3

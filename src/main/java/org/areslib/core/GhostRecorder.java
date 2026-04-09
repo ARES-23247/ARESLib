@@ -3,7 +3,6 @@ package org.areslib.core;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.function.Supplier;
 import org.areslib.math.kinematics.ChassisSpeeds;
@@ -78,7 +77,9 @@ public class GhostRecorder {
     try {
       File file = new File(filePath);
       file.getParentFile().mkdirs();
-      try (FileWriter writer = new FileWriter(file)) {
+      try (java.io.OutputStreamWriter writer =
+          new java.io.OutputStreamWriter(
+              new java.io.FileOutputStream(file), java.nio.charset.StandardCharsets.UTF_8)) {
         gson.toJson(m_data, writer);
         com.qualcomm.robotcore.util.RobotLog.i("Saved macro to: " + filePath);
       }

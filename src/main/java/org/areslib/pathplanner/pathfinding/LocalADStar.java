@@ -2,7 +2,6 @@ package org.areslib.pathplanner.pathfinding;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.util.*;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -76,7 +75,11 @@ public class LocalADStar implements Pathfinder {
 
     File navGridFile = new File(Filesystem.getDeployDirectory(), "pathplanner/navgrid.json");
     if (navGridFile.exists()) {
-      try (BufferedReader br = new BufferedReader(new FileReader(navGridFile))) {
+      try (BufferedReader br =
+          new BufferedReader(
+              new java.io.InputStreamReader(
+                  new java.io.FileInputStream(navGridFile),
+                  java.nio.charset.StandardCharsets.UTF_8))) {
         StringBuilder fileContentBuilder = new StringBuilder();
         String line;
         while ((line = br.readLine()) != null) {

@@ -3,7 +3,8 @@ package org.areslib.pathplanner.auto;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.areslib.command.*;
+import org.areslib.command.Command;
+import org.areslib.command.SequentialCommandGroup;
 import org.areslib.math.Pair;
 import org.areslib.pathplanner.dummy.DriverStation;
 

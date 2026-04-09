@@ -2,7 +2,6 @@ package org.areslib.pathplanner.commands;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 import org.areslib.command.Command;
@@ -64,9 +63,12 @@ public class PathPlannerAuto extends Command {
   public static Pose2d getStaringPoseFromAutoFile(String autoName) {
     try (BufferedReader br =
         new BufferedReader(
-            new FileReader(
-                new File(
-                    Filesystem.getDeployDirectory(), "pathplanner/autos/" + autoName + ".auto")))) {
+            new java.io.InputStreamReader(
+                new java.io.FileInputStream(
+                    new File(
+                        Filesystem.getDeployDirectory(),
+                        "pathplanner/autos/" + autoName + ".auto")),
+                java.nio.charset.StandardCharsets.UTF_8))) {
       StringBuilder fileContentBuilder = new StringBuilder();
       String line;
       while ((line = br.readLine()) != null) {
@@ -90,9 +92,12 @@ public class PathPlannerAuto extends Command {
   public static List<PathPlannerPath> getPathGroupFromAutoFile(String autoName) {
     try (BufferedReader br =
         new BufferedReader(
-            new FileReader(
-                new File(
-                    Filesystem.getDeployDirectory(), "pathplanner/autos/" + autoName + ".auto")))) {
+            new java.io.InputStreamReader(
+                new java.io.FileInputStream(
+                    new File(
+                        Filesystem.getDeployDirectory(),
+                        "pathplanner/autos/" + autoName + ".auto")),
+                java.nio.charset.StandardCharsets.UTF_8))) {
       StringBuilder fileContentBuilder = new StringBuilder();
       String line;
       while ((line = br.readLine()) != null) {

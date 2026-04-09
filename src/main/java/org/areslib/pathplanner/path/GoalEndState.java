@@ -79,7 +79,7 @@ public class GoalEndState {
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (!(o instanceof GoalEndState)) return false;
     GoalEndState that = (GoalEndState) o;
     return Math.abs(that.velocity - velocity) < 1E-3
         && Objects.equals(rotation, that.rotation)

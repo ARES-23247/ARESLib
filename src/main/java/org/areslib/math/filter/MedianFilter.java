@@ -1,8 +1,8 @@
 package org.areslib.math.filter;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class MedianFilter {
   private final int m_size;
-  private final LinkedList<Double> m_valueBuffer;
+  private final ArrayDeque<Double> m_valueBuffer;
 
   /**
    * Creates a new MedianFilter.
@@ -23,7 +23,7 @@ public class MedianFilter {
       throw new IllegalArgumentException("Filter size must be strictly positive");
     }
     m_size = size;
-    m_valueBuffer = new LinkedList<>();
+    m_valueBuffer = new ArrayDeque<>(size + 1);
   }
 
   /**

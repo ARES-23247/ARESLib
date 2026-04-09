@@ -91,7 +91,7 @@ public class RotationTarget {
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (!(o instanceof RotationTarget)) return false;
     RotationTarget that = (RotationTarget) o;
     return Math.abs(that.waypointRelativePosition - waypointRelativePosition) < 1E-3
         && Objects.equals(target, that.target)

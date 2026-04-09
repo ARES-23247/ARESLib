@@ -2,7 +2,6 @@ package org.areslib.command;
 
 import com.google.gson.Gson;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.function.Consumer;
 import org.areslib.core.AresRobot;
@@ -51,7 +50,9 @@ public class GhostPlaybackCommand extends Command {
 
     File file = new File(m_filePath);
     if (file.exists()) {
-      try (FileReader reader = new FileReader(file)) {
+      try (java.io.InputStreamReader reader =
+          new java.io.InputStreamReader(
+              new java.io.FileInputStream(file), java.nio.charset.StandardCharsets.UTF_8)) {
         Gson gson = new Gson();
         m_data = gson.fromJson(reader, GhostData.class);
       } catch (IOException e) {

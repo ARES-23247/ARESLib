@@ -1,6 +1,6 @@
 package org.areslib.math.filter;
 
-import java.util.LinkedList;
+import java.util.ArrayDeque;
 
 /**
  * This class implements a linear, time-invariant filter. Common uses include moving-average filters
@@ -8,7 +8,7 @@ import java.util.LinkedList;
  */
 public class LinearFilter {
   private final int m_size;
-  private final LinkedList<Double> m_inputs;
+  private final ArrayDeque<Double> m_inputs;
 
   /**
    * Creates a moving average filter.
@@ -25,7 +25,7 @@ public class LinearFilter {
       throw new IllegalArgumentException("Filter size must be strictly positive");
     }
     m_size = size;
-    m_inputs = new LinkedList<>();
+    m_inputs = new ArrayDeque<>(size + 1);
   }
 
   /**

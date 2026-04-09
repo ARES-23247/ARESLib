@@ -52,7 +52,6 @@ tasks.withType(JavaCompile).configureEach {
     options.errorprone {
         disableWarningsInGeneratedCode = true
         errorproneArgs = ['-XepAllErrorsAsWarnings']
-        excludedPaths = '.*/org/areslib/pathplanner/.*|.*\\\\org\\\\areslib\\\\pathplanner\\\\.*'
     }
 }
 

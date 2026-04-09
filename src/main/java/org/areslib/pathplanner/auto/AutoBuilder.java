@@ -2,7 +2,6 @@ package org.areslib.pathplanner.auto;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BooleanSupplier;
@@ -20,7 +19,12 @@ import org.areslib.math.geometry.Rotation2d;
 import org.areslib.math.kinematics.ChassisSpeeds;
 import org.areslib.math.numbers.N2;
 import org.areslib.math.numbers.N3;
-import org.areslib.pathplanner.commands.*;
+import org.areslib.pathplanner.commands.FollowPathHolonomic;
+import org.areslib.pathplanner.commands.PathPlannerAuto;
+import org.areslib.pathplanner.commands.PathfindHolonomic;
+import org.areslib.pathplanner.commands.PathfindThenFollowPathHolonomic;
+import org.areslib.pathplanner.commands.PathfindThenFollowPathLTV;
+import org.areslib.pathplanner.commands.PathfindThenFollowPathRamsete;
 import org.areslib.pathplanner.dummy.DriverStation;
 import org.areslib.pathplanner.dummy.Filesystem;
 import org.areslib.pathplanner.dummy.SendableChooser;
@@ -733,9 +737,12 @@ public class AutoBuilder {
   public static Command buildAuto(String autoName) {
     try (BufferedReader br =
         new BufferedReader(
-            new FileReader(
-                new File(
-                    Filesystem.getDeployDirectory(), "pathplanner/autos/" + autoName + ".auto")))) {
+            new java.io.InputStreamReader(
+                new java.io.FileInputStream(
+                    new File(
+                        Filesystem.getDeployDirectory(),
+                        "pathplanner/autos/" + autoName + ".auto")),
+                java.nio.charset.StandardCharsets.UTF_8))) {
       StringBuilder fileContentBuilder = new StringBuilder();
       String line;
       while ((line = br.readLine()) != null) {

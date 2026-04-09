@@ -102,7 +102,7 @@ public class ConstraintsZone {
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (!(o instanceof ConstraintsZone)) return false;
     ConstraintsZone that = (ConstraintsZone) o;
     return Math.abs(that.minWaypointPos - minWaypointPos) < 1E-3
         && Math.abs(that.maxWaypointPos - maxWaypointPos) < 1E-3

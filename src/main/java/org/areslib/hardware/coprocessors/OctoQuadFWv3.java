@@ -1039,7 +1039,7 @@ public class OctoQuadFWv3 extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
         bld.append(String.format(" 0x%x", b));
       }
       bld.append("\r\n");
-      System.err.print(bld);
+      RobotLog.ee("OctoQuad", bld.toString());
     }
   }
 

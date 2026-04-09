@@ -1,6 +1,11 @@
 package org.areslib.pathplanner.auto;
 
-import org.areslib.command.*;
+import org.areslib.command.Command;
+import org.areslib.command.ParallelCommandGroup;
+import org.areslib.command.ParallelDeadlineGroup;
+import org.areslib.command.ParallelRaceGroup;
+import org.areslib.command.SequentialCommandGroup;
+import org.areslib.command.Subsystem;
 import org.areslib.pathplanner.path.PathPlannerPath;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;

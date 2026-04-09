@@ -2,7 +2,6 @@ package org.areslib.pathplanner.path;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.areslib.command.Command;
@@ -284,9 +283,12 @@ public class PathPlannerPath {
   public static PathPlannerPath fromPathFile(String pathName) {
     try (BufferedReader br =
         new BufferedReader(
-            new FileReader(
-                new File(
-                    Filesystem.getDeployDirectory(), "pathplanner/paths/" + pathName + ".path")))) {
+            new java.io.InputStreamReader(
+                new java.io.FileInputStream(
+                    new File(
+                        Filesystem.getDeployDirectory(),
+                        "pathplanner/paths/" + pathName + ".path")),
+                java.nio.charset.StandardCharsets.UTF_8))) {
       StringBuilder fileContentBuilder = new StringBuilder();
       String line;
       while ((line = br.readLine()) != null) {
@@ -314,8 +316,11 @@ public class PathPlannerPath {
   public static PathPlannerPath fromChoreoTrajectory(String trajectoryName) {
     try (BufferedReader br =
         new BufferedReader(
-            new FileReader(
-                new File(Filesystem.getDeployDirectory(), "choreo/" + trajectoryName + ".traj")))) {
+            new java.io.InputStreamReader(
+                new java.io.FileInputStream(
+                    new File(
+                        Filesystem.getDeployDirectory(), "choreo/" + trajectoryName + ".traj")),
+                java.nio.charset.StandardCharsets.UTF_8))) {
       StringBuilder fileContentBuilder = new StringBuilder();
       String line;
       while ((line = br.readLine()) != null) {
@@ -586,7 +591,7 @@ public class PathPlannerPath {
         if (i != 0) {
           point.distanceAlongPath =
               allPoints.get(i - 1).distanceAlongPath
-                  + (allPoints.get(i - 1).position.getDistance(point.position));
+                  + allPoints.get(i - 1).position.getDistance(point.position);
         }
       }
 
@@ -1150,7 +1155,7 @@ public class PathPlannerPath {
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (!(o instanceof PathPlannerPath)) return false;
     PathPlannerPath that = (PathPlannerPath) o;
     return Objects.equals(bezierPoints, that.bezierPoints)
         && Objects.equals(rotationTargets, that.rotationTargets)

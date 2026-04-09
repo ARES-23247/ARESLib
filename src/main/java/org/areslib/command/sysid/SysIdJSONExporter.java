@@ -1,7 +1,6 @@
 package org.areslib.command.sysid;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -82,7 +81,9 @@ public class SysIdJSONExporter {
     sb.append("}\n");
 
     File file = new File("SysId_Output.json");
-    try (FileWriter fw = new FileWriter(file)) {
+    try (java.io.OutputStreamWriter fw =
+        new java.io.OutputStreamWriter(
+            new java.io.FileOutputStream(file), java.nio.charset.StandardCharsets.UTF_8)) {
       fw.write(sb.toString());
       com.qualcomm.robotcore.util.RobotLog.i(
           "SysId Data Successfully Exported to: " + file.getAbsolutePath());
