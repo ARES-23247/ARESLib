@@ -99,7 +99,7 @@ dependencies {
     implementation 'org.dyn4j:dyn4j:4.2.2'
 
     // Error Prone
-    errorprone "com.google.errorprone:error_prone_core:2.36.0"
+    errorprone "com.google.errorprone:error_prone_core:2.49.0"
 
     // Dashboard AAR
     ftcAars 'com.acmerobotics.dashboard:dashboard:0.5.1@aar'
