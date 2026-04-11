@@ -106,7 +106,7 @@ When tasked with "seeing how X team solved Y problem," use the following catalog
     *   Team 1323: `https://github.com/Team1323`
 
 ### FTC Elite Repositories (Game Specific & Mechanisms)
-*   **Team 14481 (Don't Blink):** `https://github.com/FTC14481` - Elite hardware mechanisms and OpMode sequences. 
+*   **Team 14481 (Don't Blink):** `https://github.com/FTC14481` - Elite hardware mechanisms and OpMode sequences.
 *   **Team 11115 (Gluten Free):** - Historical FTC top-tier implementations.
 *   **Team 8393 (Brain Stem):** - Consistently high-performing FTC architectures.
 

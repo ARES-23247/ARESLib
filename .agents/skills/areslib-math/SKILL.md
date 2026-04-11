@@ -84,7 +84,7 @@ double voltage = ff.calculate(velocityMps, accelerationMpsSq);
 ### `TrapezoidProfile`
 Generates smooth trapezoidal velocity profiles for position targets.
 ```java
-TrapezoidProfile.Constraints constraints = 
+TrapezoidProfile.Constraints constraints =
     new TrapezoidProfile.Constraints(maxVelocity, maxAcceleration);
 TrapezoidProfile profile = new TrapezoidProfile(constraints,
     new TrapezoidProfile.State(goalPosition, 0),   // goal
@@ -163,7 +163,7 @@ double voltage = elevatorFF.calculate(velocity, acceleration);
 void testPIDControllerConverges() {
     PIDController pid = new PIDController(1.0, 0.0, 0.0);
     pid.setSetpoint(10.0);
-    
+
     double output = pid.calculate(0.0);  // Error = 10.0
     assertEquals(10.0, output, 0.001, "P-only controller output should equal error * kP");
 }

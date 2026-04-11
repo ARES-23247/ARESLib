@@ -19,7 +19,7 @@ We fix this by using the **`RobotContainer` pattern**:
 * **`auto/`** - Holds your Autonomous OpModes. The templates rely on `RobotContainer.getAutonomousCommand()` to dispatch the pre-selected pathing state machine.
 * **`subsystems/`** - Encapsulates logic for discrete modules (e.g., `ElevatorSubsystem`). They handle internal PID limits, hardware wrapper interactions, and natively broadcast their telemetry strings.
     * Note the **IO Abstraction Pattern** (`ElevatorIO`/`ElevatorSubsystem`). This advanced architecture allows you to dynamically substitute simulated hardware logic without touching your main robot code.
-* **`commands/`** - Isolated files that perform an exact action, often bridging multiple subsystems natively. 
+* **`commands/`** - Isolated files that perform an exact action, often bridging multiple subsystems natively.
     * *Example:* `AlignToTagCommand` grabs location data from the `VisionSubsystem` and dynamically pipes corrective velocity vectors into the `DriveSubsystem`.
 
 ## Quick Start

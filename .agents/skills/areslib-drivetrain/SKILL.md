@@ -108,11 +108,11 @@ void testFieldCentricTransform() {
     SwerveModuleIOSim[] modules = new SwerveModuleIOSim[4];
     // ... setup ...
     SwerveDriveSubsystem drive = new SwerveDriveSubsystem(modules);
-    
+
     // Command forward in field frame
     drive.drive(new ChassisSpeeds(1.0, 0.0, 0.0));
     drive.periodic();
-    
+
     // Verify module states
     // ...
 }

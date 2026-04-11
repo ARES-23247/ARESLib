@@ -1,16 +1,16 @@
-﻿{
-    "name":  "areslib-drivetrain",
-    "version":  "1.0.0",
-    "description":  "ARESLib areslib-drivetrain - FTC robot code framework component",
-    "author":  {
-                   "name":  "Team ARES",
-                   "url":  "https://github.com/ARESLib"
-               },
-    "repository":  "https://github.com/ARESLib/ARESLib",
-    "license":  "MIT",
-    "keywords":  [
-                     "ftc",
-                     "areslib",
-                     "drivetrain"
-                 ]
+{
+  "name": "areslib-drivetrain",
+  "version": "1.0.0",
+  "description": "ARESLib areslib-drivetrain - FTC robot code framework component",
+  "author": {
+    "name": "Team ARES",
+    "url": "https://github.com/ARESLib"
+  },
+  "repository": "https://github.com/ARESLib/ARESLib",
+  "license": "MIT",
+  "keywords": [
+    "ftc",
+    "areslib",
+    "drivetrain"
+  ]
 }

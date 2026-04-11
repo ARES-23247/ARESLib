@@ -30,7 +30,7 @@ This is the ONLY place a Motor Controller or Physical Sensor can exist.
 ```java
 public class ElevatorIOReal implements ElevatorIO {
     private final DcMotorEx motor;
-    
+
     public ElevatorIOReal(HardwareMap hwMap) {
         motor = hwMap.get(DcMotorEx.class, "elevator");
     }

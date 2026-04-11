@@ -1,16 +1,16 @@
-﻿{
-    "name":  "gradle-ftc-desktop",
-    "version":  "1.0.0",
-    "description":  "ARESLib gradle-ftc-desktop - FTC robot code framework component",
-    "author":  {
-                   "name":  "Team ARES",
-                   "url":  "https://github.com/ARESLib"
-               },
-    "repository":  "https://github.com/ARESLib/ARESLib",
-    "license":  "MIT",
-    "keywords":  [
-                     "ftc",
-                     "areslib",
-                     "gradle-ftc-desktop"
-                 ]
+{
+  "name": "gradle-ftc-desktop",
+  "version": "1.0.0",
+  "description": "ARESLib gradle-ftc-desktop - FTC robot code framework component",
+  "author": {
+    "name": "Team ARES",
+    "url": "https://github.com/ARESLib"
+  },
+  "repository": "https://github.com/ARESLib/ARESLib",
+  "license": "MIT",
+  "keywords": [
+    "ftc",
+    "areslib",
+    "gradle-ftc-desktop"
+  ]
 }

@@ -47,7 +47,7 @@ All conversions between internal frames are handled by `CoordinateUtil`. See the
 ```java
 // Initialization (RobotContainer):
 GhostRecorder recorder = new GhostRecorder(
-    () -> driveSubsystem.getSpeeds(), 
+    () -> driveSubsystem.getSpeeds(),
     () -> driverGamepad.rightTrigger() > 0.5 // example varargs boolean supplier
 );
 
@@ -118,19 +118,19 @@ Autonomous tests should use the full physics simulation, not mocks:
 void testFollowPathCommandCompletes() {
     AresPhysicsWorld.getInstance().reset();
     CommandScheduler.getInstance().cancelAll();
-    
+
     // Build path
     PathPlannerPath path = PathPlannerPath.fromPathFile("ScorePath");
-    
+
     FollowPathCommand cmd = new FollowPathCommand(follower, path);
     CommandScheduler.getInstance().schedule(cmd);
-    
+
     // Run 150 ticks (3 seconds)
     for (int i = 0; i < 150; i++) {
         CommandScheduler.getInstance().run();
         AresPhysicsWorld.getInstance().update(0.02);
     }
-    
+
     assertFalse(CommandScheduler.getInstance().isScheduled(cmd),
         "Path should complete within 3 seconds");
 }

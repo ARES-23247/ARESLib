@@ -37,14 +37,14 @@ class VisionInputs implements AresLoggableInputs {
 
 ## 3. Sensor Fusion (AresSensorFusionSubsystem & Pose Estimators)
 
-The `AresVisionSubsystem` dynamically calculates WPILib-compatible standard deviations using Elite FRC team heuristics (Team 5940 B.R.E.A.D. and Team 254). 
+The `AresVisionSubsystem` dynamically calculates WPILib-compatible standard deviations using Elite FRC team heuristics (Team 5940 B.R.E.A.D. and Team 254).
 It no longer uses simple `lerp()` blending. All math relies on the `SwerveDrivePoseEstimator` or `AresHardwarePoseEstimator` Kalman filters.
 
 ```java
 // 1. Get the exact angular velocity of the robot (from ChassisSpeeds or IMU)
 double currentOmegaRadPerSec = driveSubsystem.getCommandedOmega();
 
-// 2. Compute dynamic standard deviations 
+// 2. Compute dynamic standard deviations
 // (Auto-rejects poses during high-omega motion blur, scales by distance/ambiguity)
 double[] visionStdDevs = visionSubsystem.getVisionMeasurementStdDevs(currentOmegaRadPerSec);
 
@@ -73,7 +73,7 @@ When using multiple Limelights, the `LimelightVisionWrapper` employs **Winner-Ta
 
 ## 5. AdvantageScope 3D Rendering (MCP)
 When setting up `layout.json` tabs via MCP:
-- Inject `botPose3d` into a `Field3d` tab as `log_type: "Pose3d"` 
+- Inject `botPose3d` into a `Field3d` tab as `log_type: "Pose3d"`
 - Inject `rawCameraPoses` as `log_type: "Pose3d[]"` to render multi-camera ghosts
 - Ensure the 7-element quaternion format is used (NOT 6-element Euler)
 
@@ -100,7 +100,7 @@ double robotX = visionInputs.botPose3d[0]; // X in meters
 poseEstimator.addVisionMeasurement(pose, Timer.getFPGATimestamp(), stdDevs);
 
 // GOOD — subtract pipeline latency
-poseEstimator.addVisionMeasurement(pose, 
+poseEstimator.addVisionMeasurement(pose,
     Timer.getFPGATimestamp() - (visionInputs.latencyMs / 1000.0), stdDevs);
 ```
 
@@ -114,11 +114,11 @@ void testVisionIOSimDetectsTag() {
     robot.addFixture(Geometry.createRectangle(0.4572, 0.4572));
     robot.setMass(MassType.NORMAL);
     AresPhysicsWorld.getInstance().addBody(robot);
-    
+
     VisionIOSim sim = new VisionIOSim();
     VisionIO.VisionInputs inputs = new VisionIO.VisionInputs();
     sim.updateInputs(inputs);
-    
+
     assertTrue(inputs.hasTarget, "Should detect at least one AprilTag");
 }
 ```

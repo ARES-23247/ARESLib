@@ -1,16 +1,16 @@
-﻿{
-    "name":  "areslib-statemachine",
-    "version":  "1.0.0",
-    "description":  "ARESLib areslib-statemachine - FTC robot code framework component",
-    "author":  {
-                   "name":  "Team ARES",
-                   "url":  "https://github.com/ARESLib"
-               },
-    "repository":  "https://github.com/ARESLib/ARESLib",
-    "license":  "MIT",
-    "keywords":  [
-                     "ftc",
-                     "areslib",
-                     "statemachine"
-                 ]
+{
+  "name": "areslib-statemachine",
+  "version": "1.0.0",
+  "description": "ARESLib areslib-statemachine - FTC robot code framework component",
+  "author": {
+    "name": "Team ARES",
+    "url": "https://github.com/ARESLib"
+  },
+  "repository": "https://github.com/ARESLib/ARESLib",
+  "license": "MIT",
+  "keywords": [
+    "ftc",
+    "areslib",
+    "statemachine"
+  ]
 }

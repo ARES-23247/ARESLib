@@ -27,7 +27,7 @@ When updating `AresDriverStationApp.java`:
 ## Hardware Spoofing to AdvantageScope
 When extracting debugging telemetry that does not natively map to WPILib 3D geometries (e.g., Lidar Arrays, Time of Flight distance matricies):
 
-1. **Raycasting**: Do not just log the `distance` double natively. Render ghost "points" around the robot based on the exact yaw angles of the hardware array. 
+1. **Raycasting**: Do not just log the `distance` double natively. Render ghost "points" around the robot based on the exact yaw angles of the hardware array.
 2. **Point Clouds Map**: Format the data as an active `double[]` flat array containing `[x1, y1, z1, x2, y2, z2...]` structure representing each physical contact point in 3D space, and pipe it through the `updateInputs()` AdvantageKit logger. AdvantageScope can then view this array as a 3D Pointcloud!
 
 ## Code Examples

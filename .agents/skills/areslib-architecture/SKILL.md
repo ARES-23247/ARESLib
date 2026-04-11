@@ -44,11 +44,11 @@ ARESLib bridges two coordinate systems:
 | **AdvantageScope** | Field center (0, 0) | Meters, Radians | WPILib convention |
 
 PathPlanner uses WPILib convention natively, so no coordinate conversion is needed between them.
-However, native FTC hardware wrappers (Pinpoint, OTOS) typically output FTC standards (`+X Right, +Y Forward`). 
+However, native FTC hardware wrappers (Pinpoint, OTOS) typically output FTC standards (`+X Right, +Y Forward`).
 
 ### Conversion Rules
 
-**CRITICAL BUG PREVENTION**: All Odometry hardware implementations must manually swap and negate incoming position and velocity coordinates BEFORE injecting them into `inputs.positionMeters` or `inputs.velocityMps`. 
+**CRITICAL BUG PREVENTION**: All Odometry hardware implementations must manually swap and negate incoming position and velocity coordinates BEFORE injecting them into `inputs.positionMeters` or `inputs.velocityMps`.
 - `WPILib X` = `FTC Y` (Forward)
 - `WPILib Y` = `-FTC X` (Left)
 
@@ -152,5 +152,5 @@ Unlike standard FRC environments that run OpenJDK (with parallel Garbage Collect
 ### Enforcement Rule (Object Re-use)
 When designing new Odometry layers, kinematics, or background loops:
 *   **NEVER** construct `new Pose2d()`, `new Translation2d()`, or use `.plus() / .minus()` inside the main `execute()` or `periodic()` polling loops.
-*   **ALWAYS** use the ARESLib GC-Optimized mutator `.set()` methods to recycle pointer states (e.g. `pose.getTranslation().set(x, y)`). 
+*   **ALWAYS** use the ARESLib GC-Optimized mutator `.set()` methods to recycle pointer states (e.g. `pose.getTranslation().set(x, y)`).
 *   **Thread Safety:** Because ARESLib operates single-threaded synchronously inside `CommandScheduler`, utilizing `.set()` mutability inside these math objects is completely Thread-Safe.

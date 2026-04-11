@@ -1,16 +1,16 @@
-﻿{
-    "name":  "advantagescope-hud-sim",
-    "version":  "1.0.0",
-    "description":  "ARESLib advantagescope-hud-sim - FTC robot code framework component",
-    "author":  {
-                   "name":  "Team ARES",
-                   "url":  "https://github.com/ARESLib"
-               },
-    "repository":  "https://github.com/ARESLib/ARESLib",
-    "license":  "MIT",
-    "keywords":  [
-                     "ftc",
-                     "areslib",
-                     "advantagescope-hud-sim"
-                 ]
+{
+  "name": "advantagescope-hud-sim",
+  "version": "1.0.0",
+  "description": "ARESLib advantagescope-hud-sim - FTC robot code framework component",
+  "author": {
+    "name": "Team ARES",
+    "url": "https://github.com/ARESLib"
+  },
+  "repository": "https://github.com/ARESLib/ARESLib",
+  "license": "MIT",
+  "keywords": [
+    "ftc",
+    "areslib",
+    "advantagescope-hud-sim"
+  ]
 }

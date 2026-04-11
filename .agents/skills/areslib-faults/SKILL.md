@@ -68,7 +68,7 @@ Alerts are lightweight objects that represent a potential fault. They auto-regis
 
 ```java
 // Declare as a static or instance field in your subsystem
-private final AresAlert motorDisconnectAlert = 
+private final AresAlert motorDisconnectAlert =
     new AresAlert("Drive Motor 3 disconnected!", AresAlert.AlertType.ERROR);
 
 private final AresAlert loopOverrunAlert =
@@ -136,7 +136,7 @@ This scans:
 
 Results are logged to:
 - `Diagnostics/Status` → "PASS 8/8 devices OK" or "FAIL 2/8 devices FAILED"
-- `Diagnostics/Passed/Motor: leftFront` → "OK" 
+- `Diagnostics/Passed/Motor: leftFront` → "OK"
 - `Diagnostics/Failed/Motor: rightRear` → "FAIL"
 
 If ANY device fails, the `diagnosticAlert` ERROR is activated, turning the controller red.
@@ -149,11 +149,11 @@ Every new subsystem SHOULD declare at least one fault alert:
 
 ```java
 public class ElevatorSubsystem extends SubsystemBase {
-    private final AresAlert encoderFault = 
+    private final AresAlert encoderFault =
         new AresAlert("Elevator encoder disconnected", AresAlert.AlertType.ERROR);
     private final AresAlert stallAlert =
         new AresAlert("Elevator motor stalled", AresAlert.AlertType.WARNING);
-    
+
     @Override
     public void periodic() {
         // Update IO...
@@ -171,7 +171,7 @@ void testFaultManagerRegistersAlert() {
     AresFaultManager.getInstance().reset();
     AresAlert alert = new AresAlert("TestMotor", "Overcurrent detected");
     AresFaultManager.getInstance().registerAlert(alert);
-    
+
     assertTrue(AresFaultManager.getInstance().getAlerts().contains(alert));
 }
 ```

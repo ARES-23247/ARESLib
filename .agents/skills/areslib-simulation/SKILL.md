@@ -106,7 +106,7 @@ In AdvantageScope, view this as a **Points** tab with source type `double[]`.
 void testPhysicsWorldCreatesFieldBoundaries() {
     AresPhysicsWorld.getInstance().reset();
     DecodeFieldSim.buildField(AresPhysicsWorld.getInstance());
-    
+
     // Field should have walls + obstacles
     assertTrue(AresPhysicsWorld.getInstance().getBodyCount() > 4,
         "DECODE field should have walls plus obstacles");
@@ -119,7 +119,7 @@ void testRobotBodyRegistration() {
     robot.addFixture(Geometry.createRectangle(0.4572, 0.4572));
     robot.setMass(MassType.NORMAL);
     AresPhysicsWorld.getInstance().addBody(robot);
-    
+
     assertTrue(AresPhysicsWorld.getInstance().getBodyCount() >= 1);
 }
 ```

@@ -7,10 +7,10 @@ description: Guidelines for constructing Headless JUnit 5 tests inside the ARESL
 
 
 You are an expert test engineer for Team ARES. When writing headless JUnit 5 tests for ARESLib subsystems, commands, or physics simulations, adhere strictly to the following guidelines.
-Testing FTC code presents a major hurdle: the standard WPILib and FTC SDK libraries assume you have active `HardwareMap` contexts and Android `Activity` lifecycles running. 
+Testing FTC code presents a major hurdle: the standard WPILib and FTC SDK libraries assume you have active `HardwareMap` contexts and Android `Activity` lifecycles running.
 Because `ARESLib` fully abstracts hardware via **AdvantageKit IO interfaces**, we can write blazing-fast, 100% headless Java desktop tests that bypass Android entirely!
 
-## 1. Zero SDK Dependencies 
+## 1. Zero SDK Dependencies
 NEVER import anything from `com.qualcomm.robotcore.hardware.*` (e.g., `HardwareMap`, `DcMotorEx`) or `org.firstinspires.ftc.robotcore.*` when writing JUnit assertions in the `src/test/java/` directory.
 
 - The IDE desktop Java compiler will crash natively attempting to execute tests that try to spin up `RobotCore`.
@@ -40,17 +40,17 @@ public void setup() {
 public void testCommandCompletesAfterConditionMet() {
     MySubsystem sub = new MySubsystem(mockIO);
     CommandScheduler.getInstance().registerSubsystem(sub);
-    
+
     MyCommand cmd = new MyCommand(sub);
     CommandScheduler.getInstance().schedule(cmd);
-    
+
     // Step the scheduler tick-by-tick
     CommandScheduler.getInstance().run();  // Tick 1: initialize + first execute
     assertTrue(CommandScheduler.getInstance().isScheduled(cmd));
-    
+
     // Simulate the condition that makes isFinished() return true
     when(mockIO.atTarget()).thenReturn(true);
-    
+
     CommandScheduler.getInstance().run();  // Tick 2: execute → isFinished → end
     assertFalse(CommandScheduler.getInstance().isScheduled(cmd));
 }
@@ -71,7 +71,7 @@ public class MySensorTest {
     public void setup() {
         // ALWAYS reset the singleton instance between tests
         AresPhysicsWorld physicsWorld = AresPhysicsWorld.getInstance();
-        physicsWorld.reset(); 
+        physicsWorld.reset();
         this.world = physicsWorld.getWorld();
     }
 
@@ -81,13 +81,13 @@ public class MySensorTest {
         Body testWall = new Body();
         testWall.addFixture(Geometry.createRectangle(1.0, 1.0));
         world.addBody(testWall);
-        
+
         // Assert logic...
     }
 }
 ```
 
-## 5. Injecting Mock State 
+## 5. Injecting Mock State
 When instantiating Simulated components (like `ArrayLidarIOSim`), utilize pure Java Suppliers to pipe continuous state variables (like location, battery voltage) natively into the simulation without requiring a true odometry stack.
 
 Example: `new ArrayLidarIOSim(() -> currentMockOdometryState, world)` Allows you to teleport the Lidar arbitrarily through the grid testing raycast functionality instantly.

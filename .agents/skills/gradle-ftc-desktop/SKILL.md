@@ -3,7 +3,7 @@ name: gradle-ftc-desktop
 description: Defines the Gradle build configuration that extracts FTC SDK .aar dependencies into JARs for desktop simulation. Use when troubleshooting build errors, adding new FTC dependencies, or configuring the desktop classpath for simulation and testing.
 ---
 
-# Java SE Gradle Architecture Protection 
+# Java SE Gradle Architecture Protection
 
 
 You are an expert build engineer for Team ARES. When troubleshooting build errors, adding FTC dependencies, or configuring the desktop classpath for simulation, adhere strictly to the following guidelines.
@@ -26,10 +26,10 @@ This lets VS Code, IntelliJ, and the desktop JVM resolve FTC classes without And
 dependencies {
     // Standard Maven JAR — use 'implementation' normally
     implementation 'org.dyn4j:dyn4j:5.0.2'
-    
+
     // FTC .aar dependency — MUST use 'ftcAars' configuration
     ftcAars 'com.acmerobotics.dashboard:dashboard:0.5.1@aar'
-    
+
     // Test dependencies
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
     testImplementation 'org.mockito:mockito-core:5.11.0'
@@ -99,4 +99,3 @@ If you see "cannot find symbol" errors for FTC classes, the fix is almost never 
 1. Check if the dependency is in `ftcAars` (not `implementation`)
 2. Run `.\gradlew clean build` to force re-extraction
 3. Verify the `.aar` file exists in Gradle's cache
-

@@ -15,12 +15,12 @@ The `org.areslib.core.StateMachine<S>` class is a lightweight, enum-based finite
 import org.areslib.core.StateMachine;
 
 public class IntakeSubsystem extends SubsystemBase {
-    
+
     enum IntakeState { IDLE, EXTENDING, GRIPPING, RETRACTING, STOWED }
-    
+
     // Auto-derived name or explicit named identity (strongly recommended for debugging)
     private final StateMachine<IntakeState> sm = new StateMachine<>("Intake", IntakeState.class, IntakeState.IDLE);
-    
+
     public IntakeSubsystem(IntakeIO io) {
         // Validated Transition Table (optional but highly recommended)
         // If ANY transitions are explicitly added, un-whitelisted transitions are blocked and logged.
@@ -34,29 +34,29 @@ public class IntakeSubsystem extends SubsystemBase {
         sm.onEntry(IntakeState.GRIPPING,  () -> io.closeGripper());
         sm.onEntry(IntakeState.RETRACTING,() -> io.setSlidePower(-1.0));
         sm.onEntry(IntakeState.STOWED,    () -> io.setSlidePower(0.0));
-        
+
         // Exit actions — run ONCE when leaving a state
         sm.onExit(IntakeState.EXTENDING, () -> io.setSlidePower(0.0));
-        
+
         // During actions — run EVERY loop tick while in a state
         sm.during(IntakeState.GRIPPING, () -> io.holdGripperPosition());
-        
+
         // Conditional transitions — evaluated every tick
-        sm.transition(IntakeState.EXTENDING, IntakeState.GRIPPING, 
+        sm.transition(IntakeState.EXTENDING, IntakeState.GRIPPING,
             () -> io.slidesAtTarget());
 
-        sm.transition(IntakeState.RETRACTING, IntakeState.STOWED, 
+        sm.transition(IntakeState.RETRACTING, IntakeState.STOWED,
             () -> io.slidesAtHome());
-        
+
         // Timeout transitions — auto-transition after N seconds
         sm.transitionAfter(IntakeState.GRIPPING, IntakeState.RETRACTING, 0.5);
     }
-    
+
     @Override
     public void periodic() {
         sm.update();  // MUST be called every loop — evaluates transitions + runs during actions
     }
-    
+
     // External trigger (e.g., from a button binding)
     public void startIntake() {
         sm.requestTransition(IntakeState.EXTENDING); // Use requestTransition to enforce table validation
@@ -114,7 +114,7 @@ driverGamepad.b().onTrue(new InstantCommand(() -> intake.sm.requestTransition(In
 ```java
 // BAD — no entry/exit actions, no automatic telemetry, error-prone
 switch (state) {
-    case EXTENDING: 
+    case EXTENDING:
         if (slides.atTarget()) state = GRIPPING;
         break;
 }
@@ -138,10 +138,10 @@ public void periodic() {
 void testStateMachineTransitions() {
     enum TestState { IDLE, ACTIVE, DONE }
     StateMachine<TestState> sm = new StateMachine<>(TestState.IDLE);
-    
+
     sm.setState(TestState.ACTIVE);
     assertEquals(TestState.ACTIVE, sm.getState());
-    
+
     sm.setState(TestState.DONE);
     assertEquals(TestState.DONE, sm.getState());
 }

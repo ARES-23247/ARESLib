@@ -173,7 +173,7 @@ Autonomous path following can be validated headlessly using the `areslib-testing
 void testAutoBuilderConfigured() {
     AresRobot.setSimulation(true);
     RobotContainer container = new RobotContainer(null, null, null);
-    
+
     // Verify auto builds without exception
     assertDoesNotThrow(() -> AutoBuilder.buildAuto("SquareAuto"));
 }

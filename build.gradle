@@ -32,6 +32,31 @@ spotless {
         trimTrailingWhitespace()
         endWithNewline()
     }
+    groovyGradle {
+        target fileTree('.') {
+            include '**/*.gradle'
+            exclude '**/build/**', '**/build-*/**'
+        }
+        indentWithSpaces(4)
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+    json {
+        target fileTree('.') {
+            include '**/*.json'
+            exclude '**/build/**', '**/build-*/**'
+        }
+        gson().indentWithSpaces(2)
+    }
+    format 'misc', {
+        target fileTree('.') {
+            include '**/*.md', '**/.gitignore'
+            exclude '**/build/**', '**/build-*/**'
+        }
+        trimTrailingWhitespace()
+        indentWithSpaces(2)
+        endWithNewline()
+    }
 }
 
 checkstyle {
@@ -62,7 +87,7 @@ tasks.withType(Javadoc).configureEach {
 // Automatically apply spotless formatting before compilation
 tasks.withType(JavaCompile).configureEach {
     dependsOn 'spotlessApply'
-    
+
     // Configure Error Prone to run as non-fatal warnings
     options.errorprone {
         disableWarningsInGeneratedCode = true
@@ -140,9 +165,9 @@ configurations.ftcAars.resolvedConfiguration.lenientConfiguration.getArtifacts()
             }
         }
     }
-    
+
     def jarFile = file("$outDir/${artifact.name}-${artifact.moduleVersion.id.version}.jar")
-    
+
     if (!jarFile.exists()) {
         copy {
             from zipTree(aarFile)
@@ -151,7 +176,7 @@ configurations.ftcAars.resolvedConfiguration.lenientConfiguration.getArtifacts()
             rename('classes.jar', jarFile.name)
         }
     }
-    
+
     // Inject the extracted JAR directly back into the compile classpath
     dependencies.add('implementation', files(jarFile))
 }

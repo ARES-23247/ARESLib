@@ -1,16 +1,16 @@
-﻿{
-    "name":  "areslib-ci",
-    "version":  "1.0.0",
-    "description":  "ARESLib areslib-ci - FTC robot code framework component",
-    "author":  {
-                   "name":  "Team ARES",
-                   "url":  "https://github.com/ARESLib"
-               },
-    "repository":  "https://github.com/ARESLib/ARESLib",
-    "license":  "MIT",
-    "keywords":  [
-                     "ftc",
-                     "areslib",
-                     "ci"
-                 ]
+{
+  "name": "areslib-ci",
+  "version": "1.0.0",
+  "description": "ARESLib areslib-ci - FTC robot code framework component",
+  "author": {
+    "name": "Team ARES",
+    "url": "https://github.com/ARESLib"
+  },
+  "repository": "https://github.com/ARESLib/ARESLib",
+  "license": "MIT",
+  "keywords": [
+    "ftc",
+    "areslib",
+    "ci"
+  ]
 }

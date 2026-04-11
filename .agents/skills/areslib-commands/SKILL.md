@@ -7,7 +7,7 @@ description: Helps construct custom ARESLib WPILib-style commands, subsystem bas
 
 
 You are an expert command architecture engineer for Team ARES. When creating commands, binding buttons, or scheduling autonomous sequences in ARESLib, adhere strictly to the following guidelines.
-ARESLib explicitly completely bypasses the legacy `FTCLib` library, shipping with a completely custom `org.areslib.command` WPILib-ported architecture. Do NOT use `com.arcrobotics.ftclib`. 
+ARESLib explicitly completely bypasses the legacy `FTCLib` library, shipping with a completely custom `org.areslib.command` WPILib-ported architecture. Do NOT use `com.arcrobotics.ftclib`.
 
 ## 1. Subsystem Configuration
 When generating subsystems:
@@ -84,7 +84,7 @@ The `AresGamepad` wrapper provides WPILib-style `Trigger` objects for reactive b
 AresGamepad driver = new AresGamepad(gamepad1);
 
 driver.a()            // A / Cross button
-driver.b()            // B / Circle button  
+driver.b()            // B / Circle button
 driver.x()            // X / Square button
 driver.y()            // Y / Triangle button
 driver.leftBumper()   // Left bumper
@@ -158,11 +158,11 @@ void testCommandSchedulerLifecycle() {
     CommandScheduler.getInstance().reset();
     SubsystemBase mockSub = new SubsystemBase() {};
     CommandScheduler.getInstance().registerSubsystem(mockSub);
-    
+
     InstantCommand cmd = new InstantCommand(() -> {}, mockSub);
     CommandScheduler.getInstance().schedule(cmd);
     assertTrue(CommandScheduler.getInstance().isScheduled(cmd));
-    
+
     CommandScheduler.getInstance().run();
     assertFalse(CommandScheduler.getInstance().isScheduled(cmd));
 }

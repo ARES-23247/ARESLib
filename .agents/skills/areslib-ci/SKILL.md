@@ -67,13 +67,13 @@ ARESLib leverages `gradle/actions/setup-gradle@v4` for automatic build layer cac
       - name: Apply Code Formatting
         if: matrix.os == 'ubuntu-latest'
         run: ./gradlew spotlessApply
-        
+
       - name: Commit Auto-formatted Code
         if: matrix.os == 'ubuntu-latest'
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "style: auto-format code with spotless"
-          
+
       - name: Run Reviewdog PMD Annotations
         uses: kemsakurai/action-pmd@v1
         if: github.event_name == 'pull_request' && matrix.os == 'ubuntu-latest'
