@@ -76,4 +76,12 @@ public interface VisionIO {
    * @param index The index of the pipeline to switch to.
    */
   default void setPipeline(int index) {}
+
+  /**
+   * Pushes the robot's high-precision IMU yaw to the vision sensor. Required for ambiguity-free
+   * MegaTag 2.0 solvers to function.
+   *
+   * @param yaw The field-centric rotation of the robot.
+   */
+  default void updateRobotOrientation(org.areslib.math.geometry.Rotation2d yaw) {}
 }

@@ -171,6 +171,15 @@ public class LimelightVisionWrapper implements VisionIO {
     }
   }
 
+  @Override
+  public void updateRobotOrientation(org.areslib.math.geometry.Rotation2d yaw) {
+    for (Limelight3A limelight : limelights) {
+      if (limelight != null && limelight.isConnected()) {
+        limelight.updateRobotOrientation(yaw.getDegrees());
+      }
+    }
+  }
+
   /**
    * Provide raw access to the primary driver if teams need Limelight-specific deep functions. Use
    * sparingly to avoid breaking simulator portability.

@@ -35,6 +35,8 @@ public class AresVisionSubsystem extends SubsystemBase {
   /** Pre-allocated cache for {@link #getVisionMeasurementStdDevs}. */
   private final double[] stdDevCache = new double[3];
 
+  private java.util.function.Supplier<org.areslib.math.geometry.Rotation2d> yawSupplier = null;
+
   private double calculateDistanceWeight(double distance) {
     double baseWeight =
         MIN_WEIGHT
@@ -67,12 +69,27 @@ public class AresVisionSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    if (yawSupplier != null) {
+      io.updateRobotOrientation(yawSupplier.get());
+    }
+
     // Automatically fetch network tables or driver inputs
     io.updateInputs(inputs);
 
     // This line performs magic: It automatically diffs the fields within 'inputs'
     // and pushes the changes across network tables into AdvantageScope for logging.
     AresAutoLogger.processInputs("Vision", inputs);
+  }
+
+  /**
+   * Configures a provider to continuously feed the exact WPILib/ARESLib Field-Centric robot yaw
+   * into the vision system over USB for Megatag2 processing.
+   *
+   * @param yawSupplier A method reference, e.g., {@code () -> swerve.getPose().getRotation()}
+   */
+  public void setYawSupplier(
+      java.util.function.Supplier<org.areslib.math.geometry.Rotation2d> yawSupplier) {
+    this.yawSupplier = yawSupplier;
   }
 
   public boolean hasTarget() {
