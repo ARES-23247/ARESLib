@@ -30,28 +30,23 @@ public class ElevatorSubsystem extends SubsystemBase {
     AresAutoLogger.processInputs("Elevator", inputs);
 
     // Compute error
-    double error = targetPositionMeters - inputs.positionMeters;
+    double errorMeters = targetPositionMeters - inputs.positionMeters;
 
-    // Proportional Control with constant gravity feedforward (kG).
-    // DESIGN NOTE: kG is always applied upward regardless of direction. This creates an
-    // intentionally asymmetric response: the elevator moves up at full P-speed but descends
-    // more slowly because kG opposes the downward P-output. This is a safety feature —
-    // it prevents free-fall if the P term underestimates gravity or the motor loses power.
-    // Teams tuning for faster descent should increase kP, NOT remove kG.
-    double volts = (error * P) + G;
+    // Proportional Control with constant gravity feedforward (KG_FEEDFORWARD).
+    double outputVolts = (errorMeters * KP_POSITION) + KG_FEEDFORWARD;
 
-    if (inputs.positionMeters >= MAX_POSITION_METERS && volts > G) {
+    if (inputs.positionMeters >= MAX_POSITION_METERS && outputVolts > KG_FEEDFORWARD) {
       // At upper limit: only apply gravity hold, don't push higher
-      volts = G;
-    } else if (inputs.positionMeters <= MIN_POSITION_METERS && error <= 0.0) {
+      outputVolts = KG_FEEDFORWARD;
+    } else if (inputs.positionMeters <= MIN_POSITION_METERS && errorMeters <= 0.0) {
       // At floor with no upward demand: zero output to prevent grinding into hard stop
-      volts = 0.0;
+      outputVolts = 0.0;
     }
 
-    io.setVoltage(volts);
+    io.setVoltage(outputVolts);
 
     AresAutoLogger.recordOutput("Elevator/TargetPositionMeters", targetPositionMeters);
-    AresAutoLogger.recordOutput("Elevator/ErrorMeters", error);
+    AresAutoLogger.recordOutput("Elevator/ErrorMeters", errorMeters);
   }
 
   public void setTargetPosition(double positionMeters) {

@@ -41,11 +41,11 @@ public class MecanumDriveSubsystem extends SubsystemBase implements AresDrivetra
     /** Derivative gain for drive velocity PID. */
     public double driveKd = 0.0;
 
-    /** Static feedforward for drive motors. */
-    public double driveKs = 0.1;
+    /** Static feedforward for drive motors (Volts). */
+    public double driveKsVolts = 0.1;
 
-    /** Velocity feedforward for drive motors. */
-    public double driveKv = 2.5;
+    /** Velocity feedforward for drive motors (Volts / (m/s)). */
+    public double driveKvVoltsPerMps = 2.5;
 
     /** Max linear acceleration (m/s²). 0 = no slew limiting. */
     public double maxAccelerationMps2 = 0.0;
@@ -94,7 +94,8 @@ public class MecanumDriveSubsystem extends SubsystemBase implements AresDrivetra
     this.rearLeftPid = new PIDController(config.driveKp, config.driveKi, config.driveKd);
     this.rearRightPid = new PIDController(config.driveKp, config.driveKi, config.driveKd);
 
-    this.driveFeedforward = new SimpleMotorFeedforward(config.driveKs, config.driveKv);
+    this.driveFeedforward =
+        new SimpleMotorFeedforward(config.driveKsVolts, config.driveKvVoltsPerMps);
 
     if (config.maxAccelerationMps2 > 0.0) {
       this.fwdLimiter = new SlewRateLimiter(config.maxAccelerationMps2);

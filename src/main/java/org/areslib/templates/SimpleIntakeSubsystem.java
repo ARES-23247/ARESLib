@@ -115,12 +115,11 @@ public class SimpleIntakeSubsystem extends SubsystemBase {
     switch (state) {
       case INTAKING:
         if (inputs.pieceDetected) {
-          // Auto-stop when piece is grabbed
           state = IntakeState.STOPPED;
           io.setMotorVoltage(0.0);
-        } else {
-          io.setMotorVoltage(8.0); // 8V intake
+          break;
         }
+        io.setMotorVoltage(8.0); // 8V intake
         break;
       case EJECTING:
         io.setMotorVoltage(-6.0); // Reverse

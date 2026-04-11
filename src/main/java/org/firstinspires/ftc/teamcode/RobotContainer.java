@@ -130,14 +130,14 @@ public class RobotContainer {
       vision =
           new AresVisionSubsystem(
               new LimelightVisionWrapper(hardwareMap, "limelightFront", "limelightRear"),
-              MIN_TARGET_AREA_PERCENT,
-              MAX_TRUST_AREA_PERCENT);
+              MIN_TARGET_AREA_PERCENTAGE,
+              MAX_TRUST_AREA_PERCENTAGE);
     } else {
       vision =
           new AresVisionSubsystem(
               new org.areslib.hardware.wrappers.ArrayVisionIOSim(() -> getOdometryInputs()),
-              MIN_TARGET_AREA_PERCENT,
-              MAX_TRUST_AREA_PERCENT);
+              MIN_TARGET_AREA_PERCENTAGE,
+              MAX_TRUST_AREA_PERCENTAGE);
     }
     CommandScheduler.getInstance().registerSubsystem(vision);
 
@@ -165,10 +165,10 @@ public class RobotContainer {
   private void initPathPlanner() {
     HolonomicPathFollowerConfig config =
         new HolonomicPathFollowerConfig(
-            new PIDConstants(5.0, 0.0, 0.0), // Translation PID
-            new PIDConstants(5.0, 0.0, 0.0), // Rotation PID
-            5.0, // Max module speed
-            0.5, // Drive base radius
+            new PIDConstants(5.0, 0, 0), // Drive PID
+            new PIDConstants(5.0, 0, 0), // Turn PID
+            MAX_MODULE_SPEED_MPS,
+            DRIVE_BASE_RADIUS_METERS,
             new ReplanningConfig());
 
     // Center Origin FTC (0,0) mapped to PathPlanner Corner (1.8288, 1.8288)
@@ -265,7 +265,7 @@ public class RobotContainer {
             });
 
     // Driver Align to Tag explicitly overrides manual driving while Held
-    driver.a().whileTrue(new AlignToTagCommand(drive, vision, ALIGN_TARGET_AREA_PERCENT));
+    driver.a().whileTrue(new AlignToTagCommand(drive, vision, ALIGN_TARGET_AREA_PERCENTAGE));
 
     // Reset field-centric yaw
     driver
@@ -312,8 +312,8 @@ public class RobotContainer {
                   double correctionOmega = error * 5.0; // P-gain
 
                   drive.driveFieldCentric(
-                      driver.getLeftY() * MAX_FWD_SPEED,
-                      driver.getLeftX() * MAX_STR_SPEED,
+                      driver.getLeftY() * MAX_FWD_SPEED_MPS,
+                      driver.getLeftX() * MAX_STR_SPEED_MPS,
                       correctionOmega,
                       new Rotation2d(pinpointInputs.headingRadians));
                 },
@@ -337,9 +337,9 @@ public class RobotContainer {
               @Override
               public void execute() {
                 drive.driveFieldCentric(
-                    driver.getLeftY() * MAX_FWD_SPEED,
-                    driver.getLeftX() * MAX_STR_SPEED,
-                    driver.getRightX() * MAX_ROT_SPEED,
+                    driver.getLeftY() * MAX_FWD_SPEED_MPS,
+                    driver.getLeftX() * MAX_STR_SPEED_MPS,
+                    driver.getRightX() * MAX_ROT_SPEED_RAD_PER_SEC,
                     new org.areslib.math.geometry.Rotation2d(0) // Placeholder
                     );
               }

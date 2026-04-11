@@ -18,12 +18,20 @@ import org.dyn4j.geometry.Geometry;
 import org.dyn4j.geometry.MassType;
 
 /**
- * AdvantageKit-style Swerve Drive Subsystem.
+ * SwerveDriveSubsystem standard implementation.
  *
- * <p>Acts as the structural controller for handling physics logic across four modules. This
- * subsystem is fully self-contained within the ARESLib library — it accepts primitive configuration
- * values via its {@link Config} inner class so that team-specific config classes do not leak into
- * the library namespace.
+ * <p>Acts as the structural controller for handling physics logic across four modules.
+ *
+ * <p><strong>Mathematical References:</strong>
+ *
+ * <ul>
+ *   <li>WPILib Swerve Kinematics: <a
+ *       href="https://docs.wpilib.org/en/stable/docs/software/kinematics-and-odometry/swerve-drive-kinematics.html">Swerve
+ *       Kinematics Docs</a>
+ *   <li>Ether's Swerve Kinematics Whitepaper: <a
+ *       href="https://www.chiefdelphi.com/t/paper-swerve-kinematics-and-suspension/131705">Ether
+ *       Whitepaper</a>
+ * </ul>
  */
 public class SwerveDriveSubsystem extends SubsystemBase implements AresDrivetrain {
 
@@ -57,11 +65,11 @@ public class SwerveDriveSubsystem extends SubsystemBase implements AresDrivetrai
     /** Derivative gain for drive velocity PID. */
     public double driveKd = 0.0;
 
-    /** Static feedforward for drive motors. */
-    public double driveKs = 0.1;
+    /** Static feedforward for drive motors (Volts). */
+    public double driveKsVolts = 0.1;
 
-    /** Velocity feedforward for drive motors. */
-    public double driveKv = 2.5;
+    /** Velocity feedforward for drive motors (Volts / (m/s)). */
+    public double driveKvVoltsPerMps = 2.5;
 
     /** Proportional gain for turn position PID. */
     public double turnKp = 3.0;
@@ -72,8 +80,8 @@ public class SwerveDriveSubsystem extends SubsystemBase implements AresDrivetrai
     /** Derivative gain for turn position PID. */
     public double turnKd = 0.0;
 
-    /** Static feedforward for turn motors. */
-    public double turnKs = 0.2;
+    /** Static feedforward for turn motors (Volts). */
+    public double turnKsVolts = 0.2;
 
     /** Max linear acceleration (m/s²). 0 = no slew limiting. */
     public double maxAccelerationMps2 = 0.0;
@@ -106,7 +114,7 @@ public class SwerveDriveSubsystem extends SubsystemBase implements AresDrivetrai
   private final PIDController[] turnPids = new PIDController[4];
   private final SimpleMotorFeedforward driveFeedforward;
   private final double maxSpeedMps;
-  private final double turnKs;
+  private final double turnKsVolts;
 
   private final SlewRateLimiter fwdLimiter;
   private final SlewRateLimiter strLimiter;
@@ -152,7 +160,7 @@ public class SwerveDriveSubsystem extends SubsystemBase implements AresDrivetrai
     }
 
     this.maxSpeedMps = config.maxModuleSpeedMps;
-    this.turnKs = config.turnKs;
+    this.turnKsVolts = config.turnKsVolts;
 
     this.kinematics =
         new SwerveDriveKinematics(
@@ -162,7 +170,8 @@ public class SwerveDriveSubsystem extends SubsystemBase implements AresDrivetrai
             new Translation2d(-config.trackWidthXMeters, -config.trackWidthYMeters) // BR
             );
 
-    this.driveFeedforward = new SimpleMotorFeedforward(config.driveKs, config.driveKv);
+    this.driveFeedforward =
+        new SimpleMotorFeedforward(config.driveKsVolts, config.driveKvVoltsPerMps);
 
     for (int i = 0; i < 4; i++) {
       drivePids[i] = new PIDController(config.driveKp, config.driveKi, config.driveKd);
@@ -317,7 +326,7 @@ public class SwerveDriveSubsystem extends SubsystemBase implements AresDrivetrai
       // Apply static friction feedforward (Ks) in the direction of the PID output
       double turnFFOut = 0.0;
       if (Math.abs(turnPidOut) > 0.001) {
-        turnFFOut = Math.signum(turnPidOut) * turnKs;
+        turnFFOut = Math.signum(turnPidOut) * turnKsVolts;
       }
 
       modules[i].setDriveVoltage(feedforwardVolts + drivePidOut);

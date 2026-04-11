@@ -12,8 +12,8 @@ public final class Constants {
 
   public static final class ElevatorConstants {
     // Standard PID gains
-    public static final double P = 50.0;
-    public static final double G = 0.2; // Gravity feedforward
+    public static final double KP_POSITION = 50.0;
+    public static final double KG_FEEDFORWARD = 0.2; // Gravity feedforward
 
     // Software limits
     public static final double MAX_POSITION_METERS = 1.0;
@@ -38,18 +38,21 @@ public final class Constants {
     public static final double MAX_VISION_TRUST_FACTOR = 0.15;
 
     // Auto-align default target area
-    public static final double ALIGN_TARGET_AREA_PERCENT = 5.0;
+    public static final double ALIGN_TARGET_AREA_PERCENTAGE = 5.0;
 
     // Confidence calculation heuristics
-    public static final double MIN_TARGET_AREA_PERCENT = 0.1;
-    public static final double MAX_TRUST_AREA_PERCENT = 1.5;
+    public static final double MIN_TARGET_AREA_PERCENTAGE = 0.1;
+    public static final double MAX_TRUST_AREA_PERCENTAGE = 1.5;
   }
 
   public static final class DriveConstants {
     // Teleop User Input Scalars
-    public static final double MAX_FWD_SPEED = 3.0;
-    public static final double MAX_STR_SPEED = 3.0;
-    public static final double MAX_ROT_SPEED = 2.5;
+    public static final double MAX_FWD_SPEED_MPS = 3.0;
+    public static final double MAX_STR_SPEED_MPS = 3.0;
+    public static final double MAX_ROT_SPEED_RAD_PER_SEC = 2.5;
+
+    public static final double MAX_MODULE_SPEED_MPS = 4.0;
+    public static final double DRIVE_BASE_RADIUS_METERS = 0.45; // Approx for 30x30 frame
 
     // Swerve Physical Configuration
     public static final org.firstinspires.ftc.teamcode.subsystems.drive.SwerveConfig SWERVE_CONFIG =
@@ -63,13 +66,13 @@ public final class Constants {
       SWERVE_CONFIG.driveKi = 0.0;
       SWERVE_CONFIG.driveKd = 0.0;
 
-      SWERVE_CONFIG.driveKs = 0.1;
-      SWERVE_CONFIG.driveKv = 2.5;
+      SWERVE_CONFIG.driveKsVolts = 0.1;
+      SWERVE_CONFIG.driveKvVoltsPerMps = 2.5;
 
       SWERVE_CONFIG.turnKp = 3.0;
       SWERVE_CONFIG.turnKi = 0.0;
       SWERVE_CONFIG.turnKd = 0.0;
-      SWERVE_CONFIG.turnKs = 0.2;
+      SWERVE_CONFIG.turnKsVolts = 0.2;
 
       SWERVE_CONFIG.wheelDiameterMM = 104.0; // 104mm standard goBILDA wheel
       SWERVE_CONFIG.driveMotorModel =
@@ -95,8 +98,8 @@ public final class Constants {
       MECANUM_CONFIG.driveKp = 1.0;
       MECANUM_CONFIG.driveKi = 0.0;
       MECANUM_CONFIG.driveKd = 0.0;
-      MECANUM_CONFIG.driveKv = 2.5;
-      MECANUM_CONFIG.driveKs = 0.1;
+      MECANUM_CONFIG.driveKvVoltsPerMps = 2.5;
+      MECANUM_CONFIG.driveKsVolts = 0.1;
     }
 
     public static final org.firstinspires.ftc.teamcode.subsystems.drive.DifferentialConfig
@@ -114,8 +117,8 @@ public final class Constants {
       DIFFERENTIAL_CONFIG.driveKp = 1.0;
       DIFFERENTIAL_CONFIG.driveKi = 0.0;
       DIFFERENTIAL_CONFIG.driveKd = 0.0;
-      DIFFERENTIAL_CONFIG.driveKv = 2.5;
-      DIFFERENTIAL_CONFIG.driveKs = 0.1;
+      DIFFERENTIAL_CONFIG.driveKvVoltsPerMps = 2.5;
+      DIFFERENTIAL_CONFIG.driveKsVolts = 0.1;
     }
   }
 

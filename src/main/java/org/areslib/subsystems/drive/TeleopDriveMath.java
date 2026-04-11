@@ -6,6 +6,15 @@ package org.areslib.subsystems.drive;
  *
  * <p>Provides deadband filtering, exponential response curves, and angular input scaling for
  * precision driving during teleop.
+ *
+ * <p><strong>Mathematical References:</strong>
+ *
+ * <ul>
+ *   <li>Polar Deadbands: <a
+ *       href="https://www.gamedeveloper.com/programming/doing-thumbstick-dead-zones-right">"Doing
+ *       Thumbstick Dead Zones Right"</a>
+ *   <li>Exponential Curves: f(x) = sgn(x) * |x|^k, where k is the sensitivity exponent.
+ * </ul>
  */
 public class TeleopDriveMath {
 
@@ -42,14 +51,14 @@ public class TeleopDriveMath {
    * @param rawInput Raw joystick value (-1.0 to 1.0).
    * @param deadband Deadband threshold.
    * @param exponent Response curve exponent.
-   * @param maxSpeed Maximum output speed (m/s or rad/s).
+   * @param maxSpeedMpsOrRadPerSec Maximum output speed (m/s or rad/s).
    * @return Processed speed value ready for ChassisSpeeds.
    */
   public static double processJoystickInput(
-      double rawInput, double deadband, double exponent, double maxSpeed) {
+      double rawInput, double deadband, double exponent, double maxSpeedMpsOrRadPerSec) {
     double filtered = applyDeadband(rawInput, deadband);
     double curved = applyExponentialCurve(filtered, exponent);
-    return curved * maxSpeed;
+    return curved * maxSpeedMpsOrRadPerSec;
   }
 
   /**
@@ -62,11 +71,11 @@ public class TeleopDriveMath {
    * @param rawY Raw Y-axis joystick value.
    * @param deadband Polar deadband radius.
    * @param exponent Response curve exponent applied to the magnitude.
-   * @param maxSpeed Maximum output speed.
+   * @param maxSpeedMps Maximum output speed.
    * @return A double array [processedX, processedY] ready for ChassisSpeeds.
    */
   public static double[] processJoystick2D(
-      double rawX, double rawY, double deadband, double exponent, double maxSpeed) {
+      double rawX, double rawY, double deadband, double exponent, double maxSpeedMps) {
     double magnitude = Math.sqrt(rawX * rawX + rawY * rawY);
 
     if (magnitude < deadband) {
@@ -78,7 +87,7 @@ public class TeleopDriveMath {
     double curved = Math.pow(Math.min(rescaled, 1.0), exponent);
 
     // Maintain original direction, apply curved magnitude
-    double scale = curved * maxSpeed / magnitude;
+    double scale = curved * maxSpeedMps / magnitude;
     return new double[] {rawX * scale, rawY * scale};
   }
 }

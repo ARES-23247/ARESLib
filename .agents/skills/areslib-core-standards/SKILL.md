@@ -13,6 +13,8 @@ Physical units must be explicitly and statically declared throughout all variabl
 - **Use `edu.wpi.first.units` where applicable:** Public interfaces should accept strictly validated WPILib Units (e.g. `Measure<Distance> distance`).
 - **Strict Prefixing/Suffixing on Doubles:** If `double` is used internally for speed/computation, the variable MUST explicitly state its SI unit suffix:
   - `double velocityMetersPerSecond` (NOT `double velocity` or `double vel`)
+  - `double wheelDiameterMillimeters` or `double wheelDiameterMM` (Acceptable for small-scale lengths)
+  - `double trackWidthInches`, `double chassisLengthInches`, or `double wheelDiameterInches` (Acceptable for robot physical dimensions and wheel sizes)
   - `double accelerationNewtons`
   - `double delaySeconds`
   - `double differenceBetweenGroundAndDesiredMeters`

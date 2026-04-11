@@ -45,34 +45,47 @@ public class AresAutoLogger {
         String key = prefix + "/" + field.getName();
         Class<?> type = field.getType();
 
-        // AdvantageScope standard mapping
+        // Standard Numeric Mapping
         if (type == double.class || type == Double.class) {
           AresTelemetry.putNumber(key, (Double) value);
-        } else if (type == int.class || type == Integer.class) {
-          AresTelemetry.putNumber(
-              key, ((Integer) value).doubleValue()); // Dashboard converts everything to double
-        } else if (type == boolean.class || type == Boolean.class) {
-          AresTelemetry.putNumber(key, ((Boolean) value) ? 1.0 : 0.0);
-        } else if (type == String.class) {
-          AresTelemetry.putString(key, (String) value);
-        } else if (type == double[].class) {
-          AresTelemetry.putNumberArray(key, (double[]) value);
-        } else if (type == org.areslib.math.kinematics.SwerveModuleState[].class) {
-          org.areslib.math.kinematics.SwerveModuleState[] states =
-              (org.areslib.math.kinematics.SwerveModuleState[]) value;
-          double[] arr = new double[states.length * 2];
-          for (int i = 0; i < states.length; i++) {
-            // AdvantageScope Swerve format: [angle, speed, angle, speed, ...]
-            arr[i * 2] = states[i].angle.getRadians();
-            arr[i * 2 + 1] = states[i].speedMetersPerSecond;
-          }
-          AresTelemetry.putNumberArray(key, arr);
+          continue;
         }
 
-        // Unsupported types are silently skipped.
+        if (type == int.class || type == Integer.class) {
+          AresTelemetry.putNumber(key, ((Integer) value).doubleValue());
+          continue;
+        }
+
+        if (type == boolean.class || type == Boolean.class) {
+          AresTelemetry.putNumber(key, ((Boolean) value) ? 1.0 : 0.0);
+          continue;
+        }
+
+        if (type == String.class) {
+          AresTelemetry.putString(key, (String) value);
+          continue;
+        }
+
+        if (type == double[].class) {
+          AresTelemetry.putNumberArray(key, (double[]) value);
+          continue;
+        }
+
+        // Complex Kinematic Mapping (Adheres to AdvantageScope standard format)
+        if (type == org.areslib.math.kinematics.SwerveModuleState[].class) {
+          org.areslib.math.kinematics.SwerveModuleState[] states =
+              (org.areslib.math.kinematics.SwerveModuleState[]) value;
+          double[] telemetryArray = new double[states.length * 2];
+          for (int i = 0; i < states.length; i++) {
+            // AdvantageScope Swerve format: [angle radians, speed meters/sec]
+            telemetryArray[i * 2] = states[i].angle.getRadians();
+            telemetryArray[i * 2 + 1] = states[i].speedMetersPerSecond;
+          }
+          AresTelemetry.putNumberArray(key, telemetryArray);
+        }
 
       } catch (IllegalAccessException e) {
-        // Inaccessible fields are skipped without crashing the robot loop.
+        // Skip inaccessible fields.
       }
     }
   }

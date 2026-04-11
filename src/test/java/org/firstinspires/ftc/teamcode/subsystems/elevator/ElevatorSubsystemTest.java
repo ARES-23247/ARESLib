@@ -41,7 +41,8 @@ class ElevatorSubsystemTest {
     elevator.periodic();
 
     // Output should be positive (error * kP + kG)
-    assertTrue(mockIO.voltage > G, "Elevator should output voltage > G to rise");
+    assertTrue(
+        mockIO.voltage > KG_FEEDFORWARD, "Elevator should output voltage > KG_FEEDFORWARD to rise");
   }
 
   @Test
@@ -56,7 +57,7 @@ class ElevatorSubsystemTest {
     // Safety clamps should restrict TargetPosition, and output should be floored to just gravity
     // feedforward
     assertEquals(
-        G,
+        KG_FEEDFORWARD,
         mockIO.voltage,
         0.001,
         "Voltage should clamp exactly at gravity feedforward at max height");
