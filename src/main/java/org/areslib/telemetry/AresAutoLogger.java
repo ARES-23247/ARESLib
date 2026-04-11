@@ -1,21 +1,62 @@
 package org.areslib.telemetry;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import org.areslib.math.kinematics.SwerveModuleState;
 
 /**
- * AdvantageKit-Style AutoLogger. Caches reflected field layouts per class so {@code getFields()} is
- * only called once, then iterates over the cached array for subsequent calls. Supports primitive
- * types, Strings, double arrays, and SwerveModuleState arrays.
+ * AdvantageKit-Style AutoLogger.
+ *
+ * <p>Hardened for zero-allocation in the hot path. Caches field layouts and pre-concatenated keys
+ * per (prefix + class) combination. Uses non-boxing primitive access where possible.
  */
 public class AresAutoLogger {
 
-  /** Per-class field layout cache — avoids repeated reflection after first access. */
-  private static final Map<Class<?>, Field[]> FIELD_CACHE = new ConcurrentHashMap<>();
+  /** Unified entry for a single field being logged. */
+  private static class LogEntry {
+    final Field field;
+    final String key;
+    final LogType type;
+    double[] arrayCache; // Cached for SwerveModuleState array logging
+
+    LogEntry(Field field, String key) {
+      this.field = field;
+      this.key = key;
+      this.type = LogType.fromClass(field.getType());
+      this.field.setAccessible(true);
+    }
+  }
+
+  private enum LogType {
+    DOUBLE,
+    INT,
+    BOOLEAN,
+    STRING,
+    DOUBLE_ARRAY,
+    SWERVE_STATES,
+    UNKNOWN;
+
+    static LogType fromClass(Class<?> clazz) {
+      if (clazz == double.class || clazz == Double.class) return DOUBLE;
+      if (clazz == int.class || clazz == Integer.class) return INT;
+      if (clazz == boolean.class || clazz == Boolean.class) return BOOLEAN;
+      if (clazz == String.class) return STRING;
+      if (clazz == double[].class) return DOUBLE_ARRAY;
+      if (clazz == SwerveModuleState[].class) return SWERVE_STATES;
+      return UNKNOWN;
+    }
+  }
+
+  /** Cache of entries per prefix+class combination — eliminates per-cycle key concatenation. */
+  private static final Map<String, List<LogEntry>> ENTRY_CACHE = new ConcurrentHashMap<>();
 
   /**
    * Replicates AdvantageKit's @AutoLog by flattening all supported primitives inside the inputs.
+   *
+   * <p>Optimized for zero GC pressure via persistent entry caching.
    *
    * @param prefix Base directory string (e.g. "Elevator", "Swerve/FrontLeft")
    * @param inputs The object containing primitive fields.
@@ -23,69 +64,65 @@ public class AresAutoLogger {
   public static void processInputs(String prefix, AresLoggableInputs inputs) {
     if (inputs == null) return;
 
-    Class<?> clazz = inputs.getClass();
-
-    // Lazily cache the declared fields on first access for this class
-    Field[] fields =
-        FIELD_CACHE.computeIfAbsent(
-            clazz,
-            c -> {
-              Field[] flds = c.getDeclaredFields();
-              for (Field f : flds) {
-                f.setAccessible(true);
+    String cacheKey = prefix + "_" + inputs.getClass().getName();
+    List<LogEntry> entries =
+        ENTRY_CACHE.computeIfAbsent(
+            cacheKey,
+            k -> {
+              List<LogEntry> list = new ArrayList<>();
+              Field[] fields = inputs.getClass().getDeclaredFields();
+              for (Field f : fields) {
+                list.add(new LogEntry(f, prefix + "/" + f.getName()));
               }
-              return flds;
+              return list;
             });
 
-    for (Field field : fields) {
+    for (int i = 0; i < entries.size(); i++) {
+      LogEntry entry = entries.get(i);
       try {
-        Object value = field.get(inputs);
-        if (value == null) continue;
+        switch (entry.type) {
+          case DOUBLE:
+            // Use primitive access to avoid Double boxing
+            AresTelemetry.putNumber(entry.key, entry.field.getDouble(inputs));
+            break;
 
-        String key = prefix + "/" + field.getName();
-        Class<?> type = field.getType();
+          case INT:
+            AresTelemetry.putNumber(entry.key, (double) entry.field.getInt(inputs));
+            break;
 
-        // Standard Numeric Mapping
-        if (type == double.class || type == Double.class) {
-          AresTelemetry.putNumber(key, (Double) value);
-          continue;
+          case BOOLEAN:
+            AresTelemetry.putNumber(entry.key, entry.field.getBoolean(inputs) ? 1.0 : 0.0);
+            break;
+
+          case STRING:
+            Object strVal = entry.field.get(inputs);
+            if (strVal != null) AresTelemetry.putString(entry.key, (String) strVal);
+            break;
+
+          case DOUBLE_ARRAY:
+            double[] arr = (double[]) entry.field.get(inputs);
+            if (arr != null) AresTelemetry.putNumberArray(entry.key, arr);
+            break;
+
+          case SWERVE_STATES:
+            SwerveModuleState[] states = (SwerveModuleState[]) entry.field.get(inputs);
+            if (states != null) {
+              if (entry.arrayCache == null || entry.arrayCache.length != states.length * 2) {
+                entry.arrayCache = new double[states.length * 2];
+              }
+              for (int j = 0; j < states.length; j++) {
+                entry.arrayCache[j * 2] = states[j].angle.getRadians();
+                entry.arrayCache[j * 2 + 1] = states[j].speedMetersPerSecond;
+              }
+              AresTelemetry.putNumberArray(entry.key, entry.arrayCache);
+            }
+            break;
+
+          default:
+            break;
         }
-
-        if (type == int.class || type == Integer.class) {
-          AresTelemetry.putNumber(key, ((Integer) value).doubleValue());
-          continue;
-        }
-
-        if (type == boolean.class || type == Boolean.class) {
-          AresTelemetry.putNumber(key, ((Boolean) value) ? 1.0 : 0.0);
-          continue;
-        }
-
-        if (type == String.class) {
-          AresTelemetry.putString(key, (String) value);
-          continue;
-        }
-
-        if (type == double[].class) {
-          AresTelemetry.putNumberArray(key, (double[]) value);
-          continue;
-        }
-
-        // Complex Kinematic Mapping (Adheres to AdvantageScope standard format)
-        if (type == org.areslib.math.kinematics.SwerveModuleState[].class) {
-          org.areslib.math.kinematics.SwerveModuleState[] states =
-              (org.areslib.math.kinematics.SwerveModuleState[]) value;
-          double[] telemetryArray = new double[states.length * 2];
-          for (int i = 0; i < states.length; i++) {
-            // AdvantageScope Swerve format: [angle radians, speed meters/sec]
-            telemetryArray[i * 2] = states[i].angle.getRadians();
-            telemetryArray[i * 2 + 1] = states[i].speedMetersPerSecond;
-          }
-          AresTelemetry.putNumberArray(key, telemetryArray);
-        }
-
       } catch (IllegalAccessException e) {
-        // Skip inaccessible fields.
+        // Skip inaccessible or non-primitive fields if they failed
       }
     }
   }

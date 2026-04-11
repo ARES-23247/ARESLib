@@ -41,6 +41,10 @@ public class Translation2d implements Interpolatable<Translation2d> {
     y = other.y;
   }
 
+  public Translation2d copy() {
+    return new Translation2d(x, y);
+  }
+
   public double getX() {
     return x;
   }

@@ -56,3 +56,12 @@ Disallow single-character or massively abbreviated variable names outside of sta
 
 ## 6. File Limits
 - Restrict logic class lengths strictly to functional encapsulation. Refactor large loops into bounded helper libraries if a subsystem natively exceeds ~600 lines.
+
+## 7. Zero-Allocation Architecture
+High-frequency loops (Periodic, Drive, Odometry) MUST be GC-safe. Continuous heap allocation in the "hot path" causes jitter and long-term performance degradation.
+
+- **Pre-allocate Caches:** Use `private final` fields for all non-primitive objects used within `periodic()` or `drive()`.
+- **In-place Mutators:** Prefer methods that populate a provided result object over methods that return `new` instances.
+  - **BAD:** `targetSpeeds = ChassisSpeeds.discretize(speeds, dt); // Allocates`
+  - **GOOD:** `ChassisSpeeds.discretize(v, o, dt, result); // In-place`
+- **Telemetry Caching:** Use `AresAutoLogger` which handles reflection and string caching internally. Never perform string concatenation in a loop.

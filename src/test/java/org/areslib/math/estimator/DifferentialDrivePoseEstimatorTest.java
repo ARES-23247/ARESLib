@@ -1,28 +1,25 @@
 package org.areslib.math.estimator;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
 import org.areslib.math.geometry.Pose2d;
 import org.areslib.math.geometry.Rotation2d;
-import org.areslib.math.geometry.Twist2d;
 import org.areslib.math.kinematics.DifferentialDriveKinematics;
 import org.areslib.math.kinematics.DifferentialDriveWheelPositions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 class DifferentialDrivePoseEstimatorTest {
 
   private static final double EPSILON = 1e-6;
-  private DifferentialDriveKinematics mockKinematics;
+  private DifferentialDriveKinematics kinematics;
   private DifferentialDrivePoseEstimator estimator;
 
   @BeforeEach
   void setUp() {
-    mockKinematics = Mockito.mock(DifferentialDriveKinematics.class);
+    // 0.5m track width
+    kinematics = new DifferentialDriveKinematics(0.5);
 
     DifferentialDriveWheelPositions initialPositions =
         new DifferentialDriveWheelPositions(0.0, 0.0);
@@ -30,7 +27,7 @@ class DifferentialDrivePoseEstimatorTest {
 
     estimator =
         new DifferentialDrivePoseEstimator(
-            mockKinematics, new Rotation2d(0.0), initialPositions, initialPose);
+            kinematics, new Rotation2d(0.0), initialPositions, initialPose);
   }
 
   @Test
@@ -44,8 +41,7 @@ class DifferentialDrivePoseEstimatorTest {
   @Test
   @DisplayName("Update applies kinematic twist delta")
   void updateAppliesKinematicStep() {
-    when(mockKinematics.toTwist2d(any(), any())).thenReturn(new Twist2d(1.0, 0.0, 0.0));
-
+    // Forward 1.0m
     DifferentialDriveWheelPositions newPositions = new DifferentialDriveWheelPositions(1.0, 1.0);
 
     Pose2d newEstimatedPos = estimator.update(new Rotation2d(0.0), newPositions, 0.5);
@@ -58,11 +54,9 @@ class DifferentialDrivePoseEstimatorTest {
   @DisplayName("Vision measurement applies correctly with history buffer")
   void visionMeasurementAppliesCorrectly() {
     // Step 1: Move from X=0 to X=1 at t=0.5
-    when(mockKinematics.toTwist2d(any(), any())).thenReturn(new Twist2d(1.0, 0.0, 0.0));
     estimator.update(new Rotation2d(0.0), new DifferentialDriveWheelPositions(1.0, 1.0), 0.5);
 
     // Step 2: Move from X=1 to X=2 at t=1.0
-    when(mockKinematics.toTwist2d(any(), any())).thenReturn(new Twist2d(1.0, 0.0, 0.0));
     estimator.update(new Rotation2d(0.0), new DifferentialDriveWheelPositions(2.0, 2.0), 1.0);
 
     // Current estimator is at X=2.0
@@ -84,7 +78,7 @@ class DifferentialDrivePoseEstimatorTest {
   @Test
   @DisplayName("Resetting position zero-outs the odometry states")
   void resetPositionClearsState() {
-    when(mockKinematics.toTwist2d(any(), any())).thenReturn(new Twist2d(5.0, 0.0, 0.0));
+    // Move to X=5.0
     estimator.update(new Rotation2d(0.0), new DifferentialDriveWheelPositions(5.0, 5.0), 1.0);
 
     estimator.resetPosition(

@@ -3,9 +3,7 @@ package org.areslib.math.kinematics;
 /**
  * MecanumDriveWheelSpeeds standard implementation.
  *
- * <p>This class provides the core structural components or hardware abstraction for {@code
- * MecanumDriveWheelSpeeds}. Extracted and compiled as part of the ARESLib Code Audit for missing
- * documentation coverage.
+ * <p>Hardened for zero-allocation in high-frequency loops.
  */
 public class MecanumDriveWheelSpeeds {
   public double frontLeftMetersPerSecond;
@@ -20,9 +18,25 @@ public class MecanumDriveWheelSpeeds {
       double frontRightMetersPerSecond,
       double rearLeftMetersPerSecond,
       double rearRightMetersPerSecond) {
-    this.frontLeftMetersPerSecond = frontLeftMetersPerSecond;
-    this.frontRightMetersPerSecond = frontRightMetersPerSecond;
-    this.rearLeftMetersPerSecond = rearLeftMetersPerSecond;
-    this.rearRightMetersPerSecond = rearRightMetersPerSecond;
+    set(
+        frontLeftMetersPerSecond,
+        frontRightMetersPerSecond,
+        rearLeftMetersPerSecond,
+        rearRightMetersPerSecond);
+  }
+
+  /**
+   * Sets the wheel speeds in-place.
+   *
+   * @param fl Front left speed (m/s).
+   * @param fr Front right speed (m/s).
+   * @param rl Rear left speed (m/s).
+   * @param rr Rear right speed (m/s).
+   */
+  public void set(double fl, double fr, double rl, double rr) {
+    this.frontLeftMetersPerSecond = fl;
+    this.frontRightMetersPerSecond = fr;
+    this.rearLeftMetersPerSecond = rl;
+    this.rearRightMetersPerSecond = rr;
   }
 }

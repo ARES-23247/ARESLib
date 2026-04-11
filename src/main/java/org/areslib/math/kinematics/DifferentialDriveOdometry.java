@@ -7,8 +7,10 @@ import org.areslib.math.geometry.Twist2d;
 public class DifferentialDriveOdometry {
   private final DifferentialDriveKinematics kinematics;
   private Pose2d pose;
-  private Rotation2d previousAngle;
-  private DifferentialDriveWheelPositions previousWheelPositions;
+  private final Rotation2d previousAngle = new Rotation2d();
+  private final DifferentialDriveWheelPositions previousWheelPositions =
+      new DifferentialDriveWheelPositions();
+  private final Twist2d twistCache = new Twist2d();
 
   public DifferentialDriveOdometry(
       DifferentialDriveKinematics kinematics,
@@ -16,10 +18,9 @@ public class DifferentialDriveOdometry {
       DifferentialDriveWheelPositions wheelPositions,
       Pose2d initialPose) {
     this.kinematics = kinematics;
-    pose = initialPose;
-    previousAngle = gyroAngle;
-    previousWheelPositions =
-        new DifferentialDriveWheelPositions(wheelPositions.leftMeters, wheelPositions.rightMeters);
+    this.pose = initialPose;
+    this.previousAngle.set(gyroAngle);
+    this.previousWheelPositions.set(wheelPositions);
   }
 
   public DifferentialDriveOdometry(
@@ -31,10 +32,9 @@ public class DifferentialDriveOdometry {
 
   public void resetPosition(
       Rotation2d gyroAngle, DifferentialDriveWheelPositions wheelPositions, Pose2d pose) {
-    this.pose = pose;
-    previousAngle = gyroAngle;
-    previousWheelPositions =
-        new DifferentialDriveWheelPositions(wheelPositions.leftMeters, wheelPositions.rightMeters);
+    this.pose.set(pose);
+    this.previousAngle.set(gyroAngle);
+    this.previousWheelPositions.set(wheelPositions);
   }
 
   /**
@@ -52,15 +52,15 @@ public class DifferentialDriveOdometry {
   }
 
   public Pose2d update(Rotation2d gyroAngle, DifferentialDriveWheelPositions wheelPositions) {
-    Twist2d twist = kinematics.toTwist2d(previousWheelPositions, wheelPositions);
+    kinematics.toTwist2d(previousWheelPositions, wheelPositions, twistCache);
 
-    twist.dtheta = gyroAngle.minus(previousAngle).getRadians();
+    // Override the kinematic twist with the gyro delta for accuracy
+    twistCache.dtheta = gyroAngle.minus(previousAngle).getRadians();
 
-    pose = pose.exp(twist);
+    pose.exp(twistCache, pose);
 
-    previousAngle = gyroAngle;
-    previousWheelPositions =
-        new DifferentialDriveWheelPositions(wheelPositions.leftMeters, wheelPositions.rightMeters);
+    previousAngle.set(gyroAngle);
+    previousWheelPositions.set(wheelPositions);
 
     return pose;
   }

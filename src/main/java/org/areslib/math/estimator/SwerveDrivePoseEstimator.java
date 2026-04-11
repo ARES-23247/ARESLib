@@ -66,8 +66,9 @@ public class SwerveDrivePoseEstimator {
    */
   public Pose2d update(
       Rotation2d gyroAngle, SwerveModulePosition[] modulePositions, double timestampSeconds) {
-    estimatedPose = odometry.update(gyroAngle, modulePositions);
-    poseBuffer.addSample(timestampSeconds, estimatedPose);
+    odometry.update(gyroAngle, modulePositions);
+    estimatedPose = odometry.getPose();
+    poseBuffer.addSample(timestampSeconds, estimatedPose.copy());
     return estimatedPose;
   }
 

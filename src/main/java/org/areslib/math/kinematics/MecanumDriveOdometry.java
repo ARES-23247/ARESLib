@@ -7,8 +7,10 @@ import org.areslib.math.geometry.Twist2d;
 public class MecanumDriveOdometry {
   private final MecanumDriveKinematics kinematics;
   private Pose2d pose;
-  private Rotation2d previousAngle;
-  private MecanumDriveWheelPositions previousWheelPositions;
+  private final Rotation2d previousAngle = new Rotation2d();
+  private final MecanumDriveWheelPositions previousWheelPositions =
+      new MecanumDriveWheelPositions();
+  private final Twist2d twistCache = new Twist2d();
 
   public MecanumDriveOdometry(
       MecanumDriveKinematics kinematics,
@@ -16,14 +18,9 @@ public class MecanumDriveOdometry {
       MecanumDriveWheelPositions wheelPositions,
       Pose2d initialPose) {
     this.kinematics = kinematics;
-    pose = initialPose;
-    previousAngle = gyroAngle;
-    previousWheelPositions =
-        new MecanumDriveWheelPositions(
-            wheelPositions.frontLeftMeters,
-            wheelPositions.frontRightMeters,
-            wheelPositions.rearLeftMeters,
-            wheelPositions.rearRightMeters);
+    this.pose = initialPose;
+    this.previousAngle.set(gyroAngle);
+    this.previousWheelPositions.set(wheelPositions);
   }
 
   public MecanumDriveOdometry(
@@ -35,14 +32,9 @@ public class MecanumDriveOdometry {
 
   public void resetPosition(
       Rotation2d gyroAngle, MecanumDriveWheelPositions wheelPositions, Pose2d pose) {
-    this.pose = pose;
-    previousAngle = gyroAngle;
-    previousWheelPositions =
-        new MecanumDriveWheelPositions(
-            wheelPositions.frontLeftMeters,
-            wheelPositions.frontRightMeters,
-            wheelPositions.rearLeftMeters,
-            wheelPositions.rearRightMeters);
+    this.pose.set(pose);
+    this.previousAngle.set(gyroAngle);
+    this.previousWheelPositions.set(wheelPositions);
   }
 
   /**
@@ -60,19 +52,15 @@ public class MecanumDriveOdometry {
   }
 
   public Pose2d update(Rotation2d gyroAngle, MecanumDriveWheelPositions wheelPositions) {
-    Twist2d twist = kinematics.toTwist2d(previousWheelPositions, wheelPositions);
+    kinematics.toTwist2d(previousWheelPositions, wheelPositions, twistCache);
 
-    twist.dtheta = gyroAngle.minus(previousAngle).getRadians();
+    // Override the kinematic twist with the gyro delta for accuracy
+    twistCache.dtheta = gyroAngle.minus(previousAngle).getRadians();
 
-    pose = pose.exp(twist);
+    pose.exp(twistCache, pose);
 
-    previousAngle = gyroAngle;
-    previousWheelPositions =
-        new MecanumDriveWheelPositions(
-            wheelPositions.frontLeftMeters,
-            wheelPositions.frontRightMeters,
-            wheelPositions.rearLeftMeters,
-            wheelPositions.rearRightMeters);
+    previousAngle.set(gyroAngle);
+    previousWheelPositions.set(wheelPositions);
 
     return pose;
   }

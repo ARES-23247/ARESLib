@@ -22,33 +22,13 @@ import org.dyn4j.geometry.MassType;
  *
  * <p>Acts as the structural controller for handling physics logic across four modules.
  *
- * <p><strong>Mathematical References:</strong>
- *
- * <ul>
- *   <li>WPILib Swerve Kinematics: <a
- *       href="https://docs.wpilib.org/en/stable/docs/software/kinematics-and-odometry/swerve-drive-kinematics.html">Swerve
- *       Kinematics Docs</a>
- *   <li>Ether's Swerve Kinematics Whitepaper: <a
- *       href="https://www.chiefdelphi.com/t/paper-swerve-kinematics-and-suspension/131705">Ether
- *       Whitepaper</a>
- * </ul>
+ * <p>Hardened for zero-allocation in high-frequency loops.
  */
 public class SwerveDriveSubsystem extends SubsystemBase implements AresDrivetrain {
 
-  /**
-   * Angular acceleration is allowed to be faster than linear acceleration because rotational
-   * inertia is significantly lower than translational inertia for typical FTC-sized robots. This
-   * multiplier is applied to {@code maxAccelerationMps2} when constructing the rotation slew rate
-   * limiter.
-   */
   private static final double ANGULAR_ACCEL_MULTIPLIER = 2.0;
 
-  /**
-   * Configuration data class for the SwerveDriveSubsystem.
-   *
-   * <p>Contains physics and tuning parameters specific to a robot's physical construction. Team
-   * code should populate an instance of this class and pass it to the subsystem constructor.
-   */
+  /** Configuration data class for the SwerveDriveSubsystem. */
   public static class Config {
     /** Distance from center to wheels along X (meters). */
     public double trackWidthXMeters = 0.3;
@@ -104,9 +84,9 @@ public class SwerveDriveSubsystem extends SubsystemBase implements AresDrivetrai
   private final SwerveModuleIO.SwerveModuleInputs brInputs =
       new SwerveModuleIO.SwerveModuleInputs();
 
-  private double commandedVx = 0.0;
-  private double commandedVy = 0.0;
-  private double commandedOmega = 0.0;
+  private double commandedVxMps = 0.0;
+  private double commandedVyMps = 0.0;
+  private double commandedOmegaRadPerSec = 0.0;
 
   private final SwerveDriveKinematics kinematics;
 
@@ -120,24 +100,19 @@ public class SwerveDriveSubsystem extends SubsystemBase implements AresDrivetrai
   private final SlewRateLimiter strLimiter;
   private final SlewRateLimiter rotLimiter;
 
-  // Pre-allocated caches to avoid per-loop heap allocations in periodic() and drive()
+  // Pre-allocated caches to avoid per-loop heap allocations
   private final SwerveModuleState[] cachedActualStates = new SwerveModuleState[4];
+  private final SwerveModuleState[] cachedTargetStates = new SwerveModuleState[4];
   private final SwerveModuleState[] cachedOptimizedStates = new SwerveModuleState[4];
   private final Rotation2d[] cachedModuleRotations = new Rotation2d[4];
+  private final ChassisSpeeds targetChassisSpeeds = new ChassisSpeeds();
+  private final ChassisSpeeds discreteChassisSpeeds = new ChassisSpeeds();
+
   private final SwerveModuleIO[] modules;
   private final SwerveModuleIO.SwerveModuleInputs[] inputsArray;
 
   private Body simChassis = null;
 
-  /**
-   * Constructs the SwerveDriveSubsystem.
-   *
-   * @param config The robot-specific physical tuning constants and constraints.
-   * @param frontLeft The front left module IO.
-   * @param frontRight The front right module IO.
-   * @param backLeft The back left module IO.
-   * @param backRight The back right module IO.
-   */
   public SwerveDriveSubsystem(
       Config config,
       SwerveModuleIO frontLeft,
@@ -155,6 +130,7 @@ public class SwerveDriveSubsystem extends SubsystemBase implements AresDrivetrai
 
     for (int i = 0; i < 4; i++) {
       cachedActualStates[i] = new SwerveModuleState();
+      cachedTargetStates[i] = new SwerveModuleState();
       cachedOptimizedStates[i] = new SwerveModuleState();
       cachedModuleRotations[i] = new Rotation2d();
     }
@@ -191,9 +167,8 @@ public class SwerveDriveSubsystem extends SubsystemBase implements AresDrivetrai
 
     if (org.areslib.core.AresRobot.isSimulation()) {
       simChassis = new Body();
-      // 18x18 inches is 0.4572 meters
       BodyFixture fixture = simChassis.addFixture(Geometry.createRectangle(0.4572, 0.4572));
-      fixture.setDensity(20.0); // Approximation for a ~15kg FTC robot
+      fixture.setDensity(20.0);
       fixture.setFriction(0.5);
       simChassis.setMass(MassType.NORMAL);
       simChassis.setLinearDamping(0.9);
@@ -214,11 +189,10 @@ public class SwerveDriveSubsystem extends SubsystemBase implements AresDrivetrai
     AresAutoLogger.processInputs("Swerve/BackLeft", blInputs);
     AresAutoLogger.processInputs("Swerve/BackRight", brInputs);
 
-    SwerveModuleIO.SwerveModuleInputs[] allInputs = {flInputs, frInputs, blInputs, brInputs};
     for (int i = 0; i < 4; i++) {
-      cachedModuleRotations[i] = new Rotation2d(allInputs[i].turnAbsolutePositionRad);
-      cachedActualStates[i].speedMetersPerSecond = allInputs[i].driveVelocityMps;
-      cachedActualStates[i].angle = cachedModuleRotations[i];
+      cachedModuleRotations[i].set(inputsArray[i].turnAbsolutePositionRad);
+      cachedActualStates[i].speedMetersPerSecond = inputsArray[i].driveVelocityMps;
+      cachedActualStates[i].angle.set(cachedModuleRotations[i]);
     }
     AresTelemetry.logSwerveStates("Robot/SwerveActual", cachedActualStates);
   }
@@ -226,62 +200,39 @@ public class SwerveDriveSubsystem extends SubsystemBase implements AresDrivetrai
   @Override
   public void simulationPeriodic() {
     if (simChassis != null) {
-      // Apply commanded velocities to the physical body
-      simChassis.setLinearVelocity(commandedVx, commandedVy);
-      simChassis.setAngularVelocity(commandedOmega);
+      simChassis.setLinearVelocity(commandedVxMps, commandedVyMps);
+      simChassis.setAngularVelocity(commandedOmegaRadPerSec);
     }
   }
 
-  /**
-   * @return The commanded X velocity in m/s.
-   */
   @Override
   public double getCommandedVx() {
-    return commandedVx;
+    return commandedVxMps;
   }
 
-  /**
-   * @return The commanded Y velocity in m/s.
-   */
   @Override
   public double getCommandedVy() {
-    return commandedVy;
+    return commandedVyMps;
   }
 
-  /**
-   * @return The commanded angular velocity in rad/s.
-   */
   @Override
   public double getCommandedOmega() {
-    return commandedOmega;
+    return commandedOmegaRadPerSec;
   }
 
-  /**
-   * Commands the swerve drive to move in a field-centric manner.
-   *
-   * @param vxMetersPerSec The X velocity (field relative) in m/s.
-   * @param vyMetersPerSec The Y velocity (field relative) in m/s.
-   * @param omegaRadPerSec The angular velocity in rad/s.
-   * @param robotHeading The current robot heading.
-   */
   public void driveFieldCentric(
       double vxMetersPerSec,
       double vyMetersPerSec,
       double omegaRadPerSec,
       Rotation2d robotHeading) {
-    ChassisSpeeds speeds =
-        ChassisSpeeds.fromFieldRelativeSpeeds(
-            vxMetersPerSec, vyMetersPerSec, omegaRadPerSec, robotHeading);
-    drive(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond);
+    targetChassisSpeeds.fromFieldRelative(
+        vxMetersPerSec, vyMetersPerSec, omegaRadPerSec, robotHeading);
+    drive(
+        targetChassisSpeeds.vxMetersPerSecond,
+        targetChassisSpeeds.vyMetersPerSecond,
+        targetChassisSpeeds.omegaRadiansPerSecond);
   }
 
-  /**
-   * Commands the swerve drive to move in a robot-centric manner.
-   *
-   * @param forwardMetersPerSec The forward velocity in m/s (X axis).
-   * @param strafeMetersPerSec The strafe velocity in m/s (Y axis).
-   * @param turnRadPerSec The angular velocity in rad/s.
-   */
   public void drive(double forwardMetersPerSec, double strafeMetersPerSec, double turnRadPerSec) {
     if (fwdLimiter != null) {
       forwardMetersPerSec =
@@ -292,26 +243,30 @@ public class SwerveDriveSubsystem extends SubsystemBase implements AresDrivetrai
           rotLimiter.calculate(turnRadPerSec, org.areslib.core.AresRobot.LOOP_PERIOD_SECS);
     }
 
-    this.commandedVx = forwardMetersPerSec;
-    this.commandedVy = strafeMetersPerSec;
-    this.commandedOmega = turnRadPerSec;
+    this.commandedVxMps = forwardMetersPerSec;
+    this.commandedVyMps = strafeMetersPerSec;
+    this.commandedOmegaRadPerSec = turnRadPerSec;
 
-    ChassisSpeeds speeds =
-        new ChassisSpeeds(forwardMetersPerSec, strafeMetersPerSec, turnRadPerSec);
-    speeds = ChassisSpeeds.discretize(speeds, org.areslib.core.AresRobot.LOOP_PERIOD_SECS);
-    SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds);
-    SwerveDriveKinematics.desaturateWheelSpeeds(states, maxSpeedMps);
+    ChassisSpeeds.discretize(
+        forwardMetersPerSec,
+        strafeMetersPerSec,
+        turnRadPerSec,
+        org.areslib.core.AresRobot.LOOP_PERIOD_SECS,
+        discreteChassisSpeeds);
 
-    AresTelemetry.logSwerveStates("Robot/SwerveTarget", states);
+    kinematics.toSwerveModuleStates(discreteChassisSpeeds, cachedTargetStates);
+    SwerveDriveKinematics.desaturateWheelSpeeds(cachedTargetStates, maxSpeedMps);
+
+    AresTelemetry.logSwerveStates("Robot/SwerveTarget", cachedTargetStates);
 
     for (int i = 0; i < 4; i++) {
-      cachedModuleRotations[i] = new Rotation2d(inputsArray[i].turnAbsolutePositionRad);
-      SwerveModuleState.optimize(states[i], cachedModuleRotations[i], cachedOptimizedStates[i]);
+      cachedModuleRotations[i].set(inputsArray[i].turnAbsolutePositionRad);
+      SwerveModuleState.optimize(
+          cachedTargetStates[i], cachedModuleRotations[i], cachedOptimizedStates[i]);
 
       double targetSpeedMps = cachedOptimizedStates[i].speedMetersPerSecond;
       double targetAngleRad = cachedOptimizedStates[i].angle.getRadians();
 
-      // Prevent snapping back to 0 degrees when stopping
       if (Math.abs(targetSpeedMps) <= 0.01) {
         targetAngleRad = inputsArray[i].turnAbsolutePositionRad;
         targetSpeedMps = 0.0;
@@ -319,11 +274,9 @@ public class SwerveDriveSubsystem extends SubsystemBase implements AresDrivetrai
 
       double feedforwardVolts = driveFeedforward.calculate(targetSpeedMps);
       double drivePidOut = drivePids[i].calculate(inputsArray[i].driveVelocityMps, targetSpeedMps);
-
       double turnPidOut =
           turnPids[i].calculate(inputsArray[i].turnAbsolutePositionRad, targetAngleRad);
 
-      // Apply static friction feedforward (Ks) in the direction of the PID output
       double turnFFOut = 0.0;
       if (Math.abs(turnPidOut) > 0.001) {
         turnFFOut = Math.signum(turnPidOut) * turnKsVolts;

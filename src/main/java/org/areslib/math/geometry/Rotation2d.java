@@ -4,23 +4,48 @@ import java.util.Objects;
 
 /** A rotation in a 2D coordinate frame represented a point on the unit circle (cosine and sine). */
 public class Rotation2d implements Interpolatable<Rotation2d> {
-  private double value;
+  private double valueRadians;
   private double cos;
   private double sin;
 
   public Rotation2d() {
-    value = 0.0;
+    valueRadians = 0.0;
     cos = 1.0;
     sin = 0.0;
   }
 
-  public Rotation2d(double value) {
-    this.value = value;
-    cos = Math.cos(value);
-    sin = Math.sin(value);
+  public Rotation2d(double valueRadians) {
+    this.valueRadians = valueRadians;
+    cos = Math.cos(valueRadians);
+    sin = Math.sin(valueRadians);
   }
 
   public Rotation2d(double x, double y) {
+    set(x, y);
+  }
+
+  /**
+   * Sets the rotation in radians in-place. Useful for eliminating garbage collection overhead in
+   * tight loops.
+   */
+  public void set(double valueRadians) {
+    this.valueRadians = valueRadians;
+    cos = Math.cos(valueRadians);
+    sin = Math.sin(valueRadians);
+  }
+
+  /** Sets the rotation in degrees in-place. */
+  public void setDegrees(double degrees) {
+    set(Math.toRadians(degrees));
+  }
+
+  /**
+   * Sets the rotation based on X and Y components (atan2).
+   *
+   * @param x X component.
+   * @param y Y component.
+   */
+  public void set(double x, double y) {
     double magnitude = Math.hypot(x, y);
     if (magnitude > 1e-6) {
       sin = y / magnitude;
@@ -29,24 +54,20 @@ public class Rotation2d implements Interpolatable<Rotation2d> {
       sin = 0.0;
       cos = 1.0;
     }
-    value = Math.atan2(sin, cos);
-  }
-
-  /**
-   * Sets the rotation in radians in-place. Useful for eliminating garbage collection overhead in
-   * tight loops.
-   */
-  public void set(double value) {
-    this.value = value;
-    cos = Math.cos(value);
-    sin = Math.sin(value);
+    valueRadians = Math.atan2(sin, cos);
   }
 
   /** Sets the rotation equal to another Rotation2d in-place. */
   public void set(Rotation2d other) {
-    value = other.value;
+    valueRadians = other.valueRadians;
     cos = other.cos;
     sin = other.sin;
+  }
+
+  public Rotation2d copy() {
+    Rotation2d out = new Rotation2d();
+    out.set(this);
+    return out;
   }
 
   public static Rotation2d fromDegrees(double degrees) {
@@ -54,11 +75,11 @@ public class Rotation2d implements Interpolatable<Rotation2d> {
   }
 
   public double getRadians() {
-    return value;
+    return valueRadians;
   }
 
   public double getDegrees() {
-    return Math.toDegrees(value);
+    return Math.toDegrees(valueRadians);
   }
 
   public double getCos() {
@@ -78,11 +99,11 @@ public class Rotation2d implements Interpolatable<Rotation2d> {
   }
 
   public Rotation2d unaryMinus() {
-    return new Rotation2d(-value);
+    return new Rotation2d(-valueRadians);
   }
 
   public Rotation2d times(double scalar) {
-    return new Rotation2d(value * scalar);
+    return new Rotation2d(valueRadians * scalar);
   }
 
   public Rotation2d rotateBy(Rotation2d other) {
@@ -99,7 +120,8 @@ public class Rotation2d implements Interpolatable<Rotation2d> {
 
   @Override
   public String toString() {
-    return String.format("Rotation2d(Rads: %.2f, Deg: %.2f)", value, Math.toDegrees(value));
+    return String.format(
+        "Rotation2d(Rads: %.2f, Deg: %.2f)", valueRadians, Math.toDegrees(valueRadians));
   }
 
   @Override

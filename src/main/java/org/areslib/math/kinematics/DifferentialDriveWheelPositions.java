@@ -11,4 +11,18 @@ public class DifferentialDriveWheelPositions {
     this.leftMeters = leftMeters;
     this.rightMeters = rightMeters;
   }
+
+  public void set(DifferentialDriveWheelPositions other) {
+    this.leftMeters = other.leftMeters;
+    this.rightMeters = other.rightMeters;
+  }
+
+  public void set(double leftMeters, double rightMeters) {
+    this.leftMeters = leftMeters;
+    this.rightMeters = rightMeters;
+  }
+
+  public DifferentialDriveWheelPositions copy() {
+    return new DifferentialDriveWheelPositions(leftMeters, rightMeters);
+  }
 }

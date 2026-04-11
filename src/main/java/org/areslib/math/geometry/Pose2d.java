@@ -27,16 +27,40 @@ public class Pose2d implements Interpolatable<Pose2d> {
    * objects in tight odometry loops.
    */
   public void set(Pose2d other) {
-    // We use the underlying set() methods of Translation2d and Rotation2d
-    // to avoid creating ANY trailing orphaned objects for the GC.
     translation.set(other.translation);
     rotation.set(other.rotation);
   }
 
-  /** Sets the pose components in-place. */
+  /**
+   * Sets the pose components in-place.
+   *
+   * @param translation The new translation.
+   * @param rotation The new rotation.
+   */
   public void set(Translation2d translation, Rotation2d rotation) {
-    translation.set(translation);
-    rotation.set(rotation);
+    this.translation.set(translation);
+    this.rotation.set(rotation);
+  }
+
+  /**
+   * Creates a deep copy of the pose.
+   *
+   * @return A new Pose2d instance with copied components.
+   */
+  public Pose2d copy() {
+    return new Pose2d(translation.copy(), rotation.copy());
+  }
+
+  /**
+   * Sets the pose components in-place.
+   *
+   * @param x The new X coordinate.
+   * @param y The new Y coordinate.
+   * @param angleRadians The new angle in radians.
+   */
+  public void set(double x, double y, double angleRadians) {
+    translation.set(x, y);
+    rotation.set(angleRadians);
   }
 
   public Transform2d minus(Pose2d other) {
@@ -113,6 +137,18 @@ public class Pose2d implements Interpolatable<Pose2d> {
    * @return The new Pose2d.
    */
   public Pose2d exp(Twist2d twist) {
+    Pose2d out = new Pose2d();
+    exp(twist, out);
+    return out;
+  }
+
+  /**
+   * Calculates the exponential map (constant curvature velocity integration) in-place.
+   *
+   * @param twist The twist to apply.
+   * @param out The object to populate with the result.
+   */
+  public void exp(Twist2d twist, Pose2d out) {
     double dx = twist.dx;
     double dy = twist.dy;
     double dtheta = twist.dtheta;
@@ -129,12 +165,18 @@ public class Pose2d implements Interpolatable<Pose2d> {
       c = (1.0 - cosTheta) / dtheta;
     }
 
-    Transform2d transform =
-        new Transform2d(
-            new Translation2d(dx * s - dy * c, dx * c + dy * s),
-            new Rotation2d(cosTheta, sinTheta));
+    double tx = dx * s - dy * c;
+    double ty = dx * c + dy * s;
 
-    return this.plus(new Pose2d(transform.getTranslation(), transform.getRotation()));
+    // Apply the local transform to the current pose
+    double cos = rotation.getCos();
+    double sin = rotation.getSin();
+
+    double newX = translation.getX() + (tx * cos - ty * sin);
+    double newY = translation.getY() + (tx * sin + ty * cos);
+    double newTheta = rotation.getRadians() + dtheta;
+
+    out.set(newX, newY, newTheta);
   }
 
   /**
@@ -162,7 +204,8 @@ public class Pose2d implements Interpolatable<Pose2d> {
     Translation2d translationPart =
         transform
             .getTranslation()
-            .rotateBy(new Rotation2d(halfThetaByTanOfHalfDtheta, -halfDtheta));
+            .rotateBy(new Rotation2d(halfThetaByTanOfHalfDtheta, -halfDtheta))
+            .times(Math.hypot(halfThetaByTanOfHalfDtheta, halfDtheta));
 
     return new Twist2d(translationPart.getX(), translationPart.getY(), dtheta);
   }

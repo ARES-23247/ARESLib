@@ -16,10 +16,10 @@ public class EliteShooterMathTest {
     ChassisSpeeds currentSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
 
     double vShot = 20.0;
+    EliteShooterMath.EliteShooterSetpoint result = new EliteShooterMath.EliteShooterSetpoint();
 
-    EliteShooterMath.EliteShooterSetpoint result =
-        EliteShooterMath.calculateShotOnTheMove(
-            currentPose, currentSpeeds, 5.0, 0.0, 0.0, 0.0, vShot, 9.81, 0.0);
+    EliteShooterMath.calculateShotOnTheMove(
+        currentPose, currentSpeeds, 5.0, 0.0, 0.0, 0.0, vShot, 9.81, 0.0, result);
 
     // Aim yaw should be 0 radians (straight ahead on X axis)
     assertEquals(0.0, result.robotAimYawRadians, 1e-4);
@@ -38,10 +38,10 @@ public class EliteShooterMathTest {
     ChassisSpeeds currentSpeeds = new ChassisSpeeds(0.0, 2.0, 0.0);
 
     double vShot = 20.0;
+    EliteShooterMath.EliteShooterSetpoint result = new EliteShooterMath.EliteShooterSetpoint();
 
-    EliteShooterMath.EliteShooterSetpoint result =
-        EliteShooterMath.calculateShotOnTheMove(
-            currentPose, currentSpeeds, 5.0, 0.0, 0.0, 0.0, vShot, 9.81, 0.0);
+    EliteShooterMath.calculateShotOnTheMove(
+        currentPose, currentSpeeds, 5.0, 0.0, 0.0, 0.0, vShot, 9.81, 0.0, result);
 
     // Because the robot is moving left(+Y), the virtual target must be shifted right(-Y) to
     // compensate
@@ -51,15 +51,39 @@ public class EliteShooterMathTest {
   }
 
   @Test
+  public void testGravityCompensation() {
+    Pose2d currentPose = new Pose2d(0.0, 0.0, new Rotation2d());
+    ChassisSpeeds currentSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
+
+    double vShot = 10.0;
+    double gravity = 9.81;
+    double distance = 5.0;
+    double targetZ = 0.0;
+    double releaseZ = 0.0;
+
+    EliteShooterMath.EliteShooterSetpoint result = new EliteShooterMath.EliteShooterSetpoint();
+    EliteShooterMath.calculateShotOnTheMove(
+        currentPose, currentSpeeds, distance, 0.0, targetZ, releaseZ, vShot, gravity, 0.0, result);
+
+    // Ball falls 0.5 * 9.81 * (0.5^2) = 1.22625 meters.
+    // To hit a target at release height, it must aim UP.
+    assertTrue(result.hoodRadians > 0, "Must aim UP to compensate for gravity");
+
+    // Exact Vz required = (dz + drop) / t = (0 + 1.22625) / 0.5 = 2.4525
+    // atan2(2.4525, 10) approx 13.77 degrees
+    assertEquals(Math.atan2(2.4525, 10), result.hoodRadians, 1e-2);
+  }
+
+  @Test
   public void testFeedforwardCalculation() {
     Pose2d currentPose = new Pose2d(0.0, 0.0, new Rotation2d());
     ChassisSpeeds currentSpeeds = new ChassisSpeeds(2.0, 0.0, 0.0);
 
     double vShot = 20.0;
+    EliteShooterMath.EliteShooterSetpoint result = new EliteShooterMath.EliteShooterSetpoint();
 
-    EliteShooterMath.EliteShooterSetpoint result =
-        EliteShooterMath.calculateShotOnTheMove(
-            currentPose, currentSpeeds, 5.0, 5.0, 0.0, 0.0, vShot, 9.81, 0.0);
+    EliteShooterMath.calculateShotOnTheMove(
+        currentPose, currentSpeeds, 5.0, 5.0, 0.0, 0.0, vShot, 9.81, 0.0, result);
 
     // There should be a non-zero chassis angular feedforward
     assertTrue(

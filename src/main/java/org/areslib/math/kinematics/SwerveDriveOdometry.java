@@ -15,8 +15,11 @@ import org.areslib.math.geometry.Twist2d;
 public class SwerveDriveOdometry {
   private final SwerveDriveKinematics kinematics;
   private Pose2d pose;
-  private Rotation2d previousAngle;
-  private SwerveModulePosition[] previousModulePositions;
+  private final Rotation2d previousAngle = new Rotation2d();
+  private final SwerveModulePosition[] previousModulePositions;
+
+  // Pre-allocated cache to avoid per-loop heap allocations
+  private final Twist2d cachedTwist = new Twist2d();
 
   /**
    * Constructs a SwerveDriveOdometry object.
@@ -32,8 +35,8 @@ public class SwerveDriveOdometry {
       SwerveModulePosition[] modulePositions,
       Pose2d initialPose) {
     this.kinematics = kinematics;
-    pose = initialPose;
-    previousAngle = gyroAngle;
+    this.pose = initialPose;
+    this.previousAngle.set(gyroAngle);
 
     previousModulePositions = new SwerveModulePosition[modulePositions.length];
     for (int i = 0; i < modulePositions.length; i++) {
@@ -58,11 +61,11 @@ public class SwerveDriveOdometry {
    */
   public void resetPosition(
       Rotation2d gyroAngle, SwerveModulePosition[] modulePositions, Pose2d pose) {
-    this.pose = pose;
-    previousAngle = gyroAngle;
+    this.pose.set(pose);
+    this.previousAngle.set(gyroAngle);
     for (int i = 0; i < modulePositions.length; i++) {
-      previousModulePositions[i] =
-          new SwerveModulePosition(modulePositions[i].distanceMeters, modulePositions[i].angle);
+      previousModulePositions[i].distanceMeters = modulePositions[i].distanceMeters;
+      previousModulePositions[i].angle = modulePositions[i].angle;
     }
   }
 
@@ -98,15 +101,15 @@ public class SwerveDriveOdometry {
       throw new IllegalArgumentException("Number of modules must remain constant.");
     }
 
-    Twist2d twist = kinematics.toTwist2d(previousModulePositions, modulePositions);
+    kinematics.toTwist2d(previousModulePositions, modulePositions, cachedTwist);
 
     // WPILib exact odometry substitution: Gyro defines absolute dtheta!
-    twist.dtheta = gyroAngle.minus(previousAngle).getRadians();
+    cachedTwist.dtheta = gyroAngle.minus(previousAngle).getRadians();
 
     // Exact exponential curve geometry mapping
-    pose = pose.exp(twist);
+    pose.exp(cachedTwist, pose);
 
-    previousAngle = gyroAngle;
+    previousAngle.set(gyroAngle);
     for (int i = 0; i < modulePositions.length; i++) {
       previousModulePositions[i].distanceMeters = modulePositions[i].distanceMeters;
       previousModulePositions[i].angle = modulePositions[i].angle;

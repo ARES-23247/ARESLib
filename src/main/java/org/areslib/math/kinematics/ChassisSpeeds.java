@@ -4,8 +4,13 @@ import org.areslib.math.geometry.Rotation2d;
 
 /** Represents the speed of a robot chassis. */
 public class ChassisSpeeds {
+  /** The velocity in the X direction (meters per second). */
   public double vxMetersPerSecond;
+
+  /** The velocity in the Y direction (meters per second). */
   public double vyMetersPerSecond;
+
+  /** The angular velocity (radians per second). */
   public double omegaRadiansPerSecond;
 
   public ChassisSpeeds() {}
@@ -17,65 +22,111 @@ public class ChassisSpeeds {
     this.omegaRadiansPerSecond = omegaRadiansPerSecond;
   }
 
+  /**
+   * Sets the velocity components.
+   *
+   * @param vx Forward velocity (m/s).
+   * @param vy Strafe velocity (m/s).
+   * @param omega Angular velocity (rad/s).
+   * @return This object for chaining.
+   */
+  public ChassisSpeeds set(double vx, double vy, double omega) {
+    this.vxMetersPerSecond = vx;
+    this.vyMetersPerSecond = vy;
+    this.omegaRadiansPerSecond = omega;
+    return this;
+  }
+
+  /**
+   * Sets this object from field-relative speeds.
+   *
+   * @param vx Field-relative X (m/s).
+   * @param vy Field-relative Y (m/s).
+   * @param omega Angular velocity (rad/s).
+   * @param robotAngle Current robot heading.
+   * @return This object for chaining.
+   */
+  public ChassisSpeeds fromFieldRelative(
+      double vx, double vy, double omega, Rotation2d robotAngle) {
+    double cos = robotAngle.getCos();
+    double sin = robotAngle.getSin();
+    this.vxMetersPerSecond = vx * cos + vy * sin;
+    this.vyMetersPerSecond = -vx * sin + vy * cos;
+    this.omegaRadiansPerSecond = omega;
+    return this;
+  }
+
   public static ChassisSpeeds fromFieldRelativeSpeeds(
       double vxMetersPerSecond,
       double vyMetersPerSecond,
       double omegaRadiansPerSecond,
       Rotation2d robotAngle) {
-    return new ChassisSpeeds(
-        vxMetersPerSecond * robotAngle.getCos() + vyMetersPerSecond * robotAngle.getSin(),
-        -vxMetersPerSecond * robotAngle.getSin() + vyMetersPerSecond * robotAngle.getCos(),
-        omegaRadiansPerSecond);
+    return new ChassisSpeeds()
+        .fromFieldRelative(vxMetersPerSecond, vyMetersPerSecond, omegaRadiansPerSecond, robotAngle);
   }
 
   /**
-   * Discretizes a continuous-time chassis speed.
-   *
-   * <p>This function resolves "Drive Skew" in swerve drives. When actualizing a continuous command,
-   * the robot will actually drive an arc over the duration of the control loop (dt). This function
-   * uses Pose Exponential integration to compute the exact discrete speeds required to land
-   * perfectly at the end of the arc.
+   * Discretizes a continuous-time chassis speed into an equivalent discrete speed for a loop cycle.
    *
    * @param vxMetersPerSecond Forward velocity.
    * @param vyMetersPerSecond Sideways velocity.
    * @param omegaRadiansPerSecond Angular velocity.
-   * @param dtSeconds The duration of the control loop (standard is 0.02).
-   * @return Discretized ChassisSpeeds.
+   * @param dtSeconds The duration of the control loop.
+   * @param result Object to populate with discretized speeds.
    */
-  public static ChassisSpeeds discretize(
+  public static void discretize(
       double vxMetersPerSecond,
       double vyMetersPerSecond,
       double omegaRadiansPerSecond,
-      double dtSeconds) {
+      double dtSeconds,
+      ChassisSpeeds result) {
 
-    // Guard: a zero or negative timestep would cause division by zero below.
-    // Return the continuous speeds unchanged, which is the mathematically correct
-    // limit as dt → 0 (the arc displacement collapses to the instantaneous velocity).
     if (dtSeconds <= 0.0) {
-      return new ChassisSpeeds(vxMetersPerSecond, vyMetersPerSecond, omegaRadiansPerSecond);
+      result.set(vxMetersPerSecond, vyMetersPerSecond, omegaRadiansPerSecond);
+      return;
     }
 
-    // Use the exact pose exponential mapping to calculate the arc displacement
-    org.areslib.math.geometry.Pose2d desiredDeltaPose =
-        new org.areslib.math.geometry.Pose2d(0, 0, new Rotation2d())
-            .exp(
-                new org.areslib.math.geometry.Twist2d(
-                    vxMetersPerSecond * dtSeconds,
-                    vyMetersPerSecond * dtSeconds,
-                    omegaRadiansPerSecond * dtSeconds));
+    // If omega is negligible, discretization is identity
+    if (Math.abs(omegaRadiansPerSecond) < 1e-9) {
+      result.set(vxMetersPerSecond, vyMetersPerSecond, omegaRadiansPerSecond);
+      return;
+    }
 
-    return new ChassisSpeeds(
-        desiredDeltaPose.getX() / dtSeconds,
-        desiredDeltaPose.getY() / dtSeconds,
-        desiredDeltaPose.getRotation().getRadians() / dtSeconds);
+    // Exact pose logarithm mapping (the inverse of what we had)
+    double theta = omegaRadiansPerSecond * dtSeconds;
+    double halfTheta = 0.5 * theta;
+    double cosMinusOne = Math.cos(theta) - 1.0;
+
+    double halfThetaByTanOfHalfTheta;
+    if (Math.abs(cosMinusOne) < 1e-9) {
+      halfThetaByTanOfHalfTheta = 1.0 - 1.0 / 12.0 * theta * theta;
+    } else {
+      halfThetaByTanOfHalfTheta = -(halfTheta * Math.sin(theta)) / cosMinusOne;
+    }
+
+    // Log calculation involves rotating the desired translation to find the equivalent twist
+    // x = halfTheta * cot(halfTheta), y = -halfTheta
+    double x = halfThetaByTanOfHalfTheta;
+    double y = -halfTheta;
+
+    // Apply rotation matrix:
+    // newVx = vx * x - vy * y
+    // newVy = vx * y + vy * x
+    double resultVx = vxMetersPerSecond * x - vyMetersPerSecond * y;
+    double resultVy = vxMetersPerSecond * y + vyMetersPerSecond * x;
+
+    result.set(resultVx, resultVy, omegaRadiansPerSecond);
   }
 
   public static ChassisSpeeds discretize(ChassisSpeeds continuousSpeeds, double dtSeconds) {
-    return discretize(
+    ChassisSpeeds result = new ChassisSpeeds();
+    discretize(
         continuousSpeeds.vxMetersPerSecond,
         continuousSpeeds.vyMetersPerSecond,
         continuousSpeeds.omegaRadiansPerSecond,
-        dtSeconds);
+        dtSeconds,
+        result);
+    return result;
   }
 
   @Override

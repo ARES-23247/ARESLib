@@ -13,14 +13,10 @@ import org.areslib.telemetry.AresAutoLogger;
 /**
  * AdvantageKit-style Differential Drive Subsystem.
  *
- * <p>Acts as the structural controller for handling physics logic across left and right sides.
- * Configuration is provided via the nested {@link Config} class to avoid cyclic dependencies.
+ * <p>Hardened for zero-allocation in high-frequency loops.
  */
 public class DifferentialDriveSubsystem extends SubsystemBase implements AresDrivetrain {
 
-  /**
-   * @see SwerveDriveSubsystem#ANGULAR_ACCEL_MULTIPLIER
-   */
   private static final double ANGULAR_ACCEL_MULTIPLIER = 2.0;
 
   /** Configuration data class for the DifferentialDriveSubsystem. */
@@ -51,8 +47,8 @@ public class DifferentialDriveSubsystem extends SubsystemBase implements AresDri
   private final DifferentialDriveIO.DifferentialDriveInputs inputs =
       new DifferentialDriveIO.DifferentialDriveInputs();
 
-  private double commandedVx = 0.0;
-  private double commandedOmega = 0.0;
+  private double commandedVxMps = 0.0;
+  private double commandedOmegaRadPerSec = 0.0;
 
   private final DifferentialDriveKinematics kinematics;
 
@@ -62,6 +58,11 @@ public class DifferentialDriveSubsystem extends SubsystemBase implements AresDri
 
   private final SlewRateLimiter fwdLimiter;
   private final SlewRateLimiter rotLimiter;
+
+  // Pre-allocated caches to avoid per-loop heap allocations
+  private final ChassisSpeeds targetChassisSpeeds = new ChassisSpeeds();
+  private final ChassisSpeeds discreteChassisSpeeds = new ChassisSpeeds();
+  private final DifferentialDriveWheelSpeeds cachedWheelSpeeds = new DifferentialDriveWheelSpeeds();
 
   /**
    * Constructs the DifferentialDriveSubsystem.
@@ -94,61 +95,32 @@ public class DifferentialDriveSubsystem extends SubsystemBase implements AresDri
     AresAutoLogger.processInputs("DifferentialDrive", inputs);
   }
 
-  /**
-   * @return The commanded X velocity in m/s.
-   */
   @Override
   public double getCommandedVx() {
-    return commandedVx;
+    return commandedVxMps;
   }
 
-  /**
-   * Always returns 0.0 — differential drives cannot strafe.
-   *
-   * @return 0.0
-   */
   @Override
   public double getCommandedVy() {
     return 0.0;
   }
 
-  /**
-   * @return The commanded angular velocity in rad/s.
-   */
   @Override
   public double getCommandedOmega() {
-    return commandedOmega;
+    return commandedOmegaRadPerSec;
   }
 
-  /**
-   * Commands the differential drive to move in a field-centric manner.
-   *
-   * <p>Note: Differential drives cannot strafe. The Y velocity component from the field-relative
-   * transform is silently discarded.
-   *
-   * @param vxMetersPerSec The X velocity (field relative) in m/s.
-   * @param vyMetersPerSec The Y velocity (field relative) in m/s — discarded.
-   * @param omegaRadPerSec The angular velocity in rad/s.
-   * @param robotHeading The current robot heading.
-   */
   public void driveFieldCentric(
       double vxMetersPerSec,
       double vyMetersPerSec,
       double omegaRadPerSec,
       Rotation2d robotHeading) {
-    ChassisSpeeds speeds =
-        ChassisSpeeds.fromFieldRelativeSpeeds(
-            vxMetersPerSec, vyMetersPerSec, omegaRadPerSec, robotHeading);
+    targetChassisSpeeds.fromFieldRelative(
+        vxMetersPerSec, vyMetersPerSec, omegaRadPerSec, robotHeading);
     // Differential drives can only use forward (vx) and turn (omega); strafe (vy) is dropped
-    drive(speeds.vxMetersPerSecond, speeds.omegaRadiansPerSecond);
+    drive(targetChassisSpeeds.vxMetersPerSecond, targetChassisSpeeds.omegaRadiansPerSecond);
   }
 
-  /**
-   * Commands the differential drive to move in a robot-centric manner.
-   *
-   * @param forwardMetersPerSec The forward velocity in m/s (X axis).
-   * @param turnRadPerSec The angular velocity in rad/s.
-   */
   public void drive(double forwardMetersPerSec, double turnRadPerSec) {
     if (fwdLimiter != null) {
       forwardMetersPerSec =
@@ -157,21 +129,25 @@ public class DifferentialDriveSubsystem extends SubsystemBase implements AresDri
           rotLimiter.calculate(turnRadPerSec, org.areslib.core.AresRobot.LOOP_PERIOD_SECS);
     }
 
-    this.commandedVx = forwardMetersPerSec;
-    this.commandedOmega = turnRadPerSec;
+    this.commandedVxMps = forwardMetersPerSec;
+    this.commandedOmegaRadPerSec = turnRadPerSec;
 
-    ChassisSpeeds speeds = new ChassisSpeeds(forwardMetersPerSec, 0.0, turnRadPerSec);
-    speeds = ChassisSpeeds.discretize(speeds, org.areslib.core.AresRobot.LOOP_PERIOD_SECS);
+    ChassisSpeeds.discretize(
+        forwardMetersPerSec,
+        0.0,
+        turnRadPerSec,
+        org.areslib.core.AresRobot.LOOP_PERIOD_SECS,
+        discreteChassisSpeeds);
 
-    DifferentialDriveWheelSpeeds wheelSpeeds = kinematics.toWheelSpeeds(speeds);
+    kinematics.toWheelSpeeds(discreteChassisSpeeds, cachedWheelSpeeds);
 
     double leftVolts =
-        driveFeedforward.calculate(wheelSpeeds.leftMetersPerSecond)
-            + leftPid.calculate(inputs.leftVelocityMps, wheelSpeeds.leftMetersPerSecond);
+        driveFeedforward.calculate(cachedWheelSpeeds.leftMetersPerSecond)
+            + leftPid.calculate(inputs.leftVelocityMps, cachedWheelSpeeds.leftMetersPerSecond);
 
     double rightVolts =
-        driveFeedforward.calculate(wheelSpeeds.rightMetersPerSecond)
-            + rightPid.calculate(inputs.rightVelocityMps, wheelSpeeds.rightMetersPerSecond);
+        driveFeedforward.calculate(cachedWheelSpeeds.rightMetersPerSecond)
+            + rightPid.calculate(inputs.rightVelocityMps, cachedWheelSpeeds.rightMetersPerSecond);
 
     io.setVoltages(leftVolts, rightVolts);
   }

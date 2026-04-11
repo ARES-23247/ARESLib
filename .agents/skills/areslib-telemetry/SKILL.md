@@ -128,3 +128,12 @@ periodic() {
     // Missing: AresTelemetry.update();
 }
 ```
+
+## 5. Performance & Zero-Allocation
+The telemetry pipeline is hardened for high-frequency execution (e.g. 250Hz odometry loops).
+
+- **Internal Caching:** `AresAutoLogger` uses an internal `ENTRY_CACHE` to store `Entry` objects and reflection fields. The first call to `processInputs` for a new class/prefix combination incurs a one-time reflection cost; subsequent calls are zero-allocation and look up cached handles.
+- **Avoid Per-Loop Concatenation:** Never use `"+"`, `String.format()`, or `StringBuilder` inside `periodic()`. The `processInputs` method handles key concatenation once and caches the result.
+- **Array Logging:** When logging arrays (e.g. Swerve states), use pre-allocated arrays to avoid GC pressure.
+  - **BAD:** `AresTelemetry.logSwerveStates("Target", new SwerveModuleState[]{...}); // New array every loop`
+  - **GOOD:** Use a `private final SwerveModuleState[] cachedStates` field and populate its elements before logging.

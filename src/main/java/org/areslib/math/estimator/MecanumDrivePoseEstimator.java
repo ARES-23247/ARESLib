@@ -66,7 +66,7 @@ public class MecanumDrivePoseEstimator {
   public Pose2d update(
       Rotation2d gyroAngle, MecanumDriveWheelPositions wheelPositions, double timestampSeconds) {
     estimatedPose = odometry.update(gyroAngle, wheelPositions);
-    poseBuffer.addSample(timestampSeconds, estimatedPose);
+    poseBuffer.addSample(timestampSeconds, estimatedPose.copy());
     return estimatedPose;
   }
 

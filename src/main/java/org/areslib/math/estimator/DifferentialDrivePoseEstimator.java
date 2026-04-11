@@ -70,7 +70,7 @@ public class DifferentialDrivePoseEstimator {
       DifferentialDriveWheelPositions wheelPositions,
       double timestampSeconds) {
     estimatedPose = odometry.update(gyroAngle, wheelPositions);
-    poseBuffer.addSample(timestampSeconds, estimatedPose);
+    poseBuffer.addSample(timestampSeconds, estimatedPose.copy());
     return estimatedPose;
   }
 

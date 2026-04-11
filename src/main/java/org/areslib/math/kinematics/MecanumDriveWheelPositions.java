@@ -25,4 +25,27 @@ public class MecanumDriveWheelPositions {
     this.rearLeftMeters = rearLeftMeters;
     this.rearRightMeters = rearRightMeters;
   }
+
+  public void set(MecanumDriveWheelPositions other) {
+    this.frontLeftMeters = other.frontLeftMeters;
+    this.frontRightMeters = other.frontRightMeters;
+    this.rearLeftMeters = other.rearLeftMeters;
+    this.rearRightMeters = other.rearRightMeters;
+  }
+
+  public void set(
+      double frontLeftMeters,
+      double frontRightMeters,
+      double rearLeftMeters,
+      double rearRightMeters) {
+    this.frontLeftMeters = frontLeftMeters;
+    this.frontRightMeters = frontRightMeters;
+    this.rearLeftMeters = rearLeftMeters;
+    this.rearRightMeters = rearRightMeters;
+  }
+
+  public MecanumDriveWheelPositions copy() {
+    return new MecanumDriveWheelPositions(
+        frontLeftMeters, frontRightMeters, rearLeftMeters, rearRightMeters);
+  }
 }

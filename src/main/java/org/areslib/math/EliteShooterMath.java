@@ -37,106 +37,144 @@ public class EliteShooterMath {
 
     /** Whether the solution is physically valid (positive time-of-flight). */
     public boolean isValid;
+
+    /** Resets the setpoint to an invalid state. */
+    public void reset() {
+      robotAimYawRadians = 0;
+      chassisAngularFeedforward = 0;
+      hoodRadians = 0;
+      hoodFeedforward = 0;
+      launchSpeedMetersPerSec = 0;
+      isValid = false;
+    }
   }
 
   /**
    * Mathematically solves the exact shot state needed to hit a 3D target given current robot speeds
    * and constraints.
    *
+   * <p><strong>Mathematical Reference:</strong> Trajectory compensation solves for {@code t} in:
+   * {@code ||P_target - (P_robot + V_robot*t)|| = V_shot * t}
+   *
    * @param robotPose Current field-relative robot pose.
    * @param fieldRelativeSpeeds Current field-relative speeds of the chassis.
-   * @param targetX The X coordinate of the target on the field (meters).
-   * @param targetY The Y coordinate of the target on the field (meters).
-   * @param targetZ The Z coordinate (height) of the target on the field (meters).
-   * @param releaseHeightZ Height of the robot's shooter mechanism from the floor (meters).
+   * @param targetXMeters The X coordinate of the target on the field (meters).
+   * @param targetYMeters The Y coordinate of the target on the field (meters).
+   * @param targetZMeters The Z coordinate (height) of the target on the field (meters).
+   * @param releaseHeightZMeters Height of the robot's shooter mechanism from the floor (meters).
    * @param nominalShotSpeedMetersPerSec Base shot velocity output limit.
-   * @param gravity Gravity constant (typically 9.81, positive downward).
+   * @param gravityMetersPerSecSq Gravity constant (typically 9.81).
    * @param liftCoefficient Aerodynamic lift coefficient of the game piece (0 for no lift).
-   * @return Computed EliteShooterSetpoint with exact angles and feedforwards.
+   * @param result Setpoint object to populate (Zero-allocation pattern).
    */
-  public static EliteShooterSetpoint calculateShotOnTheMove(
+  public static void calculateShotOnTheMove(
       Pose2d robotPose,
       ChassisSpeeds fieldRelativeSpeeds,
-      double targetX,
-      double targetY,
-      double targetZ,
-      double releaseHeightZ,
+      double targetXMeters,
+      double targetYMeters,
+      double targetZMeters,
+      double releaseHeightZMeters,
       double nominalShotSpeedMetersPerSec,
-      double gravity,
-      double liftCoefficient) {
-
-    EliteShooterSetpoint setpoint = new EliteShooterSetpoint();
+      double gravityMetersPerSecSq,
+      double liftCoefficient,
+      EliteShooterSetpoint result) {
 
     // Vector from robot to target
-    double dx = targetX - robotPose.getTranslation().getX();
-    double dy = targetY - robotPose.getTranslation().getY();
-    double dz = targetZ - releaseHeightZ;
+    double deltaXMeters = targetXMeters - robotPose.getTranslation().getX();
+    double deltaYMeters = targetYMeters - robotPose.getTranslation().getY();
+    double deltaZMeters = targetZMeters - releaseHeightZMeters;
 
-    double vShot = nominalShotSpeedMetersPerSec;
-    double vx = fieldRelativeSpeeds.vxMetersPerSecond;
-    double vy = fieldRelativeSpeeds.vyMetersPerSecond;
+    double velocityRobotXMetersPerSec = fieldRelativeSpeeds.vxMetersPerSecond;
+    double velocityRobotYMetersPerSec = fieldRelativeSpeeds.vyMetersPerSecond;
 
     // Solve quadratic equation for time-of-flight:
     // a = vx^2 + vy^2 - vShot^2
     // b = -2 * (dx * vx + dy * vy)
     // c = dx^2 + dy^2 + dz^2
-    double a = vx * vx + vy * vy - vShot * vShot;
+    double coeffsA =
+        velocityRobotXMetersPerSec * velocityRobotXMetersPerSec
+            + velocityRobotYMetersPerSec * velocityRobotYMetersPerSec
+            - nominalShotSpeedMetersPerSec * nominalShotSpeedMetersPerSec;
 
-    if (Math.abs(a) < 1e-6) {
+    if (Math.abs(coeffsA) < 1e-6) {
       // Adjust to avoid division by zero / non-quadratic states
-      vShot = 1.01 * vShot;
-      a = vx * vx + vy * vy - vShot * vShot;
+      nominalShotSpeedMetersPerSec = 1.01 * nominalShotSpeedMetersPerSec;
+      coeffsA =
+          velocityRobotXMetersPerSec * velocityRobotXMetersPerSec
+              + velocityRobotYMetersPerSec * velocityRobotYMetersPerSec
+              - nominalShotSpeedMetersPerSec * nominalShotSpeedMetersPerSec;
     }
 
-    double b = -2.0 * (dx * vx + dy * vy);
-    double c = dx * dx + dy * dy + dz * dz;
+    double coeffsB =
+        -2.0
+            * (deltaXMeters * velocityRobotXMetersPerSec
+                + deltaYMeters * velocityRobotYMetersPerSec);
+    double coeffsC =
+        deltaXMeters * deltaXMeters + deltaYMeters * deltaYMeters + deltaZMeters * deltaZMeters;
 
-    double discriminant = b * b - 4.0 * a * c;
+    double discriminant = coeffsB * coeffsB - 4.0 * coeffsA * coeffsC;
     if (discriminant < 0.0) {
       discriminant = 0.0;
     }
 
     // Solve for time of flight
-    double t = (-b - Math.sqrt(discriminant)) / (2.0 * a);
+    double timeOfFlightSeconds = (-coeffsB - Math.sqrt(discriminant)) / (2.0 * coeffsA);
 
-    if (t <= 0) {
-      setpoint.isValid = false;
-      return setpoint;
+    if (timeOfFlightSeconds <= 0) {
+      result.reset();
+      return;
     }
 
     // Virtual shot vector: where the ball needs to go relative to robot
-    double virtualShotX = (dx - vx * t) / t;
-    double virtualShotY = (dy - vy * t) / t;
+    double virtualShotXMetersPerSec =
+        (deltaXMeters - velocityRobotXMetersPerSec * timeOfFlightSeconds) / timeOfFlightSeconds;
+    double virtualShotYMetersPerSec =
+        (deltaYMeters - velocityRobotYMetersPerSec * timeOfFlightSeconds) / timeOfFlightSeconds;
 
-    double virtualTargetYawRad = Math.atan2(virtualShotY, virtualShotX);
-    double xyVel = Math.sqrt(virtualShotX * virtualShotX + virtualShotY * virtualShotY);
+    double virtualTargetYawRad = Math.atan2(virtualShotYMetersPerSec, virtualShotXMetersPerSec);
+    double xyVelocityMetersPerSec =
+        Math.sqrt(
+            virtualShotXMetersPerSec * virtualShotXMetersPerSec
+                + virtualShotYMetersPerSec * virtualShotYMetersPerSec);
 
     // Apply gravity and lift compensation
-    double drop = 0.5 * t * t * gravity;
-    drop += 0.5 * liftCoefficient * c;
+    // Corrected: Aim UP by 'drop' to offset gravity pulling the ball down.
+    double gravityDropMeters =
+        0.5 * timeOfFlightSeconds * timeOfFlightSeconds * gravityMetersPerSecSq;
+    gravityDropMeters += 0.5 * liftCoefficient * coeffsC;
 
-    double pitchAngleRads = Math.atan2((dz - drop) / t, xyVel);
-    double adjustedVShot = Math.sqrt((dz - drop) * (dz - drop) / (t * t) + xyVel * xyVel);
+    double pitchAngleRad =
+        Math.atan2(
+            (deltaZMeters + gravityDropMeters) / timeOfFlightSeconds, xyVelocityMetersPerSec);
+    double adjustedLaunchSpeedMps =
+        Math.sqrt(
+            Math.pow((deltaZMeters + gravityDropMeters) / timeOfFlightSeconds, 2)
+                + xyVelocityMetersPerSec * xyVelocityMetersPerSec);
 
-    // Compute Chassis Aim and Feedforward (use distSq directly — avoids sqrt only to re-square)
-    double distSq = dx * dx + dy * dy;
+    // Compute Chassis Aim and Feedforward (use distanceSquared directly — avoids sqrt only to
+    // re-square)
+    double distanceSquaredMeters = deltaXMeters * deltaXMeters + deltaYMeters * deltaYMeters;
 
-    double chassisAngularFF = (dy * vx - dx * vy) / distSq;
+    double chassisAngularFF =
+        (deltaYMeters * velocityRobotXMetersPerSec - deltaXMeters * velocityRobotYMetersPerSec)
+            / distanceSquaredMeters;
 
     // Project robot velocity into the target frame for hood feed-forward
-    double cosAngle = Math.cos(virtualTargetYawRad);
-    double sinAngle = Math.sin(virtualTargetYawRad);
-    double projectedX = vx * cosAngle + vy * sinAngle;
+    double cosYaw = Math.cos(virtualTargetYawRad);
+    double sinYaw = Math.sin(virtualTargetYawRad);
+    double projectedXVelocityMps =
+        velocityRobotXMetersPerSec * cosYaw + velocityRobotYMetersPerSec * sinYaw;
 
-    double hoodFF = projectedX * -dz / (distSq + dz * dz);
+    double hoodFF =
+        projectedXVelocityMps
+            * -deltaZMeters
+            / (distanceSquaredMeters + deltaZMeters * deltaZMeters);
 
-    setpoint.robotAimYawRadians = virtualTargetYawRad;
-    setpoint.chassisAngularFeedforward = chassisAngularFF;
-    setpoint.hoodRadians = pitchAngleRads;
-    setpoint.hoodFeedforward = hoodFF;
-    setpoint.launchSpeedMetersPerSec = adjustedVShot;
-    setpoint.isValid = true;
-
-    return setpoint;
+    result.robotAimYawRadians = virtualTargetYawRad;
+    result.chassisAngularFeedforward = chassisAngularFF;
+    result.hoodRadians = pitchAngleRad;
+    result.hoodFeedforward = hoodFF;
+    result.launchSpeedMetersPerSec = adjustedLaunchSpeedMps;
+    result.isValid = true;
   }
 }

@@ -1,6 +1,5 @@
 package org.areslib.math.kinematics;
 
-import org.areslib.math.geometry.Rotation2d;
 import org.areslib.math.geometry.Translation2d;
 
 /**
@@ -36,10 +35,9 @@ public class SwerveDriveKinematics {
    * Converts a chassis speed to array of swerve module states.
    *
    * @param chassisSpeeds The chassis speeds.
-   * @return Array of swerve module states.
+   * @param states The array to populate with new states. Must be of length >= numModules.
    */
-  public SwerveModuleState[] toSwerveModuleStates(ChassisSpeeds chassisSpeeds) {
-    SwerveModuleState[] states = new SwerveModuleState[modules.length];
+  public void toSwerveModuleStates(ChassisSpeeds chassisSpeeds, SwerveModuleState[] states) {
     for (int i = 0; i < modules.length; i++) {
       double vx =
           chassisSpeeds.vxMetersPerSecond * inverseKinematics[i * 2][0]
@@ -51,18 +49,33 @@ public class SwerveDriveKinematics {
               + chassisSpeeds.vyMetersPerSecond * inverseKinematics[i * 2 + 1][1]
               + chassisSpeeds.omegaRadiansPerSecond * inverseKinematics[i * 2 + 1][2];
 
-      states[i] = new SwerveModuleState(Math.hypot(vx, vy), new Rotation2d(vx, vy));
+      states[i].speedMetersPerSecond = Math.hypot(vx, vy);
+      states[i].angle.set(vx, vy);
     }
+  }
+
+  /**
+   * Converts a chassis speed to array of swerve module states.
+   *
+   * @param chassisSpeeds The chassis speeds.
+   * @return Array of swerve module states.
+   */
+  public SwerveModuleState[] toSwerveModuleStates(ChassisSpeeds chassisSpeeds) {
+    SwerveModuleState[] states = new SwerveModuleState[modules.length];
+    for (int i = 0; i < modules.length; i++) {
+      states[i] = new SwerveModuleState();
+    }
+    toSwerveModuleStates(chassisSpeeds, states);
     return states;
   }
 
   /**
    * Converts an array of swerve module states into a single chassis speed.
    *
+   * @param result The object to populate with computed speeds.
    * @param moduleStates Array of swerve module states.
-   * @return The chassis speed.
    */
-  public ChassisSpeeds toChassisSpeeds(SwerveModuleState... moduleStates) {
+  public void toChassisSpeeds(ChassisSpeeds result, SwerveModuleState... moduleStates) {
     if (moduleStates.length != modules.length) {
       throw new IllegalArgumentException("Number of module states must match number of modules");
     }
@@ -80,7 +93,69 @@ public class SwerveDriveKinematics {
       omega += forwardKinematics[2][i * 2] * moduleVx + forwardKinematics[2][i * 2 + 1] * moduleVy;
     }
 
-    return new ChassisSpeeds(vx, vy, omega);
+    result.set(vx, vy, omega);
+  }
+
+  /**
+   * Converts an array of swerve module states into a single chassis speed.
+   *
+   * @param moduleStates Array of swerve module states.
+   * @return The chassis speed.
+   */
+  public ChassisSpeeds toChassisSpeeds(SwerveModuleState... moduleStates) {
+    ChassisSpeeds result = new ChassisSpeeds();
+    toChassisSpeeds(result, moduleStates);
+    return result;
+  }
+
+  /**
+   * Converts swerve module position deltas into a Twist2d. (Allocates)
+   *
+   * @param previousPositions The module positions at the start of the interval.
+   * @param currentPositions The module positions at the end of the interval.
+   * @return The twist over the interval.
+   */
+  public org.areslib.math.geometry.Twist2d toTwist2d(
+      SwerveModulePosition[] previousPositions, SwerveModulePosition[] currentPositions) {
+    org.areslib.math.geometry.Twist2d out = new org.areslib.math.geometry.Twist2d();
+    toTwist2d(previousPositions, currentPositions, out);
+    return out;
+  }
+
+  /**
+   * Converts swerve module position deltas into a Twist2d in-place.
+   *
+   * @param previousPositions The module positions at the start of the interval.
+   * @param currentPositions The module positions at the end of the interval.
+   * @param out The object to populate.
+   */
+  public void toTwist2d(
+      SwerveModulePosition[] previousPositions,
+      SwerveModulePosition[] currentPositions,
+      org.areslib.math.geometry.Twist2d out) {
+    if (previousPositions.length != modules.length || currentPositions.length != modules.length) {
+      throw new IllegalArgumentException("Number of module positions must match number of modules");
+    }
+
+    double dx = 0;
+    double dy = 0;
+    double dtheta = 0;
+
+    for (int i = 0; i < modules.length; i++) {
+      double distanceDelta =
+          currentPositions[i].distanceMeters - previousPositions[i].distanceMeters;
+      // Rotation2d used here is immutable, but we are using its pre-computed trig values
+      double moduleDx = distanceDelta * currentPositions[i].angle.getCos();
+      double moduleDy = distanceDelta * currentPositions[i].angle.getSin();
+
+      dx += forwardKinematics[0][i * 2] * moduleDx + forwardKinematics[0][i * 2 + 1] * moduleDy;
+      dy += forwardKinematics[1][i * 2] * moduleDx + forwardKinematics[1][i * 2 + 1] * moduleDy;
+      dtheta += forwardKinematics[2][i * 2] * moduleDx + forwardKinematics[2][i * 2 + 1] * moduleDy;
+    }
+
+    out.dx = dx;
+    out.dy = dy;
+    out.dtheta = dtheta;
   }
 
   /**
@@ -101,31 +176,5 @@ public class SwerveDriveKinematics {
             state.speedMetersPerSecond / realMaxSpeed * attainableMaxSpeedMetersPerSecond;
       }
     }
-  }
-
-  /**
-   * Converts an array of swerve module position deltas into a single Twist2d delta.
-   *
-   * @param start Module positions at the start of the interval.
-   * @param end Module positions at the end of the interval.
-   * @return The twist over the interval.
-   */
-  public org.areslib.math.geometry.Twist2d toTwist2d(
-      SwerveModulePosition[] start, SwerveModulePosition[] end) {
-    if (start.length != modules.length || end.length != modules.length) {
-      throw new IllegalArgumentException("Number of module positions must match number of modules");
-    }
-
-    SwerveModuleState[] moduleDeltas = new SwerveModuleState[modules.length];
-    for (int i = 0; i < modules.length; i++) {
-      moduleDeltas[i] =
-          new SwerveModuleState(end[i].distanceMeters - start[i].distanceMeters, end[i].angle);
-    }
-
-    ChassisSpeeds twistSpeeds = toChassisSpeeds(moduleDeltas);
-    return new org.areslib.math.geometry.Twist2d(
-        twistSpeeds.vxMetersPerSecond,
-        twistSpeeds.vyMetersPerSecond,
-        twistSpeeds.omegaRadiansPerSecond);
   }
 }

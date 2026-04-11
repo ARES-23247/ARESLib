@@ -14,14 +14,10 @@ import org.areslib.telemetry.AresAutoLogger;
 /**
  * AdvantageKit-style Mecanum Drive Subsystem.
  *
- * <p>Acts as the structural controller for handling physics logic across all four wheels.
- * Configuration is provided via the nested {@link Config} class to avoid cyclic dependencies.
+ * <p>Hardened for zero-allocation in high-frequency loops.
  */
 public class MecanumDriveSubsystem extends SubsystemBase implements AresDrivetrain {
 
-  /**
-   * @see SwerveDriveSubsystem#ANGULAR_ACCEL_MULTIPLIER
-   */
   private static final double ANGULAR_ACCEL_MULTIPLIER = 2.0;
 
   /** Configuration data class for the MecanumDriveSubsystem. */
@@ -54,9 +50,9 @@ public class MecanumDriveSubsystem extends SubsystemBase implements AresDrivetra
   private final MecanumDriveIO io;
   private final MecanumDriveIO.MecanumDriveInputs inputs = new MecanumDriveIO.MecanumDriveInputs();
 
-  private double commandedVx = 0.0;
-  private double commandedVy = 0.0;
-  private double commandedOmega = 0.0;
+  private double commandedVxMps = 0.0;
+  private double commandedVyMps = 0.0;
+  private double commandedOmegaRadPerSec = 0.0;
 
   private final MecanumDriveKinematics kinematics;
 
@@ -69,6 +65,11 @@ public class MecanumDriveSubsystem extends SubsystemBase implements AresDrivetra
   private final SlewRateLimiter fwdLimiter;
   private final SlewRateLimiter strLimiter;
   private final SlewRateLimiter rotLimiter;
+
+  // Pre-allocated caches to avoid per-loop heap allocations
+  private final ChassisSpeeds targetChassisSpeeds = new ChassisSpeeds();
+  private final ChassisSpeeds discreteChassisSpeeds = new ChassisSpeeds();
+  private final MecanumDriveWheelSpeeds cachedWheelSpeeds = new MecanumDriveWheelSpeeds();
 
   /**
    * Constructs the MecanumDriveSubsystem.
@@ -114,56 +115,34 @@ public class MecanumDriveSubsystem extends SubsystemBase implements AresDrivetra
     AresAutoLogger.processInputs("MecanumDrive", inputs);
   }
 
-  /**
-   * @return The commanded X velocity in m/s.
-   */
   @Override
   public double getCommandedVx() {
-    return commandedVx;
+    return commandedVxMps;
   }
 
-  /**
-   * @return The commanded Y velocity in m/s.
-   */
   @Override
   public double getCommandedVy() {
-    return commandedVy;
+    return commandedVyMps;
   }
 
-  /**
-   * @return The commanded angular velocity in rad/s.
-   */
   @Override
   public double getCommandedOmega() {
-    return commandedOmega;
+    return commandedOmegaRadPerSec;
   }
 
-  /**
-   * Commands the mecanum drive to move in a field-centric manner.
-   *
-   * @param vxMetersPerSec The X velocity (field relative) in m/s.
-   * @param vyMetersPerSec The Y velocity (field relative) in m/s.
-   * @param omegaRadPerSec The angular velocity in rad/s.
-   * @param robotHeading The current robot heading.
-   */
   public void driveFieldCentric(
       double vxMetersPerSec,
       double vyMetersPerSec,
       double omegaRadPerSec,
       Rotation2d robotHeading) {
-    ChassisSpeeds speeds =
-        ChassisSpeeds.fromFieldRelativeSpeeds(
-            vxMetersPerSec, vyMetersPerSec, omegaRadPerSec, robotHeading);
-    drive(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond);
+    targetChassisSpeeds.fromFieldRelative(
+        vxMetersPerSec, vyMetersPerSec, omegaRadPerSec, robotHeading);
+    drive(
+        targetChassisSpeeds.vxMetersPerSecond,
+        targetChassisSpeeds.vyMetersPerSecond,
+        targetChassisSpeeds.omegaRadiansPerSecond);
   }
 
-  /**
-   * Commands the mecanum drive to move in a robot-centric manner.
-   *
-   * @param forwardMetersPerSec The forward velocity in m/s (X axis).
-   * @param strafeMetersPerSec The strafe velocity in m/s (Y axis).
-   * @param turnRadPerSec The angular velocity in rad/s.
-   */
   public void drive(double forwardMetersPerSec, double strafeMetersPerSec, double turnRadPerSec) {
     if (fwdLimiter != null) {
       forwardMetersPerSec =
@@ -174,35 +153,38 @@ public class MecanumDriveSubsystem extends SubsystemBase implements AresDrivetra
           rotLimiter.calculate(turnRadPerSec, org.areslib.core.AresRobot.LOOP_PERIOD_SECS);
     }
 
-    this.commandedVx = forwardMetersPerSec;
-    this.commandedVy = strafeMetersPerSec;
-    this.commandedOmega = turnRadPerSec;
+    this.commandedVxMps = forwardMetersPerSec;
+    this.commandedVyMps = strafeMetersPerSec;
+    this.commandedOmegaRadPerSec = turnRadPerSec;
 
-    ChassisSpeeds speeds =
-        new ChassisSpeeds(forwardMetersPerSec, strafeMetersPerSec, turnRadPerSec);
-    speeds = ChassisSpeeds.discretize(speeds, org.areslib.core.AresRobot.LOOP_PERIOD_SECS);
+    ChassisSpeeds.discretize(
+        forwardMetersPerSec,
+        strafeMetersPerSec,
+        turnRadPerSec,
+        org.areslib.core.AresRobot.LOOP_PERIOD_SECS,
+        discreteChassisSpeeds);
 
-    MecanumDriveWheelSpeeds wheelSpeeds = kinematics.toWheelSpeeds(speeds);
+    kinematics.toWheelSpeeds(discreteChassisSpeeds, cachedWheelSpeeds);
 
     double flVolts =
-        driveFeedforward.calculate(wheelSpeeds.frontLeftMetersPerSecond)
+        driveFeedforward.calculate(cachedWheelSpeeds.frontLeftMetersPerSecond)
             + frontLeftPid.calculate(
-                inputs.frontLeftVelocityMps, wheelSpeeds.frontLeftMetersPerSecond);
+                inputs.frontLeftVelocityMps, cachedWheelSpeeds.frontLeftMetersPerSecond);
 
     double frVolts =
-        driveFeedforward.calculate(wheelSpeeds.frontRightMetersPerSecond)
+        driveFeedforward.calculate(cachedWheelSpeeds.frontRightMetersPerSecond)
             + frontRightPid.calculate(
-                inputs.frontRightVelocityMps, wheelSpeeds.frontRightMetersPerSecond);
+                inputs.frontRightVelocityMps, cachedWheelSpeeds.frontRightMetersPerSecond);
 
     double rlVolts =
-        driveFeedforward.calculate(wheelSpeeds.rearLeftMetersPerSecond)
+        driveFeedforward.calculate(cachedWheelSpeeds.rearLeftMetersPerSecond)
             + rearLeftPid.calculate(
-                inputs.rearLeftVelocityMps, wheelSpeeds.rearLeftMetersPerSecond);
+                inputs.rearLeftVelocityMps, cachedWheelSpeeds.rearLeftMetersPerSecond);
 
     double rrVolts =
-        driveFeedforward.calculate(wheelSpeeds.rearRightMetersPerSecond)
+        driveFeedforward.calculate(cachedWheelSpeeds.rearRightMetersPerSecond)
             + rearRightPid.calculate(
-                inputs.rearRightVelocityMps, wheelSpeeds.rearRightMetersPerSecond);
+                inputs.rearRightVelocityMps, cachedWheelSpeeds.rearRightMetersPerSecond);
 
     io.setVoltages(flVolts, frVolts, rlVolts, rrVolts);
   }
