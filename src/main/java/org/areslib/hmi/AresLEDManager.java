@@ -18,11 +18,11 @@ public class AresLEDManager {
   private AresLEDManager() {}
 
   /**
-   * Returns the singleton instance of the LED Manager.
+   * Returns the singleton instance of the LED Manager. Thread-safe.
    *
    * @return The singleton instance of the LED Manager
    */
-  public static AresLEDManager getInstance() {
+  public static synchronized AresLEDManager getInstance() {
     if (instance == null) {
       instance = new AresLEDManager();
     }

@@ -61,4 +61,10 @@ public interface AresLoggerBackend {
 
   /** Triggers the backend to flush/send current packets. */
   void update();
+
+  /**
+   * Releases any resources held by this backend (file handles, sockets, etc.). Called automatically
+   * by {@link AresTelemetry#clearBackends()} during OpMode transitions.
+   */
+  default void close() {}
 }

@@ -6,23 +6,21 @@ package org.areslib.core;
  * <p>In FTC, the alliance color is typically determined by the OpMode name convention or by reading
  * from the Driver Station. This utility provides a centralized way to track alliance state for
  * coordinate flipping, autonomous mirroring, and LED color selection.
+ *
+ * <p><b>Canonical Alliance Type:</b> This class uses {@link FieldConstants.Alliance} as the single
+ * source of truth for alliance identity. There is no separate Alliance enum here to prevent
+ * duplication and import confusion.
  */
 public class AllianceUtil {
 
-  /** The two possible alliances in FTC competition. */
-  public enum Alliance {
-    RED,
-    BLUE
-  }
-
-  private static Alliance currentAlliance = Alliance.RED;
+  private static FieldConstants.Alliance currentAlliance = FieldConstants.Alliance.RED;
 
   /**
    * Sets the current alliance. Should be called during initialization based on the selected OpMode.
    *
    * @param alliance The alliance color for this match.
    */
-  public static void setAlliance(Alliance alliance) {
+  public static void setAlliance(FieldConstants.Alliance alliance) {
     currentAlliance = alliance;
   }
 
@@ -31,7 +29,7 @@ public class AllianceUtil {
    *
    * @return The alliance color.
    */
-  public static Alliance getAlliance() {
+  public static FieldConstants.Alliance getAlliance() {
     return currentAlliance;
   }
 
@@ -41,7 +39,7 @@ public class AllianceUtil {
    * @return True if Red alliance.
    */
   public static boolean isRed() {
-    return currentAlliance == Alliance.RED;
+    return currentAlliance == FieldConstants.Alliance.RED;
   }
 
   /**
@@ -50,7 +48,7 @@ public class AllianceUtil {
    * @return True if Blue alliance.
    */
   public static boolean isBlue() {
-    return currentAlliance == Alliance.BLUE;
+    return currentAlliance == FieldConstants.Alliance.BLUE;
   }
 
   /**
@@ -75,8 +73,18 @@ public class AllianceUtil {
     return isRed() ? headingRadians : Math.PI - headingRadians;
   }
 
+  /**
+   * Returns the field-centric heading offset for the current alliance. This offset accounts for
+   * driver station position on the field wall.
+   *
+   * @return The heading offset in radians to apply for field-centric driving.
+   */
+  public static double getHeadingOffsetRadians() {
+    return currentAlliance.getHeadingOffsetRadians();
+  }
+
   /** Resets the alliance to the default (Red). */
   public static void reset() {
-    currentAlliance = Alliance.RED;
+    currentAlliance = FieldConstants.Alliance.RED;
   }
 }

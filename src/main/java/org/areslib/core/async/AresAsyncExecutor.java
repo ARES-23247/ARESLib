@@ -73,13 +73,18 @@ public class AresAsyncExecutor {
   }
 
   /**
-   * Starts a one-off asynchronous task.
+   * Starts a one-off asynchronous task. No-ops if the executor has been stopped.
    *
    * @param task The task to run in the background.
    */
   public static void runAsync(Runnable task) {
+    if (!isRunning) {
+      com.qualcomm.robotcore.util.RobotLog.w(
+          "AresAsyncExecutor.runAsync() called after stop() — ignoring.");
+      return;
+    }
     if (executor == null || executor.isShutdown()) {
-      executor = Executors.newScheduledThreadPool(4); // lazy init pool
+      return;
     }
     executor.execute(task);
   }

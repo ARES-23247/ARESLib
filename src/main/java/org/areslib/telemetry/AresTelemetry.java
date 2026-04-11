@@ -27,10 +27,23 @@ public class AresTelemetry {
   }
 
   /**
-   * Removes all registered BACKENDS. Should be called during scheduler reset to prevent stale
-   * backend accumulation across OpMode transitions.
+   * Closes and removes all registered BACKENDS. Calls {@link AresLoggerBackend#close()} on each
+   * backend to release file handles and sockets before clearing. Should be called during scheduler
+   * reset to prevent stale backend accumulation across OpMode transitions.
    */
   public static void clearBackends() {
+    for (AresLoggerBackend backend : BACKENDS) {
+      try {
+        backend.close();
+      } catch (Exception e) {
+        // Log but don't propagate — we're shutting down
+        com.qualcomm.robotcore.util.RobotLog.e(
+            "AresTelemetry: Error closing backend "
+                + backend.getClass().getSimpleName()
+                + ": "
+                + e);
+      }
+    }
     BACKENDS.clear();
   }
 
@@ -113,11 +126,16 @@ public class AresTelemetry {
     }
   }
 
-  // Pre-allocated caches for zero-GC hot-path logging
-  private static final double[] POSE2D_CACHE = new double[3];
-  private static final double[] SWERVE_STATES_CACHE = new double[8];
-  private static final double[] DIFF_SPEEDS_CACHE = new double[2];
-  private static final double[] MECANUM_SPEEDS_CACHE = new double[4];
+  // Thread-local caches for zero-GC hot-path logging.
+  // ThreadLocal ensures safety when the physics thread and main loop both log concurrently.
+  private static final ThreadLocal<double[]> POSE2D_CACHE =
+      ThreadLocal.withInitial(() -> new double[3]);
+  private static final ThreadLocal<double[]> SWERVE_STATES_CACHE =
+      ThreadLocal.withInitial(() -> new double[8]);
+  private static final ThreadLocal<double[]> DIFF_SPEEDS_CACHE =
+      ThreadLocal.withInitial(() -> new double[2]);
+  private static final ThreadLocal<double[]> MECANUM_SPEEDS_CACHE =
+      ThreadLocal.withInitial(() -> new double[4]);
 
   // Helper methods ported from the old AresLogger
 
@@ -130,10 +148,11 @@ public class AresTelemetry {
    * @param headingRadians The heading in radians.
    */
   public static void putPose2d(String key, double xMeters, double yMeters, double headingRadians) {
-    POSE2D_CACHE[0] = xMeters;
-    POSE2D_CACHE[1] = yMeters;
-    POSE2D_CACHE[2] = headingRadians;
-    putNumberArray(key, POSE2D_CACHE);
+    double[] cache = POSE2D_CACHE.get();
+    cache[0] = xMeters;
+    cache[1] = yMeters;
+    cache[2] = headingRadians;
+    putNumberArray(key, cache);
   }
 
   /**
@@ -144,11 +163,12 @@ public class AresTelemetry {
    */
   public static void logSwerveStates(String key, SwerveModuleState[] states) {
     if (states.length != 4) return;
+    double[] cache = SWERVE_STATES_CACHE.get();
     for (int i = 0; i < 4; i++) {
-      SWERVE_STATES_CACHE[i * 2] = states[i].angle.getRadians(); // Angle first for AdvantageScope
-      SWERVE_STATES_CACHE[i * 2 + 1] = states[i].speedMetersPerSecond;
+      cache[i * 2] = states[i].angle.getRadians(); // Angle first for AdvantageScope
+      cache[i * 2 + 1] = states[i].speedMetersPerSecond;
     }
-    putNumberArray(key, SWERVE_STATES_CACHE);
+    putNumberArray(key, cache);
   }
 
   /**
@@ -158,9 +178,10 @@ public class AresTelemetry {
    * @param speeds The wheel speeds.
    */
   public static void logDifferentialSpeeds(String key, DifferentialDriveWheelSpeeds speeds) {
-    DIFF_SPEEDS_CACHE[0] = speeds.leftMetersPerSecond;
-    DIFF_SPEEDS_CACHE[1] = speeds.rightMetersPerSecond;
-    putNumberArray(key, DIFF_SPEEDS_CACHE);
+    double[] cache = DIFF_SPEEDS_CACHE.get();
+    cache[0] = speeds.leftMetersPerSecond;
+    cache[1] = speeds.rightMetersPerSecond;
+    putNumberArray(key, cache);
   }
 
   /**
@@ -170,10 +191,11 @@ public class AresTelemetry {
    * @param speeds The wheel speeds.
    */
   public static void logMecanumSpeeds(String key, MecanumDriveWheelSpeeds speeds) {
-    MECANUM_SPEEDS_CACHE[0] = speeds.frontLeftMetersPerSecond;
-    MECANUM_SPEEDS_CACHE[1] = speeds.frontRightMetersPerSecond;
-    MECANUM_SPEEDS_CACHE[2] = speeds.rearLeftMetersPerSecond;
-    MECANUM_SPEEDS_CACHE[3] = speeds.rearRightMetersPerSecond;
-    putNumberArray(key, MECANUM_SPEEDS_CACHE);
+    double[] cache = MECANUM_SPEEDS_CACHE.get();
+    cache[0] = speeds.frontLeftMetersPerSecond;
+    cache[1] = speeds.frontRightMetersPerSecond;
+    cache[2] = speeds.rearLeftMetersPerSecond;
+    cache[3] = speeds.rearRightMetersPerSecond;
+    putNumberArray(key, cache);
   }
 }

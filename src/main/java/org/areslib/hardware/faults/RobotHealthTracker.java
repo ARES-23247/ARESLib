@@ -22,6 +22,9 @@ public class RobotHealthTracker extends SubsystemBase {
   private static RobotHealthTracker instance;
   private final List<FaultMonitor> monitors = new ArrayList<>();
 
+  /** Pre-allocated list for active fault messages — avoids per-tick allocation. */
+  private final List<String> activeFaults = new ArrayList<>();
+
   /** Lazily-created AresAlerts bridged to AresFaultManager for each monitor. */
   private final Map<FaultMonitor, AresAlert> alertBridge = new HashMap<>();
 
@@ -78,7 +81,7 @@ public class RobotHealthTracker extends SubsystemBase {
 
   @Override
   public void periodic() {
-    List<String> activeFaults = new ArrayList<>();
+    activeFaults.clear();
 
     for (FaultMonitor monitor : monitors) {
       // Lazily create an AresAlert for each monitor so AresFaultManager picks it up

@@ -39,6 +39,23 @@ public class AresHardwareManager {
   /** The computed master power multiplier (0.0 to 1.0) applied to chassis actuators. */
   public static double masterPowerScale = 1.0;
 
+  /**
+   * EMA (Exponential Moving Average) filter weight for current sensor readings. Lower values
+   * produce smoother filtering but slower response. Default is 0.2, providing a stable reading with
+   * ~5-loop settling time at 50Hz.
+   */
+  private static double currentEmaAlpha = 0.2;
+
+  /**
+   * Sets the EMA filter alpha for the current sensor. Must be in [0.0, 1.0]. Higher alpha means
+   * faster response but more noise.
+   *
+   * @param alpha The new alpha value.
+   */
+  public static void setCurrentEmaAlpha(double alpha) {
+    currentEmaAlpha = Math.max(0.0, Math.min(1.0, alpha));
+  }
+
   /** Loggable structured representation of the global power status. */
   public static class AresPowerInputs implements AresLoggableInputs {
     public double batteryVoltage = 12.0;
@@ -174,7 +191,7 @@ public class AresHardwareManager {
     if (floodgateSensor != null) {
       // Floodgate V2 maps 0-3.3V to 0-80A
       double rawAmps = (floodgateSensor.getVoltage() / 3.3) * 80.0;
-      totalCurrentAmps = (totalCurrentAmps * 0.8) + (rawAmps * 0.2);
+      totalCurrentAmps = (totalCurrentAmps * (1.0 - currentEmaAlpha)) + (rawAmps * currentEmaAlpha);
     }
 
     double voltageScale = 1.0;

@@ -46,4 +46,37 @@ public class GhostData {
     omegaRadiansPerSecond.add(omega);
     buttonMasks.add(mask);
   }
+
+  /**
+   * Validates the integrity of the recording data. All parallel lists must have equal size.
+   *
+   * @return {@code true} if the data is structurally valid.
+   * @throws IllegalStateException if lists have mismatched sizes.
+   */
+  public boolean validate() {
+    int expectedSize = vxMetersPerSecond.size();
+    if (vyMetersPerSecond.size() != expectedSize
+        || omegaRadiansPerSecond.size() != expectedSize
+        || buttonMasks.size() != expectedSize) {
+      throw new IllegalStateException(
+          "GhostData integrity failure: list sizes mismatch — vx="
+              + expectedSize
+              + " vy="
+              + vyMetersPerSecond.size()
+              + " omega="
+              + omegaRadiansPerSecond.size()
+              + " masks="
+              + buttonMasks.size());
+    }
+    return true;
+  }
+
+  /**
+   * Returns the number of recorded frames.
+   *
+   * @return The frame count.
+   */
+  public int getFrameCount() {
+    return vxMetersPerSecond.size();
+  }
 }

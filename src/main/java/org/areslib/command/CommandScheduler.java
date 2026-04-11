@@ -13,7 +13,6 @@ import java.util.Set;
  * <p>Uses standard Java logic and handles generic subsystems and commands.
  */
 public final class CommandScheduler {
-  private static CommandScheduler instance;
 
   // A set of all registered subsystems
   private final Set<Subsystem> subsystems = new LinkedHashSet<>();
@@ -54,16 +53,18 @@ public final class CommandScheduler {
     buttons.add(button);
   }
 
+  /** Initialization-on-demand holder — thread-safe, zero-contention lazy init. */
+  private static class Holder {
+    static CommandScheduler instance = new CommandScheduler();
+  }
+
   /**
    * Returns the Singleton instance of the scheduler.
    *
    * @return the instance
    */
-  public static synchronized CommandScheduler getInstance() {
-    if (instance == null) {
-      instance = new CommandScheduler();
-    }
-    return instance;
+  public static CommandScheduler getInstance() {
+    return Holder.instance;
   }
 
   /**

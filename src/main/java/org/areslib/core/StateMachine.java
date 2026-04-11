@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 
 /**
  * A lightweight, enum-based finite state machine for managing subsystem complexity.
@@ -58,6 +59,12 @@ public class StateMachine<S extends Enum<S>> {
   /** Validated transition table. Null means "allow all" (unvalidated mode). */
   private Map<S, EnumSet<S>> validTransitions = null;
 
+  /**
+   * Injectable time source for deterministic replay. Defaults to wall-clock nanoTime. Override via
+   * {@link #StateMachine(String, Class, Enum, DoubleSupplier)} for test/simulation determinism.
+   */
+  private final DoubleSupplier timeSource;
+
   private BiConsumer<S, S> onTransitionCallback = (from, to) -> {};
 
   /**
@@ -72,12 +79,28 @@ public class StateMachine<S extends Enum<S>> {
    * @param initialState The state the machine starts in.
    */
   public StateMachine(String name, Class<S> enumClass, S initialState) {
+    this(name, enumClass, initialState, () -> System.nanoTime() / 1_000_000_000.0);
+  }
+
+  /**
+   * Constructs a StateMachine with an explicit time source for deterministic testing.
+   *
+   * @param name Human-readable name for log output.
+   * @param enumClass The enum class token.
+   * @param initialState The state the machine starts in.
+   * @param timeSource A supplier returning the current time in seconds.
+   */
+  public StateMachine(String name, Class<S> enumClass, S initialState, DoubleSupplier timeSource) {
     this.name = name;
     this.enumClass = enumClass;
+    this.timeSource = timeSource;
     currentState = initialState;
     previousState = initialState;
-    stateEntryTime = now();
+    stateEntryTime = this.timeSource.getAsDouble();
     totalTransitionCount = 0;
+
+    // Emit initial state to telemetry
+    org.areslib.telemetry.AresAutoLogger.recordOutput("StateMachine/" + name, currentState.name());
   }
 
   /**
@@ -298,8 +321,10 @@ public class StateMachine<S extends Enum<S>> {
     stateEntryTime = now();
     totalTransitionCount++;
 
-    // Log the transition
+    // Log the transition and transition count
     org.areslib.telemetry.AresAutoLogger.recordOutput("StateMachine/" + name, currentState.name());
+    org.areslib.telemetry.AresAutoLogger.recordOutput(
+        "StateMachine/" + name + "/TransitionCount", totalTransitionCount);
 
     // Run entry actions for new state
     List<Runnable> entryActions = this.entryActions.get(currentState);
@@ -367,8 +392,45 @@ public class StateMachine<S extends Enum<S>> {
     return totalTransitionCount;
   }
 
-  private static double now() {
-    return System.nanoTime() / 1_000_000_000.0;
+  /**
+   * Emits the validated transition table as a DOT-format graph string to telemetry. Only meaningful
+   * if transitions have been explicitly registered via {@link #addTransition}.
+   *
+   * <p>Call this once after all transitions are registered (e.g., at the end of subsystem
+   * construction). The output is logged under {@code StateMachine/<name>/Graph}.
+   */
+  public void emitTransitionGraph() {
+    if (validTransitions == null || validTransitions.isEmpty()) {
+      org.areslib.telemetry.AresAutoLogger.recordOutput(
+          "StateMachine/" + name + "/Graph", "UNVALIDATED (all transitions allowed)");
+      return;
+    }
+
+    StringBuilder dot = new StringBuilder(256);
+    dot.append("digraph ").append(name).append(" {");
+    for (java.util.Map.Entry<S, java.util.EnumSet<S>> entry : validTransitions.entrySet()) {
+      for (S target : entry.getValue()) {
+        dot.append(entry.getKey().name()).append(" -> ").append(target.name()).append(';');
+      }
+    }
+    dot.append('}');
+    org.areslib.telemetry.AresAutoLogger.recordOutput(
+        "StateMachine/" + name + "/Graph", dot.toString());
+  }
+
+  /**
+   * Returns the validated transition table as an unmodifiable map, or null if in unvalidated mode.
+   *
+   * @return The transition table, or null.
+   */
+  public java.util.Map<S, java.util.EnumSet<S>> getValidTransitions() {
+    return validTransitions == null
+        ? null
+        : java.util.Collections.unmodifiableMap(validTransitions);
+  }
+
+  private double now() {
+    return timeSource.getAsDouble();
   }
 
   // ── Internal types ──────────────────────────────────────────────────────────

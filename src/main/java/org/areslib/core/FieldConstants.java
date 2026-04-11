@@ -53,10 +53,16 @@ public final class FieldConstants {
   /** Standard FTC robot frame size in meters (18 inches). */
   public static final double ROBOT_SIZE_METERS = 18.0 * INCHES_TO_METERS; // 0.4572m
 
-  /** Wall collision friction coefficient for dyn4j inter-body contact. */
+  /**
+   * Wall collision friction coefficient for dyn4j inter-body contact. Dimensionless — see <a
+   * href="https://www.dyn4j.org/pages/friction">dyn4j friction documentation</a>.
+   */
   public static final double SIM_WALL_FRICTION = 0.2;
 
-  /** Wall collision restitution (bounce) coefficient for dyn4j. */
+  /**
+   * Wall collision restitution (bounce) coefficient for dyn4j. Dimensionless (0 = perfectly
+   * inelastic, 1 = perfectly elastic).
+   */
   public static final double SIM_WALL_RESTITUTION = 0.1;
 
   /** Synthetic linear damping applied to the robot body to model carpet friction. */

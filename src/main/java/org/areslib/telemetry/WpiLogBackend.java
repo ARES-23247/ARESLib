@@ -261,10 +261,12 @@ public class WpiLogBackend implements AresLoggerBackend {
   }
 
   /**
-   * Closes the underlying log file, flushing any buffered data. Should be called from {@code
+   * Closes the underlying log file, flushing any buffered data. Called automatically by {@link
+   * AresTelemetry#clearBackends()} during OpMode transitions, or manually from {@code
    * AresCommandOpMode.stop()} to prevent data loss if the OpMode is force-stopped on the Control
    * Hub.
    */
+  @Override
   public void close() {
     try {
       if (channel != null && channel.isOpen()) {

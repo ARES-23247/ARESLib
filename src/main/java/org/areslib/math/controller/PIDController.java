@@ -9,6 +9,9 @@ public class PIDController {
   private boolean continuous;
   private double minimumInput, maximumInput;
   private double period;
+  private double iZone = Double.POSITIVE_INFINITY;
+  private double minOutput = Double.NEGATIVE_INFINITY;
+  private double maxOutput = Double.POSITIVE_INFINITY;
 
   /**
    * Constructs a PIDController with the given constants. Default period is 0.02s (20ms).
@@ -90,8 +93,12 @@ public class PIDController {
       }
     }
 
-    // Apply time-aware exact calculus implementations
-    integral += error * period;
+    // Apply integral zone — zero the accumulator if error is too large
+    if (Math.abs(error) > iZone) {
+      integral = 0;
+    } else {
+      integral += error * period;
+    }
 
     double derivative = 0;
     if (period > 0) {
@@ -100,7 +107,29 @@ public class PIDController {
 
     prevError = error;
 
-    return kP * error + kI * integral + kD * derivative;
+    double output = kP * error + kI * integral + kD * derivative;
+    return Math.max(minOutput, Math.min(output, maxOutput));
+  }
+
+  /**
+   * Sets the integral zone. When the absolute error exceeds this threshold, the integral
+   * accumulator is zeroed to prevent windup at hard stops or when far from the setpoint.
+   *
+   * @param iZone The integral zone threshold. Use {@code Double.POSITIVE_INFINITY} to disable.
+   */
+  public void setIntegralZone(double iZone) {
+    this.iZone = iZone;
+  }
+
+  /**
+   * Sets the output range to clamp the controller's output. Prevents runaway corrections.
+   *
+   * @param min The minimum output value.
+   * @param max The maximum output value.
+   */
+  public void setOutputRange(double min, double max) {
+    this.minOutput = min;
+    this.maxOutput = max;
   }
 
   /**

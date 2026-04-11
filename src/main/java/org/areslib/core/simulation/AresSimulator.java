@@ -1,5 +1,7 @@
 package org.areslib.core.simulation;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.areslib.command.CommandScheduler;
 import org.areslib.command.Subsystem;
 import org.areslib.core.AresRobot;
@@ -10,7 +12,10 @@ import org.areslib.core.AresRobot;
  */
 public class AresSimulator {
   private static Thread physicsThread = null;
-  private static boolean isRunning = false;
+  private static volatile boolean isRunning = false;
+
+  /** Pre-allocated buffer for DECODE_ARTIFACT pose telemetry (grown as needed). */
+  private static double[] artifactPosesCache = new double[30]; // 10 artifacts * 3 doubles
 
   /**
    * Starts an independent background thread that executes subsystem.simulationPeriodic()
@@ -55,22 +60,30 @@ public class AresSimulator {
                 }
 
                 if (artifactCount > 0) {
-                  double[] poses = new double[artifactCount * 3];
+                  int requiredLength = artifactCount * 3;
+                  if (artifactPosesCache.length < requiredLength) {
+                    artifactPosesCache = new double[requiredLength];
+                  }
                   int ix = 0;
                   for (org.dyn4j.dynamics.Body body : bodies) {
                     if ("DECODE_ARTIFACT".equals(body.getUserData())) {
-                      poses[ix * 3] = body.getTransform().getTranslationX();
-                      poses[ix * 3 + 1] = body.getTransform().getTranslationY();
-                      poses[ix * 3 + 2] = body.getTransform().getRotationAngle();
+                      artifactPosesCache[ix * 3] = body.getTransform().getTranslationX();
+                      artifactPosesCache[ix * 3 + 1] = body.getTransform().getTranslationY();
+                      artifactPosesCache[ix * 3 + 2] = body.getTransform().getRotationAngle();
                       ix++;
                     }
                   }
+                  // Only publish the filled portion of the cache
+                  double[] slice = java.util.Arrays.copyOf(artifactPosesCache, requiredLength);
                   org.areslib.telemetry.AresAutoLogger.recordOutputArray(
-                      "Simulation/DECODE_ARTIFACTs", poses);
+                      "Simulation/DECODE_ARTIFACTs", slice);
                 }
 
-                // Poll physics logic decoupled from main scheduling pipeline
-                for (Subsystem subsystem : CommandScheduler.getInstance().getSubsystems()) {
+                // Snapshot the subsystems set to avoid ConcurrentModificationException —
+                // the main thread may register/unregister subsystems concurrently.
+                List<Subsystem> snapshot =
+                    new ArrayList<>(CommandScheduler.getInstance().getSubsystems());
+                for (Subsystem subsystem : snapshot) {
                   subsystem.simulationPeriodic();
                 }
 

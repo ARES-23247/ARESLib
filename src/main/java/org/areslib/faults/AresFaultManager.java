@@ -59,7 +59,15 @@ public class AresFaultManager {
     wasError = false;
   }
 
-  /** Resets the manager, clearing the gamepad reference but keeping registered ALERTS. */
+  /**
+   * Resets the manager, clearing the gamepad reference and the active ALERTS list.
+   *
+   * <p><b>Important:</b> Static {@link AresAlert} fields (e.g., declared as constants in subsystem
+   * classes or {@link org.areslib.hardware.AresHardwareManager}) will re-register themselves in
+   * {@code ALERTS} the next time {@link AresAlert#set(boolean)} is called with {@code true}. This
+   * is intentional — persistent hardware fault alerts survive OpMode transitions so they can
+   * re-announce if the underlying fault condition is still active.
+   */
   public static void reset() {
     driverGamepad = null;
     wasError = false;

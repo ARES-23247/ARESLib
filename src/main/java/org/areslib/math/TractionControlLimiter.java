@@ -17,7 +17,6 @@ public class TractionControlLimiter {
   private final double maxAccelMetersPerSecSq;
   private double lastVx = 0.0;
   private double lastVy = 0.0;
-  private double lastTimeSeconds;
 
   /** Pre-allocated result buffer for {@link #calculate}. */
   private final double[] resultCache = new double[2];
@@ -30,7 +29,6 @@ public class TractionControlLimiter {
    */
   public TractionControlLimiter(double maxAccelMetersPerSecSq) {
     this.maxAccelMetersPerSecSq = maxAccelMetersPerSecSq;
-    this.lastTimeSeconds = System.nanoTime() / 1_000_000_000.0;
   }
 
   /**
@@ -41,16 +39,59 @@ public class TractionControlLimiter {
    * @return A double array [safeVx, safeVy] to apply to ChassisSpeeds.
    */
   public double[] calculate(double targetVx, double targetVy) {
-    double currentTime = System.nanoTime() / 1_000_000_000.0;
-    double dt = currentTime - lastTimeSeconds;
-    lastTimeSeconds = currentTime;
+    return calculate(targetVx, targetVy, 0.0, 0.0, org.areslib.core.AresRobot.LOOP_PERIOD_SECS);
+  }
+
+  /**
+   * Heading-aware variant using the default loop period.
+   *
+   * @param targetVx Target X velocity (m/s).
+   * @param targetVy Target Y velocity (m/s).
+   * @param omegaRadPerSec Current rotational velocity (rad/s).
+   * @param wheelbaseRadiusMeters Distance from robot center to the farthest wheel (meters).
+   * @return A double array [safeVx, safeVy] to apply to ChassisSpeeds.
+   */
+  public double[] calculate(
+      double targetVx, double targetVy, double omegaRadPerSec, double wheelbaseRadiusMeters) {
+    return calculate(
+        targetVx,
+        targetVy,
+        omegaRadPerSec,
+        wheelbaseRadiusMeters,
+        org.areslib.core.AresRobot.LOOP_PERIOD_SECS);
+  }
+
+  /**
+   * Heading-aware variant that accounts for rotational velocity stealing from the translational
+   * acceleration budget. The effective wheel-contact acceleration increases with omega, so we
+   * reduce the available linear acceleration proportionally.
+   *
+   * <p>The formula is: availableAccel = maxAccel * max(0, 1 - |omega * wheelbaseRadius| / maxAccel)
+   *
+   * @param targetVx Target X velocity (m/s).
+   * @param targetVy Target Y velocity (m/s).
+   * @param omegaRadPerSec Current rotational velocity (rad/s).
+   * @param wheelbaseRadiusMeters Distance from robot center to the farthest wheel (meters).
+   * @return A double array [safeVx, safeVy] to apply to ChassisSpeeds.
+   */
+  public double[] calculate(
+      double targetVx,
+      double targetVy,
+      double omegaRadPerSec,
+      double wheelbaseRadiusMeters,
+      double dtSeconds) {
 
     // Prevent divide-by-zero on first loop
-    if (dt <= 0.0) {
+    if (dtSeconds <= 0.0) {
       resultCache[0] = lastVx;
       resultCache[1] = lastVy;
       return resultCache;
     }
+
+    // Calculate the effective acceleration budget after reserving for rotation
+    double rotationalAccel = Math.abs(omegaRadPerSec) * wheelbaseRadiusMeters / dtSeconds;
+    double effectiveMaxAccel =
+        maxAccelMetersPerSecSq * Math.max(0.0, 1.0 - rotationalAccel / maxAccelMetersPerSecSq);
 
     // Calculate requested velocity change
     double deltaVx = targetVx - lastVx;
@@ -58,11 +99,11 @@ public class TractionControlLimiter {
     double deltaNorm = Math.sqrt(deltaVx * deltaVx + deltaVy * deltaVy);
 
     // Total acceleration required to achieve this change
-    double currentAccel = deltaNorm / dt;
+    double currentAccel = deltaNorm / dtSeconds;
 
-    if (currentAccel > maxAccelMetersPerSecSq) {
+    if (currentAccel > effectiveMaxAccel && effectiveMaxAccel > 0.0) {
       // Scale down the change to exactly match peak acceleration
-      double scalar = maxAccelMetersPerSecSq / currentAccel;
+      double scalar = effectiveMaxAccel / currentAccel;
       deltaVx *= scalar;
       deltaVy *= scalar;
     }
@@ -87,6 +128,5 @@ public class TractionControlLimiter {
   public void reset() {
     lastVx = 0.0;
     lastVy = 0.0;
-    lastTimeSeconds = System.nanoTime() / 1_000_000_000.0;
   }
 }

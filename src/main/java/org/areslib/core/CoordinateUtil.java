@@ -1,8 +1,13 @@
 package org.areslib.core;
 
+import org.areslib.math.Units;
+
 /**
  * Utility functions for coordinate conversions, interpolation, and geometry scaling used within the
  * ARESLib framework.
+ *
+ * <p><b>Note:</b> Basic unit conversions (inches↔meters, mm↔meters) are canonical in {@link Units}.
+ * This class delegates to {@code Units} for those and adds geometry/interpolation helpers.
  */
 public class CoordinateUtil {
 
@@ -11,9 +16,10 @@ public class CoordinateUtil {
    *
    * @param inches The distance in inches
    * @return The distance in meters
+   * @see Units#inchesToMeters(double)
    */
   public static double inchesToMeters(double inches) {
-    return inches * 0.0254;
+    return Units.inchesToMeters(inches);
   }
 
   /**
@@ -21,9 +27,10 @@ public class CoordinateUtil {
    *
    * @param meters The distance in meters
    * @return The distance in inches
+   * @see Units#metersToInches(double)
    */
   public static double metersToInches(double meters) {
-    return meters / 0.0254;
+    return Units.metersToInches(meters);
   }
 
   /**
@@ -31,9 +38,10 @@ public class CoordinateUtil {
    *
    * @param mm The distance in millimeters
    * @return The distance in meters
+   * @see Units#millimetersToMeters(double)
    */
   public static double mmToMeters(double mm) {
-    return mm / 1000.0;
+    return Units.millimetersToMeters(mm);
   }
 
   /**

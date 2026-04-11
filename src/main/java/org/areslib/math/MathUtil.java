@@ -41,7 +41,6 @@ public final class MathUtil {
    * @param deadband Range around zero.
    * @param maxMagnitude The maximum magnitude of the signal to scale against.
    * @return The value after the deadband is applied.
-   * @param maxMagnitude The maxMagnitude value.
    */
   public static double applyDeadband(double value, double deadband, double maxMagnitude) {
     if (Math.abs(value) > deadband) {

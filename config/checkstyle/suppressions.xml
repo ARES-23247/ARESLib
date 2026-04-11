@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE suppressions PUBLIC
+    "-//Checkstyle//DTD SuppressionFilter Configuration 1.2//EN"
+    "https://checkstyle.org/dtds/suppressions_1_2.dtd">
+
+<suppressions>
+    <!-- Vendored libraries — not our code, don't enforce method length -->
+    <suppress checks="MethodLength"
+              files="PhotonCore\.java"/>
+    <suppress checks="MethodLength"
+              files="PathfindingCommand\.java"/>
+    <suppress checks="MethodLength"
+              files="PathPlannerPath\.java"/>
+    <!-- Simulation entry points with complex field setup -->
+    <suppress checks="MethodLength"
+              files="DesktopSimLauncher\.java"/>
+    <suppress checks="MethodLength"
+              files="DecodeFieldSim\.java"/>
+</suppressions>

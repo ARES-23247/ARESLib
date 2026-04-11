@@ -42,10 +42,6 @@ public class GhostRecorder {
   // --- Recording (thread-safe) ---
   private final ConcurrentLinkedQueue<String> writeBuffer = new ConcurrentLinkedQueue<>();
   private Thread writerThread;
-
-  @SuppressWarnings("PMD.AvoidStringBufferField")
-  private final StringBuilder rowBuilder = new StringBuilder(128);
-
   private long recordStartNanos;
 
   // --- Playback Cache ---
@@ -112,7 +108,7 @@ public class GhostRecorder {
 
     double timeSecs = (System.nanoTime() - recordStartNanos) / 1_000_000_000.0;
 
-    rowBuilder.setLength(0);
+    StringBuilder rowBuilder = new StringBuilder(128);
     rowBuilder
         .append(Math.round(timeSecs * 1000.0) / 1000.0)
         .append(',')
@@ -168,6 +164,26 @@ public class GhostRecorder {
     }
 
     AresAutoLogger.recordOutput("GhostMode/FramesLoaded", frames.size());
+
+    // Emit velocity profile for AdvantageScope trajectory overlay
+    if (!frames.isEmpty()) {
+      double[] vxProfile = new double[frames.size()];
+      double[] vyProfile = new double[frames.size()];
+      double[] omegaProfile = new double[frames.size()];
+      double[] timeProfile = new double[frames.size()];
+      for (int i = 0; i < frames.size(); i++) {
+        GhostFrame f = frames.get(i);
+        timeProfile[i] = f.time;
+        vxProfile[i] = f.vx;
+        vyProfile[i] = f.vy;
+        omegaProfile[i] = f.omega;
+      }
+      AresAutoLogger.recordOutputArray("GhostMode/Profile/Time", timeProfile);
+      AresAutoLogger.recordOutputArray("GhostMode/Profile/Vx", vxProfile);
+      AresAutoLogger.recordOutputArray("GhostMode/Profile/Vy", vyProfile);
+      AresAutoLogger.recordOutputArray("GhostMode/Profile/Omega", omegaProfile);
+    }
+
     return !frames.isEmpty();
   }
 
@@ -196,6 +212,22 @@ public class GhostRecorder {
     }
 
     currentFrame = frames.get(playIndex);
+
+    // Interpolate between current and next frame for smooth playback
+    if (playIndex < frames.size() - 1) {
+      GhostFrame next = frames.get(playIndex + 1);
+      double frameDt = next.time - currentFrame.time;
+      if (frameDt > 0.0) {
+        double alpha = Math.min(1.0, (t - currentFrame.time) / frameDt);
+        playbackSpeeds.vxMetersPerSecond = currentFrame.vx + alpha * (next.vx - currentFrame.vx);
+        playbackSpeeds.vyMetersPerSecond = currentFrame.vy + alpha * (next.vy - currentFrame.vy);
+        playbackSpeeds.omegaRadiansPerSecond =
+            currentFrame.omega + alpha * (next.omega - currentFrame.omega);
+        return playbackSpeeds;
+      }
+    }
+
+    // Last frame or degenerate dt — use raw values
     playbackSpeeds.vxMetersPerSecond = currentFrame.vx;
     playbackSpeeds.vyMetersPerSecond = currentFrame.vy;
     playbackSpeeds.omegaRadiansPerSecond = currentFrame.omega;

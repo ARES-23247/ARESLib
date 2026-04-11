@@ -96,13 +96,14 @@ public class EliteShooterMath {
             + velocityRobotYMetersPerSec * velocityRobotYMetersPerSec
             - nominalShotSpeedMetersPerSec * nominalShotSpeedMetersPerSec;
 
+    double effectiveShotSpeed = nominalShotSpeedMetersPerSec;
     if (Math.abs(coeffsA) < 1e-6) {
       // Adjust to avoid division by zero / non-quadratic states
-      nominalShotSpeedMetersPerSec = 1.01 * nominalShotSpeedMetersPerSec;
+      effectiveShotSpeed = 1.01 * nominalShotSpeedMetersPerSec;
       coeffsA =
           velocityRobotXMetersPerSec * velocityRobotXMetersPerSec
               + velocityRobotYMetersPerSec * velocityRobotYMetersPerSec
-              - nominalShotSpeedMetersPerSec * nominalShotSpeedMetersPerSec;
+              - effectiveShotSpeed * effectiveShotSpeed;
     }
 
     double coeffsB =
