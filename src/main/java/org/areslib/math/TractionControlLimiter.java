@@ -19,6 +19,9 @@ public class TractionControlLimiter {
   private double lastVy = 0.0;
   private double lastTimeSeconds;
 
+  /** Pre-allocated result buffer for {@link #calculate}. */
+  private final double[] resultCache = new double[2];
+
   /**
    * Initializes the 2D Traction Control limiter.
    *
@@ -43,7 +46,11 @@ public class TractionControlLimiter {
     lastTimeSeconds = currentTime;
 
     // Prevent divide-by-zero on first loop
-    if (dt <= 0.0) return new double[] {lastVx, lastVy};
+    if (dt <= 0.0) {
+      resultCache[0] = lastVx;
+      resultCache[1] = lastVy;
+      return resultCache;
+    }
 
     // Calculate requested velocity change
     double deltaVx = targetVx - lastVx;
@@ -71,7 +78,9 @@ public class TractionControlLimiter {
       lastVy = 0.0;
     }
 
-    return new double[] {lastVx, lastVy};
+    resultCache[0] = lastVx;
+    resultCache[1] = lastVy;
+    return resultCache;
   }
 
   /** Resets the limiter state. Call when the robot transitions to a new operational mode. */

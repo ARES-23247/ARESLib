@@ -201,123 +201,141 @@ public class RobotContainer {
   private void configureButtonBindings() {
     // Controller mode switching (Team 254-inspired architecture)
     // Driver X button → SPEAKER mode
-    driver
-        .x()
-        .onTrue(
-            new Command() {
-              @Override
-              public void initialize() {
-                controllerModes.setMode(ControllerModeExample.SPEAKER);
-              }
+    driver.bindOnTrue(
+        driver.x(),
+        "X Button",
+        "SPEAKER Mode",
+        new Command() {
+          @Override
+          public void initialize() {
+            controllerModes.setMode(ControllerModeExample.SPEAKER);
+          }
 
-              @Override
-              public boolean isFinished() {
-                return true;
-              }
-            });
+          @Override
+          public boolean isFinished() {
+            return true;
+          }
+        });
 
     // Driver Y button → HP (Human Player) mode
-    driver
-        .y()
-        .onTrue(
-            new Command() {
-              @Override
-              public void initialize() {
-                controllerModes.setMode(ControllerModeExample.HP);
-              }
+    driver.bindOnTrue(
+        driver.y(),
+        "Y Button",
+        "HP (Human Player) Mode",
+        new Command() {
+          @Override
+          public void initialize() {
+            controllerModes.setMode(ControllerModeExample.HP);
+          }
 
-              @Override
-              public boolean isFinished() {
-                return true;
-              }
-            });
+          @Override
+          public boolean isFinished() {
+            return true;
+          }
+        });
 
     // Operator X button → POOP (ground intake) mode
-    operator
-        .x()
-        .onTrue(
-            new Command() {
-              @Override
-              public void initialize() {
-                controllerModes.setMode(ControllerModeExample.POOP);
-              }
+    operator.bindOnTrue(
+        operator.x(),
+        "X Button",
+        "POOP (Ground Intake) Mode",
+        new Command() {
+          @Override
+          public void initialize() {
+            controllerModes.setMode(ControllerModeExample.POOP);
+          }
 
-              @Override
-              public boolean isFinished() {
-                return true;
-              }
-            });
+          @Override
+          public boolean isFinished() {
+            return true;
+          }
+        });
 
     // Operator Y button → CLIMB mode
-    operator
-        .y()
-        .onTrue(
-            new Command() {
-              @Override
-              public void initialize() {
-                controllerModes.setMode(ControllerModeExample.CLIMB);
-              }
+    operator.bindOnTrue(
+        operator.y(),
+        "Y Button",
+        "CLIMB Mode",
+        new Command() {
+          @Override
+          public void initialize() {
+            controllerModes.setMode(ControllerModeExample.CLIMB);
+          }
 
-              @Override
-              public boolean isFinished() {
-                return true;
-              }
-            });
+          @Override
+          public boolean isFinished() {
+            return true;
+          }
+        });
 
     // Driver Align to Tag explicitly overrides manual driving while Held
-    driver.a().whileTrue(new AlignToTagCommand(drive, vision, ALIGN_TARGET_AREA_PERCENTAGE));
+    driver.bindWhileTrue(
+        driver.a(),
+        "A Button (Hold)",
+        "Align to Tag",
+        new AlignToTagCommand(drive, vision, ALIGN_TARGET_AREA_PERCENTAGE));
 
     // Reset field-centric yaw
-    driver
-        .y()
-        .onTrue(
-            new Command() {
-              @Override
-              public void initialize() {
-                // Reset pose placeholder
-              }
+    driver.bindOnTrue(
+        driver.b(),
+        "B Button",
+        "Reset Field-Centric Yaw",
+        new Command() {
+          @Override
+          public void initialize() {
+            // Reset pose placeholder
+          }
 
-              @Override
-              public boolean isFinished() {
-                return true;
-              }
-            });
+          @Override
+          public boolean isFinished() {
+            return true;
+          }
+        });
 
     // Operator Elevator Dispatch (onTrue ensures single fire execution)
-    operator.dpadUp().onTrue(new ElevatorToPositionCommand(elevator, HIGH_POSITION_METERS));
-    operator.dpadDown().onTrue(new ElevatorToPositionCommand(elevator, LOW_POSITION_METERS));
+    operator.bindOnTrue(
+        operator.dpadUp(),
+        "D-Pad Up",
+        "Elevator: HIGH",
+        new ElevatorToPositionCommand(elevator, HIGH_POSITION_METERS));
+    operator.bindOnTrue(
+        operator.dpadDown(),
+        "D-Pad Down",
+        "Elevator: LOW",
+        new ElevatorToPositionCommand(elevator, LOW_POSITION_METERS));
 
     // DECODE Simulator Test: Align and Shoot on the move
     // Targets the Red Classifier goal from DecodeFieldSim (1.5, 1.5) and calculates lead
-    driver
-        .rightBumper()
-        .whileTrue(
-            new org.areslib.command.autoaim.ShootOnTheMoveCommand(
-                () ->
-                    new org.areslib.math.geometry.Translation2d(
-                        pinpointInputs.xMeters, pinpointInputs.yMeters),
-                () ->
-                    new ChassisSpeeds(
-                        drive.getCommandedVx(), drive.getCommandedVy(), drive.getCommandedOmega()),
-                new org.areslib.math.geometry.Translation2d(1.5, 1.5),
-                12.0, // 12 m/s simulated projectile velocity
-                (requiredHeading) -> {
-                  // Simple P-Controller to snap the drivetrain to the target-leading heading
-                  double error = requiredHeading.getRadians() - pinpointInputs.headingRadians;
+    driver.bindWhileTrue(
+        driver.rightBumper(),
+        "Right Bumper",
+        "Shoot On The Move",
+        new org.areslib.command.autoaim.ShootOnTheMoveCommand(
+            () ->
+                new org.areslib.math.geometry.Translation2d(
+                    pinpointInputs.xMeters, pinpointInputs.yMeters),
+            () ->
+                new ChassisSpeeds(
+                    drive.getCommandedVx(), drive.getCommandedVy(), drive.getCommandedOmega()),
+            new org.areslib.math.geometry.Translation2d(1.5, 1.5),
+            12.0, // 12 m/s simulated projectile velocity
+            (requiredHeading) -> {
+              // Simple P-Controller to snap the drivetrain to the target-leading heading
+              double error = requiredHeading.getRadians() - pinpointInputs.headingRadians;
 
-                  // Wrap error to [-PI, PI] to prevent spins
-                  while (error > Math.PI) error -= 2.0 * Math.PI;
-                  while (error < -Math.PI) error += 2.0 * Math.PI;
+              // Wrap error to [-PI, PI] to prevent spins
+              while (error > Math.PI) error -= 2.0 * Math.PI;
+              while (error < -Math.PI) error += 2.0 * Math.PI;
 
-                  double correctionOmega = error * 5.0; // P-gain
+              double correctionOmega = error * 5.0; // P-gain
 
-                  drive.driveFieldCentric(
-                      driver.getLeftY() * MAX_FWD_SPEED_MPS,
-                      driver.getLeftX() * MAX_STR_SPEED_MPS,
-                      correctionOmega,
-                      new Rotation2d(pinpointInputs.headingRadians));
-                },
-                drive));
+              drive.driveFieldCentric(
+                  driver.getLeftY() * MAX_FWD_SPEED_MPS,
+                  driver.getLeftX() * MAX_STR_SPEED_MPS,
+                  correctionOmega,
+                  new Rotation2d(pinpointInputs.headingRadians));
+            },
+            drive));
   }
 
   /**

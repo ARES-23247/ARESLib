@@ -113,6 +113,12 @@ public class AresTelemetry {
     }
   }
 
+  // Pre-allocated caches for zero-GC hot-path logging
+  private static final double[] POSE2D_CACHE = new double[3];
+  private static final double[] SWERVE_STATES_CACHE = new double[8];
+  private static final double[] DIFF_SPEEDS_CACHE = new double[2];
+  private static final double[] MECANUM_SPEEDS_CACHE = new double[4];
+
   // Helper methods ported from the old AresLogger
 
   /**
@@ -124,7 +130,10 @@ public class AresTelemetry {
    * @param headingRadians The heading in radians.
    */
   public static void putPose2d(String key, double xMeters, double yMeters, double headingRadians) {
-    putNumberArray(key, new double[] {xMeters, yMeters, headingRadians});
+    POSE2D_CACHE[0] = xMeters;
+    POSE2D_CACHE[1] = yMeters;
+    POSE2D_CACHE[2] = headingRadians;
+    putNumberArray(key, POSE2D_CACHE);
   }
 
   /**
@@ -135,12 +144,11 @@ public class AresTelemetry {
    */
   public static void logSwerveStates(String key, SwerveModuleState[] states) {
     if (states.length != 4) return;
-    double[] array = new double[8];
     for (int i = 0; i < 4; i++) {
-      array[i * 2] = states[i].angle.getRadians(); // Angle first for AdvantageScope
-      array[i * 2 + 1] = states[i].speedMetersPerSecond;
+      SWERVE_STATES_CACHE[i * 2] = states[i].angle.getRadians(); // Angle first for AdvantageScope
+      SWERVE_STATES_CACHE[i * 2 + 1] = states[i].speedMetersPerSecond;
     }
-    putNumberArray(key, array);
+    putNumberArray(key, SWERVE_STATES_CACHE);
   }
 
   /**
@@ -150,8 +158,9 @@ public class AresTelemetry {
    * @param speeds The wheel speeds.
    */
   public static void logDifferentialSpeeds(String key, DifferentialDriveWheelSpeeds speeds) {
-    double[] stateArray = new double[] {speeds.leftMetersPerSecond, speeds.rightMetersPerSecond};
-    putNumberArray(key, stateArray);
+    DIFF_SPEEDS_CACHE[0] = speeds.leftMetersPerSecond;
+    DIFF_SPEEDS_CACHE[1] = speeds.rightMetersPerSecond;
+    putNumberArray(key, DIFF_SPEEDS_CACHE);
   }
 
   /**
@@ -161,11 +170,10 @@ public class AresTelemetry {
    * @param speeds The wheel speeds.
    */
   public static void logMecanumSpeeds(String key, MecanumDriveWheelSpeeds speeds) {
-    double[] stateArray =
-        new double[] {
-          speeds.frontLeftMetersPerSecond, speeds.frontRightMetersPerSecond,
-          speeds.rearLeftMetersPerSecond, speeds.rearRightMetersPerSecond
-        };
-    putNumberArray(key, stateArray);
+    MECANUM_SPEEDS_CACHE[0] = speeds.frontLeftMetersPerSecond;
+    MECANUM_SPEEDS_CACHE[1] = speeds.frontRightMetersPerSecond;
+    MECANUM_SPEEDS_CACHE[2] = speeds.rearLeftMetersPerSecond;
+    MECANUM_SPEEDS_CACHE[3] = speeds.rearRightMetersPerSecond;
+    putNumberArray(key, MECANUM_SPEEDS_CACHE);
   }
 }

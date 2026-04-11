@@ -32,6 +32,9 @@ public class AresVisionSubsystem extends SubsystemBase {
   private static final double MIN_WEIGHT = 0.1;
   private static final double MAX_TAG_DISTANCE = 3.0;
 
+  /** Pre-allocated cache for {@link #getVisionMeasurementStdDevs}. */
+  private final double[] stdDevCache = new double[3];
+
   private double calculateDistanceWeight(double distance) {
     double baseWeight =
         MIN_WEIGHT
@@ -158,9 +161,10 @@ public class AresVisionSubsystem extends SubsystemBase {
     // Reject poses if angular velocity is too high (Team 254 Pattern: motion blur / skew destroys
     // PnP)
     if (Math.abs(currentAngularVelocityRadPerSec) > 1.5) { // ~85 deg/sec
-      return new double[] {
-        Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY
-      };
+      stdDevCache[0] = Double.POSITIVE_INFINITY;
+      stdDevCache[1] = Double.POSITIVE_INFINITY;
+      stdDevCache[2] = Double.POSITIVE_INFINITY;
+      return stdDevCache;
     }
 
     // Elite Scaling Pattern (Team 5940 B.R.E.A.D.)
@@ -174,7 +178,10 @@ public class AresVisionSubsystem extends SubsystemBase {
 
     if (inputs.fiducialCount >= 2) {
       // Highly trusted multi-tag
-      return new double[] {0.2 / distanceWeight, 0.2 / distanceWeight, 0.1 / distanceWeight};
+      stdDevCache[0] = 0.2 / distanceWeight;
+      stdDevCache[1] = 0.2 / distanceWeight;
+      stdDevCache[2] = 0.1 / distanceWeight;
+      return stdDevCache;
     } else if (inputs.fiducialCount == 1) {
       // Single tag disambiguation & distance falloff
       if (inputs.minTagAmbiguity > 0.15) {
@@ -188,14 +195,20 @@ public class AresVisionSubsystem extends SubsystemBase {
       // B.R.E.A.D. Distance-Squared Polynomial fallback
       double xyStd = (0.03 * Math.pow(distance, 2)) / distanceWeight;
       double thetaStd = (0.05 * Math.pow(distance, 2)) / distanceWeight;
-      return new double[] {xyStd, xyStd, thetaStd};
+      stdDevCache[0] = xyStd;
+      stdDevCache[1] = xyStd;
+      stdDevCache[2] = thetaStd;
+      return stdDevCache;
     }
 
     // Fallback based on area (Old ARESLib heuristic) if fiducialCount isn't populated
     if (inputs.ta < minTargetAreaPercent) return null;
     double confidence = Math.min(inputs.ta / maxTrustAreaPercent, 1.0);
     double fallbackStd = (1.0 - confidence) * 2.0 + 0.1;
-    return new double[] {fallbackStd, fallbackStd, fallbackStd * 2.0};
+    stdDevCache[0] = fallbackStd;
+    stdDevCache[1] = fallbackStd;
+    stdDevCache[2] = fallbackStd * 2.0;
+    return stdDevCache;
   }
 
   public void setPipeline(int index) {

@@ -29,6 +29,8 @@ public final class CommandScheduler {
   private final java.util.List<Command> toSchedule = new java.util.ArrayList<>();
   // Buffer for commands cancelled during iteration
   private final java.util.List<Command> toCancel = new java.util.ArrayList<>();
+  // Pre-allocated set for finished commands to avoid per-tick allocation
+  private final Set<Command> commandsToRemove = new LinkedHashSet<>();
   private boolean isIterating = false;
 
   // Loop boundary diagnostics
@@ -220,7 +222,7 @@ public final class CommandScheduler {
 
     // 4. Execute commands
     isIterating = true;
-    Set<Command> commandsToRemove = new LinkedHashSet<>();
+    commandsToRemove.clear();
     for (Command command : scheduledCommands) {
       command.execute();
       if (command.isFinished()) {

@@ -1,0 +1,16 @@
+{
+  "name": "areslib-bindings",
+  "version": "1.0.0",
+  "description": "ARESLib areslib-bindings - FTC robot code framework component",
+  "author": {
+    "name": "Team ARES",
+    "url": "https://github.com/ARESLib"
+  },
+  "repository": "https://github.com/ARESLib/ARESLib",
+  "license": "MIT",
+  "keywords": [
+    "ftc",
+    "areslib",
+    "bindings"
+  ]
+}

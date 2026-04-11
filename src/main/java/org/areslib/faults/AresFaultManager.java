@@ -41,6 +41,11 @@ public class AresFaultManager {
   private static final List<AresAlert> ALERTS = new CopyOnWriteArrayList<>();
   private static AresGamepad driverGamepad;
 
+  // Pre-allocated lists to eliminate per-tick GC pressure in update()
+  private static final List<String> CACHED_ERRORS = new ArrayList<>();
+  private static final List<String> CACHED_WARNINGS = new ArrayList<>();
+  private static final List<String> CACHED_INFOS = new ArrayList<>();
+
   private static boolean wasError = false;
   private static boolean hasNewError = false;
 
@@ -85,9 +90,9 @@ public class AresFaultManager {
 
   /** Periodically updates telemetry arrays and driver feedback. Must be called in the main loop. */
   public static void update() {
-    List<String> errors = new ArrayList<>();
-    List<String> warnings = new ArrayList<>();
-    List<String> infos = new ArrayList<>();
+    CACHED_ERRORS.clear();
+    CACHED_WARNINGS.clear();
+    CACHED_INFOS.clear();
 
     boolean hasError = false;
 
@@ -95,22 +100,22 @@ public class AresFaultManager {
       if (alert.isActive()) {
         switch (alert.getType()) {
           case ERROR:
-            errors.add(alert.getText());
+            CACHED_ERRORS.add(alert.getText());
             hasError = true;
             break;
           case WARNING:
-            warnings.add(alert.getText());
+            CACHED_WARNINGS.add(alert.getText());
             break;
           case INFO:
-            infos.add(alert.getText());
+            CACHED_INFOS.add(alert.getText());
             break;
         }
       }
     }
 
-    AresTelemetry.putStringArray("Alerts/Errors", errors.toArray(new String[0]));
-    AresTelemetry.putStringArray("Alerts/Warnings", warnings.toArray(new String[0]));
-    AresTelemetry.putStringArray("Alerts/Infos", infos.toArray(new String[0]));
+    AresTelemetry.putStringArray("Alerts/Errors", CACHED_ERRORS.toArray(new String[0]));
+    AresTelemetry.putStringArray("Alerts/Warnings", CACHED_WARNINGS.toArray(new String[0]));
+    AresTelemetry.putStringArray("Alerts/Infos", CACHED_INFOS.toArray(new String[0]));
 
     if (driverGamepad != null) {
       if (hasError) {

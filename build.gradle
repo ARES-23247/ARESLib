@@ -51,7 +51,7 @@ spotless {
     format 'misc', {
         target fileTree('.') {
             include '**/*.md', '**/.gitignore'
-            exclude '**/build/**', '**/build-*/**'
+            exclude '**/build/**', '**/build-*/**', 'CONTROLLER_MAPPINGS.md'
         }
         trimTrailingWhitespace()
         leadingTabsToSpaces(2)
@@ -213,3 +213,106 @@ task installGitHook(type: Copy) {
     filePermissions { unix(0777) }
 }
 build.dependsOn installGitHook
+
+task generateControllerMappings {
+    description = "Automatically generates CONTROLLER_MAPPINGS.md from RobotContainer.java"
+    def inputFile = file("src/main/java/org/firstinspires/ftc/teamcode/RobotContainer.java")
+    def outputFileHtml = file("CONTROLLER_MAPPINGS.html")
+    def outputFileMd = file("CONTROLLER_MAPPINGS.md")
+
+    inputs.file(inputFile)
+    outputs.files(outputFileHtml, outputFileMd)
+
+    doLast {
+        if (!inputFile.exists()) return
+        String content = inputFile.text
+
+        // Initialize both builders
+        StringBuilder html = new StringBuilder()
+        StringBuilder md = new StringBuilder()
+
+        // HTML Header
+        html.append("<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"UTF-8\">")
+        html.append("<title>ARESLib Controller Mappings</title>")
+        html.append("<style>")
+        html.append("body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; padding: 2rem; max-width: 800px; margin: 0 auto; line-height: 1.6; color: #24292e; background-color: #ffffff; }")
+        html.append("h1 { border-bottom: 2px solid #eaecef; padding-bottom: 8px; margin-bottom: 20px; }")
+        html.append("h2 { margin-top: 30px; border-bottom: 1px solid #eaecef; padding-bottom: 8px; }")
+        html.append("table { border-collapse: collapse; width: 100%; margin-top: 15px; }")
+        html.append("th, td { border: 1px solid #dfe2e5; padding: 10px 15px; text-align: left; }")
+        html.append("th { background-color: #f6f8fa; font-weight: 600; }")
+        html.append("tr:nth-child(even) { background-color: #f8f9fa; }")
+        html.append("kbd { background-color: #fafbfc; border: 1px solid #c6cbd1; border-bottom-color: #959da5; border-radius: 4px; box-shadow: inset 0 -1px 0 #959da5; color: #444d56; display: inline-block; font-size: 13px; line-height: 20px; padding: 4px 7px; font-family: ui-monospace, SFMono-Regular, monospace; }")
+        html.append(".note { background-color: #ddf4ff; border-left: 4px solid #0969da; padding: 15px; margin-top: 30px; border-radius: 4px; color: #24292f; }")
+        html.append(".subtitle { color: #57606a; font-style: italic; }")
+        html.append("</style></head><body>")
+        html.append("<h1>ARESLib Controller Mappings</h1>")
+        html.append("<p class=\"subtitle\">This document is automatically generated during compilation from <code>RobotContainer.java</code>.</p>")
+
+        // MD Header
+        md.append("# ARESLib Controller Mappings\n\n")
+        md.append("This document is automatically generated during compilation from `RobotContainer.java`.\n\n")
+
+        def pattern = java.util.regex.Pattern.compile("(?s)(driver|operator)\\s*\\.bind(?:On|While)(?:True|False)\\(\\s*[^,]+,\\s*\"([^\"]+)\"\\s*,\\s*\"([^\"]+)\"")
+        def matcher = pattern.matcher(content)
+
+        def pilotHtml = []
+        def pilotMd = []
+        def copilotHtml = []
+        def copilotMd = []
+
+        while (matcher.find()) {
+            def target = matcher.group(1)
+            def trigger = matcher.group(2)
+            def action = matcher.group(3)
+
+            def rowHtml = "<tr><td><kbd>${trigger}</kbd></td><td><b>${action}</b></td></tr>"
+            def rowMd = "| <kbd>${trigger}</kbd> | **${action}** |"
+
+            if (target == "driver") {
+                pilotHtml.add(rowHtml)
+                pilotMd.add(rowMd)
+            } else if (target == "operator") {
+                copilotHtml.add(rowHtml)
+                copilotMd.add(rowMd)
+            }
+        }
+
+        // HTML & MD Pilot Append
+        html.append("<h2>\uD83C\uDFAE Pilot (Driver) - Controller 0</h2>")
+        html.append("<p class=\"subtitle\">Primary drive controls and high-level macro sequences.</p>")
+        html.append("<table><tr><th>Controller Input</th><th>Mapped Action</th></tr>")
+        html.append("<tr><td><kbd>Left Joystick</kbd></td><td><b>Holonomic Translation (X/Y)</b></td></tr>")
+        html.append("<tr><td><kbd>Right Joystick</kbd></td><td><b>Holonomic Rotation</b></td></tr>")
+        pilotHtml.each { html.append(it) }
+        html.append("</table>")
+
+        md.append("## \uD83C\uDFAE Pilot (Driver) - Controller 0\n\n")
+        md.append("> **Primary drive controls and high-level macro sequences.**\n\n")
+        md.append("| Controller Input | Mapped Action |\n| :--- | :--- |\n")
+        md.append("| <kbd>Left Joystick</kbd> | **Holonomic Translation (X/Y)** |\n")
+        md.append("| <kbd>Right Joystick</kbd> | **Holonomic Rotation** |\n")
+        pilotMd.each { md.append(it).append('\\n') }
+        md.append("\n---\n\n")
+
+        // HTML & MD CoPilot Append
+        html.append("<h2>\uD83D\uDD79\uFE0F CoPilot (Operator) - Controller 1</h2>")
+        html.append("<p class=\"subtitle\">Manual overrides, sub-mechanism control, and fault resets.</p>")
+        html.append("<table><tr><th>Controller Input</th><th>Mapped Action</th></tr>")
+        copilotHtml.each { html.append(it) }
+        html.append("</table>")
+        html.append("<div class=\"note\"><strong>Note:</strong> All automated scoring sequences natively return the superstructure to the safe <code>STOWED</code> state immediately upon release of the binding.</div>")
+        html.append("</body></html>")
+
+        md.append("## \uD83D\uDD79\uFE0F CoPilot (Operator) - Controller 1\n\n")
+        md.append("> **Manual overrides, sub-mechanism control, and fault resets.**\n\n")
+        md.append("| Controller Input | Mapped Action |\n| :--- | :--- |\n")
+        copilotMd.each { md.append(it).append('\\n') }
+        md.append("\n---\n> [!NOTE]\n> All automated scoring sequences natively return the superstructure to the \n> safe `STOWED` state immediately upon release of the binding.\n")
+
+        outputFileHtml.setText(html.toString(), 'UTF-8')
+        outputFileMd.setText(md.toString(), 'UTF-8')
+        println "Successfully generated CONTROLLER_MAPPINGS documents."
+    }
+}
+project.compileJava.dependsOn(generateControllerMappings)

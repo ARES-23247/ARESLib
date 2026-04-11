@@ -85,6 +85,10 @@
     {
       "name": "skill-authoring",
       "source": "./skill-authoring"
+    },
+    {
+      "name": "areslib-bindings",
+      "source": "./areslib-bindings"
     }
   ]
 }

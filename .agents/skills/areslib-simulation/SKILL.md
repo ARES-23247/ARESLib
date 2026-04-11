@@ -67,6 +67,9 @@ The `DecodeFieldSim` class builds the 2025-2026 DECODE field as static dyn4j bod
 
 **Important:** Obelisk tags (AprilTags on the central structure) are **outside** the field perimeter and must NOT be used for localization. Only Goal tags (Tag 20: Blue, Tag 24: Red) are valid for navigation. See the `areslib-vision` skill.
 
+### Virtual Field Bump Tilt
+Wait, what if the robot drives over the 1-inch physical bumps? To avoid odometry skipping, ARESLib enables **virtual field bump tilt compensation**. We intentionally avoid spawning physical boundary box bumps in `dyn4j` (as they severely destabilize collision tests), and instead simulate the Z/Pitch disturbance when the `RobotPose` enters the bump zone. Always apply this logical override in vision math rather than relying on pure physics-engine geometry to lift the robot.
+
 ## 4. Point Cloud Logging (LiDAR)
 
 `ArrayLidarIOSim` generates a `double[]` flat array in `[x1, y1, z1, x2, y2, z2, ...]` format:
@@ -96,7 +99,8 @@ In AdvantageScope, view this as a **Points** tab with source type `double[]`.
 | `PhysicsSim/StepTimeMs` | `double` | Physics engine step duration |
 | `PhysicsSim/BodyCount` | `int` | Total dyn4j bodies in world |
 | `PhysicsSim/RobotPose` | `Pose2d` | True physics pose (not odometry) |
-| `Lidar/PointCloud` | `double[]` | Flat [x,y,z,...] point cloud |
+| `Simulation/DECODE_ARTIFACTs` | `double[]` | Flat `[x,y,θ,...]` array of dynamic game pieces on the field. Note the 3-value layout vs LiDAR. |
+| `Lidar/PointCloud` | `double[]` | Flat `[x,y,z,...]` point cloud |
 | `Vision/DetectedTags` | `int` | Number of AprilTags in FOV |
 
 ## 6. Testing

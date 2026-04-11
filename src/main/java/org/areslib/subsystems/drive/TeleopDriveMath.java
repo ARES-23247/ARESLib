@@ -18,6 +18,9 @@ package org.areslib.subsystems.drive;
  */
 public class TeleopDriveMath {
 
+  /** Pre-allocated result buffer for {@link #processJoystick2D}. */
+  private static final double[] JOYSTICK_2D_CACHE = new double[2];
+
   /**
    * Applies a deadband to a joystick axis value. Values within the deadband are zeroed.
    *
@@ -79,7 +82,9 @@ public class TeleopDriveMath {
     double magnitude = Math.sqrt(rawX * rawX + rawY * rawY);
 
     if (magnitude < deadband) {
-      return new double[] {0.0, 0.0};
+      JOYSTICK_2D_CACHE[0] = 0.0;
+      JOYSTICK_2D_CACHE[1] = 0.0;
+      return JOYSTICK_2D_CACHE;
     }
 
     // Rescale magnitude from deadband edge
@@ -88,6 +93,8 @@ public class TeleopDriveMath {
 
     // Maintain original direction, apply curved magnitude
     double scale = curved * maxSpeedMps / magnitude;
-    return new double[] {rawX * scale, rawY * scale};
+    JOYSTICK_2D_CACHE[0] = rawX * scale;
+    JOYSTICK_2D_CACHE[1] = rawY * scale;
+    return JOYSTICK_2D_CACHE;
   }
 }
