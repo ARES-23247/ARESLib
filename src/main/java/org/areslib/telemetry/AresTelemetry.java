@@ -121,6 +121,14 @@ public class AresTelemetry {
 
   /** Updates all registered BACKENDS. Should be called periodically. */
   public static void update() {
+    if (org.areslib.core.TunableNumber.dumpJsonNow) {
+      org.areslib.core.TunableNumber.dumpJsonNow = false;
+      String json = org.areslib.core.TunableNumber.dumpAllJson();
+      putString("System/TunablesDump", json);
+      com.qualcomm.robotcore.util.RobotLog.i(
+          "\n=== ARESLib Tunables Dump ===\n" + json + "\n=============================");
+    }
+
     for (AresLoggerBackend backend : BACKENDS) {
       backend.update();
     }

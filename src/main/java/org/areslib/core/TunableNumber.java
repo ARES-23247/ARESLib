@@ -1,6 +1,8 @@
 package org.areslib.core;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.areslib.telemetry.AresAutoLogger;
 
@@ -27,11 +29,21 @@ import org.areslib.telemetry.AresAutoLogger;
  * }
  * }</pre>
  */
+@com.acmerobotics.dashboard.config.Config
 public class TunableNumber {
+
+  /**
+   * FTC Dashboard Button Hook. Toggle to true in the dashboard web interface to trigger a
+   * system-wide log dump sequence of all tuned constants. Resets to false automatically.
+   */
+  public static boolean dumpJsonNow = false;
 
   private final String key;
   private double value;
   private double defaultValue;
+
+  /** Global registry of all instantiated tunable numbers for bulk exporting. */
+  private static final List<TunableNumber> INSTANCES = new ArrayList<>();
 
   /** Per-consumer change tracking: maps consumer ID → last seen value. */
   private final Map<Integer, Double> lastHasChangedValues = new HashMap<>();
@@ -49,6 +61,10 @@ public class TunableNumber {
 
     // Publish the initial value
     AresAutoLogger.recordOutput("Tunables/" + key, value);
+
+    synchronized (INSTANCES) {
+      INSTANCES.add(this);
+    }
   }
 
   /**
@@ -107,6 +123,31 @@ public class TunableNumber {
    */
   public String getKey() {
     return key;
+  }
+
+  /**
+   * Generates a formatted JSON string of all current active Tunable constants. Useful for dumping
+   * final tuned PID values and quickly copy-pasting them straight into your permanent source
+   * Constants.java file.
+   *
+   * @return JSON formatted dump.
+   */
+  public static String dumpAllJson() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("{\n");
+    synchronized (INSTANCES) {
+      for (int i = 0; i < INSTANCES.size(); i++) {
+        TunableNumber t = INSTANCES.get(i);
+        sb.append(String.format("  \"%s\": %.6f", t.getKey(), t.get()));
+        if (i < INSTANCES.size() - 1) {
+          sb.append(",\n");
+        } else {
+          sb.append("\n");
+        }
+      }
+    }
+    sb.append("}");
+    return sb.toString();
   }
 
   @Override
