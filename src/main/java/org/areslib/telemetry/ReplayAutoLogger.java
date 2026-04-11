@@ -17,6 +17,7 @@ import org.areslib.math.kinematics.SwerveModuleState;
 public class ReplayAutoLogger {
 
   /** Unified entry for a single field being restored. */
+  @SuppressWarnings("unused")
   private static class ReplayEntry {
     final Field field;
     final String key;
@@ -60,6 +61,7 @@ public class ReplayAutoLogger {
    * @param prefix Base directory string.
    * @param inputs The inputs object to overwrite.
    */
+  @SuppressWarnings("unused")
   public static void processReplayInputs(String prefix, AresLoggableInputs inputs) {
     if (inputs == null) return;
 
@@ -81,20 +83,17 @@ public class ReplayAutoLogger {
             });
 
     for (int i = 0; i < entries.size(); i++) {
-      ReplayEntry entry = entries.get(i);
-      try {
-        // Mock integration hook:
-        // Object historicalData = tickData.get(entry.key);
-        // if (historicalData == null) continue;
+      // ReplayEntry entry = entries.get(i);
+      // Mock integration hook:
+      // Object historicalData = tickData.get(entry.key);
+      // if (historicalData == null) continue;
 
-        // Example assignment:
-        // entry.field.set(inputs, historicalData);
+      // Example assignment:
+      // entry.field.set(inputs, historicalData);
 
-        // Real deserialization requires type casting matching the WPILog format.
-        // Leaving hook available for WPILogReader parity.
-      } catch (Exception e) {
-        // Skip reflection failures
-      }
+      // Real deserialization requires type casting matching the WPILog format.
+      // Leaving hook available for WPILogReader parity.
+      continue;
     }
   }
 }

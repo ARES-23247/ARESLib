@@ -1,6 +1,6 @@
 ---
 name: areslib-autonomous
-description: Helps build autonomous routines, path following commands, ghost replay systems, and dynamic avoidance in ARESLib. Use when creating autonomous OpModes, building path sequences, or implementing shoot-on-the-move.
+description: Helps build autonomous routines, path following commands, and dynamic avoidance in ARESLib. Use when creating autonomous OpModes, building path sequences, or implementing shoot-on-the-move.
 ---
 
 You are an expert autonomous systems engineer for Team ARES. When building autonomous routines, path following commands, or replay systems for ARESLib, adhere strictly to the following guidelines.
@@ -14,8 +14,6 @@ You are an expert autonomous systems engineer for Team ARES. When building auton
 | `AutoBuilder` | `command.auto` | Builds complete autonomous sequences from PathPlanner paths |
 | `DynamicPathCommand` | `command.auto` | On-the-fly pathfinding with obstacle avoidance |
 | `FollowPathCommand` | `command` | WPILib Command wrapper around path following |
-| `GhostRecorder` | `core` | Records driver inputs during teleop for autonomous replay |
-| `GhostPlaybackCommand` | `command` | Replays recorded ghost data as an autonomous routine |
 | `ShootOnTheMoveCommand` | `command.autoaim` | Kinematic aiming while robot is in motion |
 | `AlignToPoseCommand` | `command` | PID-based alignment to a target field pose |
 | `DynamicAvoidanceAuto` | `examples.auto` | Example autonomous that avoids Obelisk dynamically |
@@ -39,32 +37,7 @@ ARESLib uses **WPILib convention** everywhere (X-forward, Y-left, theta CCW+). P
 
 All conversions between internal frames are handled by `CoordinateUtil`. See the `areslib-architecture` skill for the full coordinate guide.
 
-### Rule C: GhostRecorder Safety
-`GhostRecorder` records robot ChassisSpeeds and binary button inputs to a CSV file using a **lock-free background writer thread**, ensuring zero main-loop blocking from file I/O. During replay, `GhostPlaybackCommand` reads the CSV and feeds the speeds and buttons back to their consumers deterministically.
-
-**Critical:** Ensure that `GhostRecorder` and `GhostPlaybackCommand` are mutually exclusive.
-
-```java
-// Initialization (RobotContainer):
-GhostRecorder recorder = new GhostRecorder(
-    () -> driveSubsystem.getSpeeds(),
-    () -> driverGamepad.rightTrigger() > 0.5 // example varargs boolean supplier
-);
-
-// Recording (in TeleOp):
-// recorder.update() MUST be called in periodic!
-recorder.startRecording("/sdcard/FIRST/macros/auto1.csv");
-
-// Playback (in Auto):
-Command playbackCmd = new GhostPlaybackCommand(
-    "/sdcard/FIRST/macros/auto1.csv",
-    recorder,
-    speeds -> driveSubsystem.drive(speeds),
-    isShooting -> shooter.setShooting(isShooting) // corresponds to rightTrigger
-);
-playbackCmd.schedule();
-```
-### Rule D: Dynamic Avoidance Uses ObstacleAvoider
+### Rule C: Dynamic Avoidance Uses ObstacleAvoider
 The `ObstacleAvoider` class in `math.pathing` generates waypoints that route around known field obstacles:
 ```java
 ObstacleAvoider avoider = new ObstacleAvoider();
@@ -107,7 +80,6 @@ The command continuously updates the heading lock while the path follower handle
 | `Auto/ActivePath` | `String` | Name of the currently executing path |
 | `Auto/FollowerBusy` | `boolean` | Whether the follower is actively tracking |
 | `Auto/TargetPose` | `Pose2d` | Current path target pose |
-| `Auto/GhostRecording` | `boolean` | Whether ghost recording is active |
 | `Auto/AimAngle` | `double` | Shoot-on-the-move compensated heading (rad) |
 
 ## 6. Testing

@@ -10,7 +10,7 @@ You are a documentation architect for Team ARES. When creating or updating AI sk
 Create a new skill whenever you:
 - Add a new subsystem (e.g., `ClawSubsystem`, `ElevatorSubsystem`)
 - Implement a new IO abstraction (e.g., `ColorSensorIO`)
-- Build a new framework utility (e.g., `AutoBuilder`, `GhostRecorder`)
+- Build a new framework utility (e.g., `AutoBuilder`)
 - Add a complex integration (e.g., a new vision pipeline)
 - Establish a new pattern that should be followed consistently
 

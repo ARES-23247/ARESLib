@@ -61,5 +61,10 @@ public class AresOperatorInterface extends SubsystemBase {
         controller.rumble(rumbleStrength, rumbleStrength, 30);
       }
     }
+
+    // 3. Continuously log driver inputs to AdvantageKit Telemetry
+    if (controller != null) {
+      controller.logInputsToTelemetry();
+    }
   }
 }

@@ -269,4 +269,33 @@ public class AresGamepad {
       gamepad.setLedColor(r, g, b, durationMs);
     }
   }
+
+  /**
+   * Logs all raw controller axes and buttons directly into the AdvantageKit telemetry pipeline to
+   * ensure perfect driver visibility and match log reviewability.
+   */
+  public void logInputsToTelemetry() {
+    if (gamepad == null) return;
+    String prefix = "DriverData/" + name + "/";
+
+    // Axes
+    AresTelemetry.putNumber(prefix + "LeftX", getLeftX());
+    AresTelemetry.putNumber(prefix + "LeftY", getLeftY());
+    AresTelemetry.putNumber(prefix + "RightX", getRightX());
+    AresTelemetry.putNumber(prefix + "RightY", getRightY());
+    AresTelemetry.putNumber(prefix + "LeftTrigger", getLeftTriggerAxis());
+    AresTelemetry.putNumber(prefix + "RightTrigger", getRightTriggerAxis());
+
+    // Buttons
+    AresTelemetry.putBoolean(prefix + "A", gamepad.a);
+    AresTelemetry.putBoolean(prefix + "B", gamepad.b);
+    AresTelemetry.putBoolean(prefix + "X", gamepad.x);
+    AresTelemetry.putBoolean(prefix + "Y", gamepad.y);
+    AresTelemetry.putBoolean(prefix + "LeftBumper", gamepad.left_bumper);
+    AresTelemetry.putBoolean(prefix + "RightBumper", gamepad.right_bumper);
+    AresTelemetry.putBoolean(prefix + "DpadUp", gamepad.dpad_up);
+    AresTelemetry.putBoolean(prefix + "DpadDown", gamepad.dpad_down);
+    AresTelemetry.putBoolean(prefix + "DpadLeft", gamepad.dpad_left);
+    AresTelemetry.putBoolean(prefix + "DpadRight", gamepad.dpad_right);
+  }
 }

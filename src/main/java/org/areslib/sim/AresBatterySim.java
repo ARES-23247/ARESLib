@@ -18,10 +18,10 @@ public class AresBatterySim {
   private double currentDrawAmps = 0.0;
   private double loadedVoltage = NOMINAL_VOLTAGE;
 
-  private static final AresBatterySim s_instance = new AresBatterySim();
+  private static final AresBatterySim INSTANCE = new AresBatterySim();
 
   public static AresBatterySim getInstance() {
-    return s_instance;
+    return INSTANCE;
   }
 
   private AresBatterySim() {}
@@ -78,6 +78,8 @@ public class AresBatterySim {
   }
 
   /**
+   * Returns the dynamically sagged voltage available to the robot on this simulation tick.
+   *
    * @return The dynamically sagged voltage available to the robot on this simulation tick.
    */
   public double getLoadedVoltage() {
@@ -85,6 +87,8 @@ public class AresBatterySim {
   }
 
   /**
+   * Returns the output total amperage drain for telemetry plotting.
+   *
    * @return Output total amperage drain for telemetry plotting
    */
   public double getTotalCurrentDraw() {

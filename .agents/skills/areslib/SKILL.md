@@ -16,7 +16,7 @@ You are an expert FTC Software Engineer for Team ARES. Before writing any code, 
 | **Core Standards** | `areslib-core-standards` | Formatting, Never Nester rules, specific unit/variable naming, mathematics formatting |
 | **Architecture** | `areslib-architecture` | IO patterns, coordinate systems, scaffolding new subsystems |
 | **Drivetrain** | `areslib-drivetrain` | Swerve/mecanum/differential kinematics, odometry, drive tuning |
-| **Autonomous** | `areslib-autonomous` | Path following, ghost replay, shoot-on-the-move, dynamic avoidance |
+| **Autonomous** | `areslib-autonomous` | Path following, shoot-on-the-move, dynamic avoidance |
 | **PathPlanner** | `pathplanner` | Dummy shim layer, AutoBuilder config, path constraints, FTC coordinate offsets |
 | **Simulation** | `areslib-simulation` | dyn4j physics, `AresPhysicsWorld`, field obstacles, game pieces, LiDAR |
 | **Vision** | `areslib-vision` | AprilTag pipelines, `VisionIO`, pose injection, camera fusion |
