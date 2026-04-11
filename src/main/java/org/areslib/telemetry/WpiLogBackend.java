@@ -15,6 +15,9 @@ import java.util.Map;
  * on-disk logs.
  */
 public class WpiLogBackend implements AresLoggerBackend {
+  private static final int INITIAL_BUFFER_CAPACITY_BYTES = 65536;
+  private static final int RECORD_HEADER_SIZE_BYTES = 17;
+
   private final Map<String, Integer> keyToId = new HashMap<>();
   private int nextEntryId = 1; // ID 0 is reserved for controls
   private FileChannel channel;
@@ -23,13 +26,23 @@ public class WpiLogBackend implements AresLoggerBackend {
   private FileOutputStream fileOutputStream;
 
   /**
+   * Initializes the WPILog backend to an automatically resolved path. It will prioritize mounted
+   * USB flash drives first to save internal memory. If no USB is present, it writes to the internal
+   * disk at `/sdcard/FIRST/logs/`.
+   */
+  public WpiLogBackend() {
+    this(resolveOptimalLogDirectory());
+  }
+
+  /**
    * Initializes the WPILog backend and creates the initial log file.
    *
    * @param directoryPath The directory path to store the .wpilog file.
    */
   public WpiLogBackend(String directoryPath) {
     startTimeMicrosec = System.nanoTime() / 1000L;
-    encodeBuffer = ByteBuffer.allocate(1024 * 64).order(ByteOrder.LITTLE_ENDIAN);
+    encodeBuffer =
+        ByteBuffer.allocate(INITIAL_BUFFER_CAPACITY_BYTES).order(ByteOrder.LITTLE_ENDIAN);
 
     File dir = new File(directoryPath);
     if (!dir.exists()) {
@@ -63,6 +76,23 @@ public class WpiLogBackend implements AresLoggerBackend {
       com.qualcomm.robotcore.util.RobotLog.e(String.valueOf(e));
       channel = null;
     }
+  }
+
+  /** Scans internal Android mounts to prioritize USB Flash Drives over eMMC internal storage. */
+  private static String resolveOptimalLogDirectory() {
+    String[] usbPaths = {
+      "/storage/usbotg/logs", "/usb_storage/logs", "/storage/usb0/logs", "/mnt/media_rw/logs"
+    };
+
+    for (String path : usbPaths) {
+      File f = new File(path);
+      if (f.getParentFile() != null && f.getParentFile().exists() && f.getParentFile().canWrite()) {
+        com.qualcomm.robotcore.util.RobotLog.i("WpiLogBackend: Found USB drive at " + path);
+        return path;
+      }
+    }
+    // Fallback directly to internal storage
+    return android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + "/FIRST/logs";
   }
 
   private void writeRecordHeader(int entryId, int payloadSize, long timestamp) throws IOException {
@@ -132,9 +162,10 @@ public class WpiLogBackend implements AresLoggerBackend {
     int id = getOrCreateEntry(key, "double[]");
     int payloadSize = values.length * 8;
     try {
-      if (encodeBuffer.capacity() < 17 + payloadSize) {
+      if (encodeBuffer.capacity() < RECORD_HEADER_SIZE_BYTES + payloadSize) {
         encodeBuffer =
-            ByteBuffer.allocate(Math.max(encodeBuffer.capacity() * 2, 17 + payloadSize))
+            ByteBuffer.allocate(
+                    Math.max(encodeBuffer.capacity() * 2, RECORD_HEADER_SIZE_BYTES + payloadSize))
                 .order(ByteOrder.LITTLE_ENDIAN);
       }
       writeRecordHeader(id, payloadSize, getTimestamp());
@@ -154,9 +185,11 @@ public class WpiLogBackend implements AresLoggerBackend {
     int id = getOrCreateEntry(key, "string");
     byte[] strBytes = value.getBytes(StandardCharsets.UTF_8);
     try {
-      if (encodeBuffer.capacity() < 17 + strBytes.length) {
+      if (encodeBuffer.capacity() < RECORD_HEADER_SIZE_BYTES + strBytes.length) {
         encodeBuffer =
-            ByteBuffer.allocate(Math.max(encodeBuffer.capacity() * 2, 17 + strBytes.length))
+            ByteBuffer.allocate(
+                    Math.max(
+                        encodeBuffer.capacity() * 2, RECORD_HEADER_SIZE_BYTES + strBytes.length))
                 .order(ByteOrder.LITTLE_ENDIAN);
       }
       writeRecordHeader(id, strBytes.length, getTimestamp());
@@ -188,9 +221,10 @@ public class WpiLogBackend implements AresLoggerBackend {
     int id = getOrCreateEntry(key, "boolean[]");
     int payloadSize = values.length;
     try {
-      if (encodeBuffer.capacity() < 17 + payloadSize) {
+      if (encodeBuffer.capacity() < RECORD_HEADER_SIZE_BYTES + payloadSize) {
         encodeBuffer =
-            ByteBuffer.allocate(Math.max(encodeBuffer.capacity() * 2, 17 + payloadSize))
+            ByteBuffer.allocate(
+                    Math.max(encodeBuffer.capacity() * 2, RECORD_HEADER_SIZE_BYTES + payloadSize))
                 .order(ByteOrder.LITTLE_ENDIAN);
       }
       writeRecordHeader(id, payloadSize, getTimestamp());
@@ -218,9 +252,10 @@ public class WpiLogBackend implements AresLoggerBackend {
     }
 
     try {
-      if (encodeBuffer.capacity() < 17 + payloadSize) {
+      if (encodeBuffer.capacity() < RECORD_HEADER_SIZE_BYTES + payloadSize) {
         encodeBuffer =
-            ByteBuffer.allocate(Math.max(encodeBuffer.capacity() * 2, 17 + payloadSize))
+            ByteBuffer.allocate(
+                    Math.max(encodeBuffer.capacity() * 2, RECORD_HEADER_SIZE_BYTES + payloadSize))
                 .order(ByteOrder.LITTLE_ENDIAN);
       }
       writeRecordHeader(id, payloadSize, getTimestamp());
