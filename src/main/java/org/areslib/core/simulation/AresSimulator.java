@@ -44,6 +44,31 @@ public class AresSimulator {
                 double dtSeconds = periodMs / 1000.0;
                 AresPhysicsWorld.getInstance().step(dtSeconds);
 
+                // Publish DECODE_ARTIFACTs to telemetry for AdvantageScope
+                java.util.List<org.dyn4j.dynamics.Body> bodies =
+                    AresPhysicsWorld.getInstance().getWorld().getBodies();
+                int artifactCount = 0;
+                for (org.dyn4j.dynamics.Body body : bodies) {
+                  if ("DECODE_ARTIFACT".equals(body.getUserData())) {
+                    artifactCount++;
+                  }
+                }
+
+                if (artifactCount > 0) {
+                  double[] poses = new double[artifactCount * 3];
+                  int ix = 0;
+                  for (org.dyn4j.dynamics.Body body : bodies) {
+                    if ("DECODE_ARTIFACT".equals(body.getUserData())) {
+                      poses[ix * 3] = body.getTransform().getTranslationX();
+                      poses[ix * 3 + 1] = body.getTransform().getTranslationY();
+                      poses[ix * 3 + 2] = body.getTransform().getRotationAngle();
+                      ix++;
+                    }
+                  }
+                  org.areslib.telemetry.AresAutoLogger.recordOutputArray(
+                      "Simulation/DECODE_ARTIFACTs", poses);
+                }
+
                 // Poll physics logic decoupled from main scheduling pipeline
                 for (Subsystem subsystem : CommandScheduler.getInstance().getSubsystems()) {
                   subsystem.simulationPeriodic();
