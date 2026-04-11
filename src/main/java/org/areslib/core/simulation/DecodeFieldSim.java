@@ -90,6 +90,9 @@ public class DecodeFieldSim {
     artifact.translate(xMeters, yMeters);
     artifact.setMass(MassType.NORMAL);
 
+    // Tag the body so Intakes know this is a game piece
+    artifact.setUserData("DECODE_ARTIFACT");
+
     // Linear/angular damping to simulate friction stopping balls from rolling forever
     artifact.setLinearDamping(1.5);
     artifact.setAngularDamping(1.5);

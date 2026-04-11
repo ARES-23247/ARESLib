@@ -58,9 +58,27 @@ public class AresPhysicsWorld {
   }
 
   /**
+   * Removes a physics body from the shared environment.
+   *
+   * @param body The cleanly constructed dyn4j Body
+   */
+  public synchronized void removeBody(Body body) {
+    if (world.containsBody(body)) {
+      world.removeBody(body);
+    }
+  }
+
+  /** Adds a ContactListener to the physics world. */
+  public synchronized void addContactListener(
+      org.dyn4j.world.listener.ContactListener<Body> listener) {
+    world.addContactListener(listener);
+  }
+
+  /**
    * Flushes the current physics simulation state, usually triggered during robotInit or resetting.
    */
   public synchronized void reset() {
     world.removeAllBodies();
+    world.removeAllListeners();
   }
 }

@@ -88,4 +88,24 @@ class SwerveModuleStateTest {
     // Speed is 0 so direction doesn't matter functionally
     assertEquals(0.0, Math.abs(result.speedMetersPerSecond), EPSILON);
   }
+
+  @Test
+  @DisplayName("optimize (mutable) keeps state when delta < 90°")
+  void optimizeMutableSmallDelta() {
+    SwerveModuleState desired = new SwerveModuleState(2.0, new Rotation2d(0.5));
+    SwerveModuleState output = new SwerveModuleState();
+    SwerveModuleState.optimize(desired, new Rotation2d(0.0), output);
+    assertEquals(2.0, output.speedMetersPerSecond, EPSILON);
+    assertEquals(0.5, output.angle.getRadians(), EPSILON);
+  }
+
+  @Test
+  @DisplayName("optimize (mutable) flips speed when delta > 90°")
+  void optimizeMutableFlipOver90() {
+    SwerveModuleState desired = new SwerveModuleState(2.0, Rotation2d.fromDegrees(150));
+    SwerveModuleState output = new SwerveModuleState();
+    SwerveModuleState.optimize(desired, new Rotation2d(0), output);
+    assertEquals(-2.0, output.speedMetersPerSecond, EPSILON);
+    assertEquals(Math.toRadians(-30), output.angle.getRadians(), 0.01);
+  }
 }
