@@ -72,6 +72,9 @@ public abstract class AresCommandOpMode extends LinearOpMode {
     AresTelemetry.clearBackends();
     org.areslib.faults.AresFaultManager.reset();
 
+    // Initialize hardware manager so battery voltage monitoring and brownout protection are active
+    org.areslib.hardware.AresHardwareManager.initHardware(hardwareMap);
+
     // Run user-provided initialization code
     robotInit();
 

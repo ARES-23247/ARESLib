@@ -65,6 +65,11 @@ public class StateMachine<S extends Enum<S>> {
    */
   private final DoubleSupplier timeSource;
 
+  /** Pre-cached telemetry key strings to avoid per-transition string concatenation. */
+  private final String telemetryStateKey;
+
+  private final String telemetryTransitionCountKey;
+
   private BiConsumer<S, S> onTransitionCallback = (from, to) -> {};
 
   /**
@@ -94,13 +99,15 @@ public class StateMachine<S extends Enum<S>> {
     this.name = name;
     this.enumClass = enumClass;
     this.timeSource = timeSource;
+    this.telemetryStateKey = "StateMachine/" + name;
+    this.telemetryTransitionCountKey = "StateMachine/" + name + "/TransitionCount";
     currentState = initialState;
     previousState = initialState;
     stateEntryTime = this.timeSource.getAsDouble();
     totalTransitionCount = 0;
 
     // Emit initial state to telemetry
-    org.areslib.telemetry.AresAutoLogger.recordOutput("StateMachine/" + name, currentState.name());
+    org.areslib.telemetry.AresAutoLogger.recordOutput(telemetryStateKey, currentState.name());
   }
 
   /**
@@ -322,9 +329,9 @@ public class StateMachine<S extends Enum<S>> {
     totalTransitionCount++;
 
     // Log the transition and transition count
-    org.areslib.telemetry.AresAutoLogger.recordOutput("StateMachine/" + name, currentState.name());
+    org.areslib.telemetry.AresAutoLogger.recordOutput(telemetryStateKey, currentState.name());
     org.areslib.telemetry.AresAutoLogger.recordOutput(
-        "StateMachine/" + name + "/TransitionCount", totalTransitionCount);
+        telemetryTransitionCountKey, totalTransitionCount);
 
     // Run entry actions for new state
     List<Runnable> entryActions = this.entryActions.get(currentState);

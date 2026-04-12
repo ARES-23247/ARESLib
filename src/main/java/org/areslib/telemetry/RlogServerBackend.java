@@ -34,6 +34,14 @@ public class RlogServerBackend implements AresLoggerBackend {
   private final long startTimeMicrosec;
   private ByteBuffer cycleBuffer;
 
+  /** Lock object for all cycleBuffer access — prevents physics thread data races. */
+  private final Object cycleLock = new Object();
+
+  /** Stored reference to close on OpMode restart, preventing port leaks. */
+  private ServerSocket serverSocket;
+
+  private Thread serverThread;
+
   private static class SocketClient {
     Socket socket;
     OutputStream out;
@@ -66,7 +74,8 @@ public class RlogServerBackend implements AresLoggerBackend {
     Thread serverThread =
         new Thread(
             () -> {
-              try (ServerSocket serverSocket = new ServerSocket(port)) {
+              try {
+                serverSocket = new ServerSocket(port);
                 com.qualcomm.robotcore.util.RobotLog.i("Rlog Server listening on port " + port);
                 while (!Thread.currentThread().isInterrupted()) {
                   Socket clientSocket = serverSocket.accept();
@@ -259,131 +268,173 @@ public class RlogServerBackend implements AresLoggerBackend {
 
   @Override
   public void putNumber(String key, double value) {
-    int id = getOrCreateEntry(key, "double");
-    ensureCapacity(1 + 2 + 2 + 8);
-    cycleBuffer.put((byte) 2);
-    cycleBuffer.putShort((short) id);
-    cycleBuffer.putShort((short) 8); // value length
-    cycleBuffer.putDouble(value);
+    synchronized (cycleLock) {
+      int id = getOrCreateEntry(key, "double");
+      ensureCapacity(1 + 2 + 2 + 8);
+      cycleBuffer.put((byte) 2);
+      cycleBuffer.putShort((short) id);
+      cycleBuffer.putShort((short) 8); // value length
+      cycleBuffer.putDouble(value);
+    }
   }
 
   @Override
   public void putNumberArray(String key, double[] values) {
-    int id = getOrCreateEntry(key, "double[]");
-    int payloadSize = safePayloadLength(key, values.length * 8);
-    ensureCapacity(1 + 2 + 2 + payloadSize);
+    synchronized (cycleLock) {
+      int id = getOrCreateEntry(key, "double[]");
+      int payloadSize = safePayloadLength(key, values.length * 8);
+      ensureCapacity(1 + 2 + 2 + payloadSize);
 
-    cycleBuffer.put((byte) 2);
-    cycleBuffer.putShort((short) id);
-    cycleBuffer.putShort((short) payloadSize);
-    int maxDoubles = payloadSize / 8;
-    for (int i = 0; i < maxDoubles; i++) {
-      cycleBuffer.putDouble(values[i]);
+      cycleBuffer.put((byte) 2);
+      cycleBuffer.putShort((short) id);
+      cycleBuffer.putShort((short) payloadSize);
+      int maxDoubles = payloadSize / 8;
+      for (int i = 0; i < maxDoubles; i++) {
+        cycleBuffer.putDouble(values[i]);
+      }
     }
   }
 
   @Override
   public void putString(String key, String value) {
-    int id = getOrCreateEntry(key, "string");
-    byte[] strBytes = value.getBytes(StandardCharsets.UTF_8);
-    int safeLen = safePayloadLength(key, strBytes.length);
-    ensureCapacity(1 + 2 + 2 + safeLen);
+    synchronized (cycleLock) {
+      int id = getOrCreateEntry(key, "string");
+      byte[] strBytes = value.getBytes(StandardCharsets.UTF_8);
+      int safeLen = safePayloadLength(key, strBytes.length);
+      ensureCapacity(1 + 2 + 2 + safeLen);
 
-    cycleBuffer.put((byte) 2);
-    cycleBuffer.putShort((short) id);
-    cycleBuffer.putShort((short) safeLen);
-    cycleBuffer.put(strBytes, 0, safeLen);
+      cycleBuffer.put((byte) 2);
+      cycleBuffer.putShort((short) id);
+      cycleBuffer.putShort((short) safeLen);
+      cycleBuffer.put(strBytes, 0, safeLen);
+    }
   }
 
   @Override
   public void putBoolean(String key, boolean value) {
-    int id = getOrCreateEntry(key, "boolean");
-    ensureCapacity(1 + 2 + 2 + 1);
-    cycleBuffer.put((byte) 2);
-    cycleBuffer.putShort((short) id);
-    cycleBuffer.putShort((short) 1);
-    cycleBuffer.put(value ? (byte) 1 : (byte) 0);
+    synchronized (cycleLock) {
+      int id = getOrCreateEntry(key, "boolean");
+      ensureCapacity(1 + 2 + 2 + 1);
+      cycleBuffer.put((byte) 2);
+      cycleBuffer.putShort((short) id);
+      cycleBuffer.putShort((short) 1);
+      cycleBuffer.put(value ? (byte) 1 : (byte) 0);
+    }
   }
 
   @Override
   public void putBooleanArray(String key, boolean[] values) {
-    int id = getOrCreateEntry(key, "boolean[]");
-    int payloadSize = safePayloadLength(key, values.length);
-    ensureCapacity(1 + 2 + 2 + payloadSize);
+    synchronized (cycleLock) {
+      int id = getOrCreateEntry(key, "boolean[]");
+      int payloadSize = safePayloadLength(key, values.length);
+      ensureCapacity(1 + 2 + 2 + payloadSize);
 
-    cycleBuffer.put((byte) 2);
-    cycleBuffer.putShort((short) id);
-    cycleBuffer.putShort((short) payloadSize);
-    for (int i = 0; i < payloadSize; i++) {
-      cycleBuffer.put(values[i] ? (byte) 1 : (byte) 0);
+      cycleBuffer.put((byte) 2);
+      cycleBuffer.putShort((short) id);
+      cycleBuffer.putShort((short) payloadSize);
+      for (int i = 0; i < payloadSize; i++) {
+        cycleBuffer.put(values[i] ? (byte) 1 : (byte) 0);
+      }
     }
   }
 
   @Override
   public void putStringArray(String key, String[] values) {
-    int id = getOrCreateEntry(key, "string[]");
+    synchronized (cycleLock) {
+      int id = getOrCreateEntry(key, "string[]");
 
-    int payloadSize = 4;
-    byte[][] utf8Strings = new byte[values.length][];
-    for (int i = 0; i < values.length; i++) {
-      utf8Strings[i] = values[i].getBytes(StandardCharsets.UTF_8);
-      payloadSize += 4 + utf8Strings[i].length;
-    }
+      int payloadSize = 4;
+      byte[][] utf8Strings = new byte[values.length][];
+      for (int i = 0; i < values.length; i++) {
+        utf8Strings[i] = values[i].getBytes(StandardCharsets.UTF_8);
+        payloadSize += 4 + utf8Strings[i].length;
+      }
 
-    int safeSize = safePayloadLength(key, payloadSize);
-    ensureCapacity(1 + 2 + 2 + safeSize);
-    cycleBuffer.put((byte) 2);
-    cycleBuffer.putShort((short) id);
-    cycleBuffer.putShort((short) safeSize);
-    cycleBuffer.putInt(values.length);
-    for (byte[] strBytes : utf8Strings) {
-      cycleBuffer.putInt(strBytes.length);
-      cycleBuffer.put(strBytes);
+      int safeSize = safePayloadLength(key, payloadSize);
+      ensureCapacity(1 + 2 + 2 + safeSize);
+      cycleBuffer.put((byte) 2);
+      cycleBuffer.putShort((short) id);
+      cycleBuffer.putShort((short) safeSize);
+      cycleBuffer.putInt(values.length);
+      for (byte[] strBytes : utf8Strings) {
+        cycleBuffer.putInt(strBytes.length);
+        cycleBuffer.put(strBytes);
+      }
     }
   }
 
   @Override
   public void putStruct(String key, String typeString, byte[] structBytes) {
-    int id = getOrCreateEntry(key, typeString);
+    synchronized (cycleLock) {
+      int id = getOrCreateEntry(key, typeString);
 
-    if (key.startsWith(".schema/")) {
-      synchronized (schemaDataCache) {
-        schemaDataCache.put(id, structBytes.clone());
+      if (key.startsWith(".schema/")) {
+        synchronized (schemaDataCache) {
+          schemaDataCache.put(id, structBytes.clone());
+        }
       }
-    }
 
-    int safeLen = safePayloadLength(key, structBytes.length);
-    ensureCapacity(1 + 2 + 2 + safeLen);
-    cycleBuffer.put((byte) 2);
-    cycleBuffer.putShort((short) id);
-    cycleBuffer.putShort((short) safeLen);
-    cycleBuffer.put(structBytes, 0, safeLen);
+      int safeLen = safePayloadLength(key, structBytes.length);
+      ensureCapacity(1 + 2 + 2 + safeLen);
+      cycleBuffer.put((byte) 2);
+      cycleBuffer.putShort((short) id);
+      cycleBuffer.putShort((short) safeLen);
+      cycleBuffer.put(structBytes, 0, safeLen);
+    }
   }
 
   @Override
   public void update() {
-    if (cycleBuffer.position() == 9) {
-      // Empty cycle (1 byte prefix + 8 byte timestamp), just replace timestamp
+    synchronized (cycleLock) {
+      if (cycleBuffer.position() == 9) {
+        // Empty cycle (1 byte prefix + 8 byte timestamp), just replace timestamp
+        cycleBuffer.clear();
+        cycleBuffer.put((byte) 0);
+        cycleBuffer.putDouble(getTimestamp());
+        return;
+      }
+
+      byte[] payload = new byte[cycleBuffer.position()];
+      cycleBuffer.flip();
+      cycleBuffer.get(payload);
+
+      if (!sendQueue.offer(payload)) {
+        com.qualcomm.robotcore.util.RobotLog.w(
+            "RLOG WARNING: Send queue full, dropping oldest telemetry frame "
+                + "to maintain 20ms loop performance.");
+        sendQueue.poll(); // drop oldest
+        sendQueue.offer(payload);
+      }
+
       cycleBuffer.clear();
       cycleBuffer.put((byte) 0);
       cycleBuffer.putDouble(getTimestamp());
-      return;
     }
+  }
 
-    byte[] payload = new byte[cycleBuffer.position()];
-    cycleBuffer.flip();
-    cycleBuffer.get(payload);
-
-    if (!sendQueue.offer(payload)) {
-      com.qualcomm.robotcore.util.RobotLog.w(
-          "RLOG WARNING: Send queue full, dropping oldest telemetry frame "
-              + "to maintain 20ms loop performance.");
-      sendQueue.poll(); // drop oldest
-      sendQueue.offer(payload);
+  /**
+   * Closes the RLOG server, releasing the bound port and disconnecting all clients. Prevents {@link
+   * java.net.BindException} on OpMode restart.
+   */
+  @Override
+  public void close() {
+    try {
+      if (serverSocket != null && !serverSocket.isClosed()) {
+        serverSocket.close();
+      }
+    } catch (IOException e) {
+      com.qualcomm.robotcore.util.RobotLog.e(String.valueOf(e));
     }
-
-    cycleBuffer.clear();
-    cycleBuffer.put((byte) 0);
-    cycleBuffer.putDouble(getTimestamp());
+    if (serverThread != null) {
+      serverThread.interrupt();
+    }
+    for (SocketClient sc : clients) {
+      try {
+        sc.socket.close();
+      } catch (IOException ignored) {
+        // Ignored during shutdown
+      }
+    }
+    clients.clear();
   }
 }

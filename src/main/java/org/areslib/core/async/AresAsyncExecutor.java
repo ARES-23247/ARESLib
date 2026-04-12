@@ -91,13 +91,22 @@ public class AresAsyncExecutor {
 
   /**
    * Shuts down the asynchronous threads. Automatically called by AresCommandOpMode at the end of
-   * the match.
+   * the match. Registered loops are preserved so they can be re-started in the next OpMode (e.g.,
+   * Auto → TeleOp transition).
    */
   public static void stop() {
     if (executor != null && !executor.isShutdown()) {
       executor.shutdownNow();
     }
-    REGISTERED_LOOPS.clear();
     isRunning = false;
+  }
+
+  /**
+   * Fully resets the async executor, clearing all registered loops. Only call this during a
+   * complete robot power-cycle or explicit full reset, not during normal OpMode transitions.
+   */
+  public static void resetAll() {
+    stop();
+    REGISTERED_LOOPS.clear();
   }
 }

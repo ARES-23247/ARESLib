@@ -154,10 +154,21 @@ public class AresVisionSubsystem extends SubsystemBase {
       return null;
     }
 
+    // Quaternion yaw extraction.
+    // IMPORTANT: This assumes botPose3d layout is [x, y, z, w, qx, qy, qz] (Hamilton convention).
+    // If your vision system outputs [x, y, z, qx, qy, qz, w] (JPL convention), swap indices:
+    //   w = botPose3d[6], qX = botPose3d[3], qY = botPose3d[4], qZ = botPose3d[5]
     double w = inputs.botPose3d[3];
     double qX = inputs.botPose3d[4];
     double qY = inputs.botPose3d[5];
     double qZ = inputs.botPose3d[6];
+
+    // Validate quaternion is normalized — a non-unit quaternion indicates wrong index mapping
+    double qNormSq = w * w + qX * qX + qY * qY + qZ * qZ;
+    if (qNormSq < 0.5 || qNormSq > 1.5) {
+      return null; // Quaternion is wildly non-unit, reject this measurement
+    }
+
     double yawRadians = Math.atan2(2.0 * (w * qZ + qX * qY), 1.0 - 2.0 * (qY * qY + qZ * qZ));
 
     return new org.areslib.math.geometry.Pose2d(

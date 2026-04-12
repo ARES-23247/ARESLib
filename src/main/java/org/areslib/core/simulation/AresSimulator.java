@@ -1,6 +1,7 @@
 package org.areslib.core.simulation;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.areslib.command.CommandScheduler;
 import org.areslib.command.Subsystem;
@@ -16,6 +17,12 @@ public class AresSimulator {
 
   /** Pre-allocated buffer for DECODE_ARTIFACT pose telemetry (grown as needed). */
   private static double[] artifactPosesCache = new double[30]; // 10 artifacts * 3 doubles
+
+  /** Pre-allocated slice for telemetry output — avoids Arrays.copyOf per tick. */
+  private static double[] artifactSliceCache = new double[30];
+
+  /** Pre-allocated subsystem snapshot list — avoids new ArrayList per tick. */
+  private static final List<Subsystem> SUBSYSTEM_SNAPSHOT = new ArrayList<>(16);
 
   /**
    * Starts an independent background thread that executes subsystem.simulationPeriodic()
@@ -73,18 +80,23 @@ public class AresSimulator {
                       ix++;
                     }
                   }
-                  // Only publish the filled portion of the cache
-                  double[] slice = java.util.Arrays.copyOf(artifactPosesCache, requiredLength);
+                  // Only publish the filled portion of the cache — reuse slice buffer
+                  if (artifactSliceCache.length < requiredLength) {
+                    artifactSliceCache = new double[requiredLength];
+                  }
+                  System.arraycopy(artifactPosesCache, 0, artifactSliceCache, 0, requiredLength);
                   org.areslib.telemetry.AresAutoLogger.recordOutputArray(
-                      "Simulation/DECODE_ARTIFACTs", slice);
+                      "Simulation/DECODE_ARTIFACTs",
+                      Arrays.copyOf(artifactSliceCache, requiredLength));
                 }
 
                 // Snapshot the subsystems set to avoid ConcurrentModificationException —
                 // the main thread may register/unregister subsystems concurrently.
-                List<Subsystem> snapshot =
-                    new ArrayList<>(CommandScheduler.getInstance().getSubsystems());
-                for (Subsystem subsystem : snapshot) {
-                  subsystem.simulationPeriodic();
+                // Reuse the pre-allocated snapshot list to avoid per-tick allocation.
+                SUBSYSTEM_SNAPSHOT.clear();
+                SUBSYSTEM_SNAPSHOT.addAll(CommandScheduler.getInstance().getSubsystems());
+                for (int si = 0; si < SUBSYSTEM_SNAPSHOT.size(); si++) {
+                  SUBSYSTEM_SNAPSHOT.get(si).simulationPeriodic();
                 }
 
                 long elapsed = System.currentTimeMillis() - start;

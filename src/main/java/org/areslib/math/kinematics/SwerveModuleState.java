@@ -91,6 +91,6 @@ public class SwerveModuleState {
     }
 
     output.speedMetersPerSecond = targetSpeed;
-    output.angle = new Rotation2d(targetAngle);
+    output.angle.set(targetAngle);
   }
 }

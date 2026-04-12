@@ -10,6 +10,7 @@ public class PIDController {
   private double minimumInput, maximumInput;
   private double period;
   private double iZone = Double.POSITIVE_INFINITY;
+  private double maxIntegral = Double.POSITIVE_INFINITY;
   private double minOutput = Double.NEGATIVE_INFINITY;
   private double maxOutput = Double.POSITIVE_INFINITY;
 
@@ -98,6 +99,8 @@ public class PIDController {
       integral = 0;
     } else {
       integral += error * period;
+      // Clamp integral to prevent unbounded windup during sustained error (e.g. stalls)
+      integral = Math.max(-maxIntegral, Math.min(integral, maxIntegral));
     }
 
     double derivative = 0;
@@ -130,6 +133,17 @@ public class PIDController {
   public void setOutputRange(double min, double max) {
     this.minOutput = min;
     this.maxOutput = max;
+  }
+
+  /**
+   * Sets the maximum absolute value the integral accumulator can reach. Prevents unbounded windup
+   * during sustained error (e.g., wheel stalls against field elements).
+   *
+   * @param maxIntegral The maximum integral magnitude. Use {@code Double.POSITIVE_INFINITY} to
+   *     disable.
+   */
+  public void setMaxIntegral(double maxIntegral) {
+    this.maxIntegral = maxIntegral;
   }
 
   /**

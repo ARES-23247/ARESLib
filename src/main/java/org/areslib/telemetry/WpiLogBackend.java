@@ -25,6 +25,9 @@ public class WpiLogBackend implements AresLoggerBackend {
   private ByteBuffer encodeBuffer;
   private FileOutputStream fileOutputStream;
 
+  /** Lock object for all encodeBuffer/channel access — prevents physics thread corruption. */
+  private final Object writeLock = new Object();
+
   /**
    * Initializes the WPILog backend to an automatically resolved path. It will prioritize mounted
    * USB flash drives first to save internal memory. If no USB is present, it writes to the internal
@@ -145,148 +148,163 @@ public class WpiLogBackend implements AresLoggerBackend {
   @Override
   public void putNumber(String key, double value) {
     if (channel == null) return;
-    int id = getOrCreateEntry(key, "double");
-    try {
-      writeRecordHeader(id, 8, getTimestamp());
-      encodeBuffer.putDouble(value);
-      encodeBuffer.flip();
-      channel.write(encodeBuffer);
-    } catch (IOException e) {
-      com.qualcomm.robotcore.util.RobotLog.e(String.valueOf(e));
+    synchronized (writeLock) {
+      int id = getOrCreateEntry(key, "double");
+      try {
+        writeRecordHeader(id, 8, getTimestamp());
+        encodeBuffer.putDouble(value);
+        encodeBuffer.flip();
+        channel.write(encodeBuffer);
+      } catch (IOException e) {
+        com.qualcomm.robotcore.util.RobotLog.e(String.valueOf(e));
+      }
     }
   }
 
   @Override
   public void putNumberArray(String key, double[] values) {
     if (channel == null) return;
-    int id = getOrCreateEntry(key, "double[]");
-    int payloadSize = values.length * 8;
-    try {
-      if (encodeBuffer.capacity() < RECORD_HEADER_SIZE_BYTES + payloadSize) {
-        encodeBuffer =
-            ByteBuffer.allocate(
-                    Math.max(encodeBuffer.capacity() * 2, RECORD_HEADER_SIZE_BYTES + payloadSize))
-                .order(ByteOrder.LITTLE_ENDIAN);
+    synchronized (writeLock) {
+      int id = getOrCreateEntry(key, "double[]");
+      int payloadSize = values.length * 8;
+      try {
+        if (encodeBuffer.capacity() < RECORD_HEADER_SIZE_BYTES + payloadSize) {
+          encodeBuffer =
+              ByteBuffer.allocate(
+                      Math.max(encodeBuffer.capacity() * 2, RECORD_HEADER_SIZE_BYTES + payloadSize))
+                  .order(ByteOrder.LITTLE_ENDIAN);
+        }
+        writeRecordHeader(id, payloadSize, getTimestamp());
+        for (double val : values) {
+          encodeBuffer.putDouble(val);
+        }
+        encodeBuffer.flip();
+        channel.write(encodeBuffer);
+      } catch (IOException e) {
+        com.qualcomm.robotcore.util.RobotLog.e(String.valueOf(e));
       }
-      writeRecordHeader(id, payloadSize, getTimestamp());
-      for (double val : values) {
-        encodeBuffer.putDouble(val);
-      }
-      encodeBuffer.flip();
-      channel.write(encodeBuffer);
-    } catch (IOException e) {
-      com.qualcomm.robotcore.util.RobotLog.e(String.valueOf(e));
     }
   }
 
   @Override
   public void putString(String key, String value) {
     if (channel == null) return;
-    int id = getOrCreateEntry(key, "string");
-    byte[] strBytes = value.getBytes(StandardCharsets.UTF_8);
-    try {
-      if (encodeBuffer.capacity() < RECORD_HEADER_SIZE_BYTES + strBytes.length) {
-        encodeBuffer =
-            ByteBuffer.allocate(
-                    Math.max(
-                        encodeBuffer.capacity() * 2, RECORD_HEADER_SIZE_BYTES + strBytes.length))
-                .order(ByteOrder.LITTLE_ENDIAN);
+    synchronized (writeLock) {
+      int id = getOrCreateEntry(key, "string");
+      byte[] strBytes = value.getBytes(StandardCharsets.UTF_8);
+      try {
+        if (encodeBuffer.capacity() < RECORD_HEADER_SIZE_BYTES + strBytes.length) {
+          encodeBuffer =
+              ByteBuffer.allocate(
+                      Math.max(
+                          encodeBuffer.capacity() * 2, RECORD_HEADER_SIZE_BYTES + strBytes.length))
+                  .order(ByteOrder.LITTLE_ENDIAN);
+        }
+        writeRecordHeader(id, strBytes.length, getTimestamp());
+        encodeBuffer.put(strBytes);
+        encodeBuffer.flip();
+        channel.write(encodeBuffer);
+      } catch (IOException e) {
+        com.qualcomm.robotcore.util.RobotLog.e(String.valueOf(e));
       }
-      writeRecordHeader(id, strBytes.length, getTimestamp());
-      encodeBuffer.put(strBytes);
-      encodeBuffer.flip();
-      channel.write(encodeBuffer);
-    } catch (IOException e) {
-      com.qualcomm.robotcore.util.RobotLog.e(String.valueOf(e));
     }
   }
 
   @Override
   public void putBoolean(String key, boolean value) {
     if (channel == null) return;
-    int id = getOrCreateEntry(key, "boolean");
-    try {
-      writeRecordHeader(id, 1, getTimestamp());
-      encodeBuffer.put(value ? (byte) 1 : (byte) 0);
-      encodeBuffer.flip();
-      channel.write(encodeBuffer);
-    } catch (IOException e) {
-      com.qualcomm.robotcore.util.RobotLog.e(String.valueOf(e));
+    synchronized (writeLock) {
+      int id = getOrCreateEntry(key, "boolean");
+      try {
+        writeRecordHeader(id, 1, getTimestamp());
+        encodeBuffer.put(value ? (byte) 1 : (byte) 0);
+        encodeBuffer.flip();
+        channel.write(encodeBuffer);
+      } catch (IOException e) {
+        com.qualcomm.robotcore.util.RobotLog.e(String.valueOf(e));
+      }
     }
   }
 
   @Override
   public void putBooleanArray(String key, boolean[] values) {
     if (channel == null) return;
-    int id = getOrCreateEntry(key, "boolean[]");
-    int payloadSize = values.length;
-    try {
-      if (encodeBuffer.capacity() < RECORD_HEADER_SIZE_BYTES + payloadSize) {
-        encodeBuffer =
-            ByteBuffer.allocate(
-                    Math.max(encodeBuffer.capacity() * 2, RECORD_HEADER_SIZE_BYTES + payloadSize))
-                .order(ByteOrder.LITTLE_ENDIAN);
+    synchronized (writeLock) {
+      int id = getOrCreateEntry(key, "boolean[]");
+      int payloadSize = values.length;
+      try {
+        if (encodeBuffer.capacity() < RECORD_HEADER_SIZE_BYTES + payloadSize) {
+          encodeBuffer =
+              ByteBuffer.allocate(
+                      Math.max(encodeBuffer.capacity() * 2, RECORD_HEADER_SIZE_BYTES + payloadSize))
+                  .order(ByteOrder.LITTLE_ENDIAN);
+        }
+        writeRecordHeader(id, payloadSize, getTimestamp());
+        for (boolean val : values) {
+          encodeBuffer.put(val ? (byte) 1 : (byte) 0);
+        }
+        encodeBuffer.flip();
+        channel.write(encodeBuffer);
+      } catch (IOException e) {
+        com.qualcomm.robotcore.util.RobotLog.e(String.valueOf(e));
       }
-      writeRecordHeader(id, payloadSize, getTimestamp());
-      for (boolean val : values) {
-        encodeBuffer.put(val ? (byte) 1 : (byte) 0);
-      }
-      encodeBuffer.flip();
-      channel.write(encodeBuffer);
-    } catch (IOException e) {
-      com.qualcomm.robotcore.util.RobotLog.e(String.valueOf(e));
     }
   }
 
   @Override
   public void putStringArray(String key, String[] values) {
     if (channel == null) return;
-    int id = getOrCreateEntry(key, "string[]");
+    synchronized (writeLock) {
+      int id = getOrCreateEntry(key, "string[]");
 
-    // Calculate payload size: 4 bytes for array length + (4 bytes length + utf8 length) per string
-    int payloadSize = 4;
-    byte[][] utf8Strings = new byte[values.length][];
-    for (int i = 0; i < values.length; i++) {
-      utf8Strings[i] = values[i].getBytes(StandardCharsets.UTF_8);
-      payloadSize += 4 + utf8Strings[i].length;
-    }
+      // Calculate payload size: 4 bytes for array length + (4 bytes length + utf8 length) per
+      // string
+      int payloadSize = 4;
+      byte[][] utf8Strings = new byte[values.length][];
+      for (int i = 0; i < values.length; i++) {
+        utf8Strings[i] = values[i].getBytes(StandardCharsets.UTF_8);
+        payloadSize += 4 + utf8Strings[i].length;
+      }
 
-    try {
-      if (encodeBuffer.capacity() < RECORD_HEADER_SIZE_BYTES + payloadSize) {
-        encodeBuffer =
-            ByteBuffer.allocate(
-                    Math.max(encodeBuffer.capacity() * 2, RECORD_HEADER_SIZE_BYTES + payloadSize))
-                .order(ByteOrder.LITTLE_ENDIAN);
+      try {
+        if (encodeBuffer.capacity() < RECORD_HEADER_SIZE_BYTES + payloadSize) {
+          encodeBuffer =
+              ByteBuffer.allocate(
+                      Math.max(encodeBuffer.capacity() * 2, RECORD_HEADER_SIZE_BYTES + payloadSize))
+                  .order(ByteOrder.LITTLE_ENDIAN);
+        }
+        writeRecordHeader(id, payloadSize, getTimestamp());
+        encodeBuffer.putInt(values.length);
+        for (byte[] strBytes : utf8Strings) {
+          encodeBuffer.putInt(strBytes.length);
+          encodeBuffer.put(strBytes);
+        }
+        encodeBuffer.flip();
+        channel.write(encodeBuffer);
+      } catch (IOException e) {
+        com.qualcomm.robotcore.util.RobotLog.e(String.valueOf(e));
       }
-      writeRecordHeader(id, payloadSize, getTimestamp());
-      encodeBuffer.putInt(values.length);
-      for (byte[] strBytes : utf8Strings) {
-        encodeBuffer.putInt(strBytes.length);
-        encodeBuffer.put(strBytes);
-      }
-      encodeBuffer.flip();
-      channel.write(encodeBuffer);
-    } catch (IOException e) {
-      com.qualcomm.robotcore.util.RobotLog.e(String.valueOf(e));
     }
   }
 
   @Override
   public void putStruct(String key, String typeString, byte[] data) {
     if (channel == null) return;
-    int id = getOrCreateEntry(key, typeString);
-    try {
-      if (encodeBuffer.capacity() < 17 + data.length) {
-        encodeBuffer =
-            ByteBuffer.allocate(Math.max(encodeBuffer.capacity() * 2, 17 + data.length))
-                .order(ByteOrder.LITTLE_ENDIAN);
+    synchronized (writeLock) {
+      int id = getOrCreateEntry(key, typeString);
+      try {
+        if (encodeBuffer.capacity() < 17 + data.length) {
+          encodeBuffer =
+              ByteBuffer.allocate(Math.max(encodeBuffer.capacity() * 2, 17 + data.length))
+                  .order(ByteOrder.LITTLE_ENDIAN);
+        }
+        writeRecordHeader(id, data.length, getTimestamp());
+        encodeBuffer.put(data);
+        encodeBuffer.flip();
+        channel.write(encodeBuffer);
+      } catch (IOException e) {
+        com.qualcomm.robotcore.util.RobotLog.e(String.valueOf(e));
       }
-      writeRecordHeader(id, data.length, getTimestamp());
-      encodeBuffer.put(data);
-      encodeBuffer.flip();
-      channel.write(encodeBuffer);
-    } catch (IOException e) {
-      com.qualcomm.robotcore.util.RobotLog.e(String.valueOf(e));
     }
   }
 

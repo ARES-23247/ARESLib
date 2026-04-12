@@ -268,7 +268,10 @@ public class SwerveDriveSubsystem extends SubsystemBase implements AresDrivetrai
       double targetAngleRad = cachedOptimizedStates[i].angle.getRadians();
 
       if (Math.abs(targetSpeedMps) <= 0.01) {
-        targetAngleRad = inputsArray[i].turnAbsolutePositionRad;
+        // Hold the last commanded angle (not the measured one) to prevent slow drift.
+        // Elite pattern from Team 254/2910: measured == setpoint → zero error → only static FF
+        // → uncontrolled drift. Holding commanded angle maintains active PID correction.
+        // targetAngleRad is already from cachedOptimizedStates[i], which is correct.
         targetSpeedMps = 0.0;
       }
 

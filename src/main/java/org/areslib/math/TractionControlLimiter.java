@@ -88,10 +88,12 @@ public class TractionControlLimiter {
       return resultCache;
     }
 
-    // Calculate the effective acceleration budget after reserving for rotation
-    double rotationalAccel = Math.abs(omegaRadPerSec) * wheelbaseRadiusMeters / dtSeconds;
+    // Calculate the tangential velocity at the farthest wheel due to rotation (m/s).
+    // This velocity steals from the friction budget available for linear acceleration.
+    double rotationalTangentialVelocity = Math.abs(omegaRadPerSec) * wheelbaseRadiusMeters;
     double effectiveMaxAccel =
-        maxAccelMetersPerSecSq * Math.max(0.0, 1.0 - rotationalAccel / maxAccelMetersPerSecSq);
+        maxAccelMetersPerSecSq
+            * Math.max(0.0, 1.0 - rotationalTangentialVelocity / maxAccelMetersPerSecSq);
 
     // Calculate requested velocity change
     double deltaVx = targetVx - lastVx;
