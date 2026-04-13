@@ -30,7 +30,7 @@ body {
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
+    height: 100vh;
     z-index: -1;
     background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
 }
@@ -107,19 +107,24 @@ nav {
     padding: 2rem;
 }
 
-/* Landing Page Hero */
 .hero {
-    height: 100vh;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
-    padding: 2rem;
+    padding: 8rem 2rem 4rem; /* Top padding to clear fixed header */
+}
+
+.hero-icon {
+    font-size: 6rem;
+    margin-bottom: 2rem;
+    filter: drop-shadow(0 0 20px var(--glow-primary));
 }
 
 .hero-title {
-    font-size: 5rem;
+    font-size: clamp(3rem, 10vw, 6rem);
     font-weight: 800;
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     -webkit-background-clip: text;

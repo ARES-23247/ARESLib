@@ -30,9 +30,9 @@
             </nav>
         </header>
 
-    <div class="container">
-        <h1 class="hero-title" style="font-size: 3rem;">The ARESLib Standard</h1>
-        <p style="color: var(--text-dim); margin-bottom: 3rem;">Coding rules for championship-grade FTC software. Compliance is mandatory.</p>
+    <div class="container" style="max-width: 900px;">
+        <h1 class="hero-title" style="font-size: clamp(2.5rem, 8vw, 4rem); text-align: left;">The ARESLib Standard</h1>
+        <p style="color: var(--text-light); font-size: 1.25rem; font-weight: 500; margin-bottom: 3rem; opacity: 0.8;">Championship-grade FTC software must be deterministic, efficient, and readable. Compliance with these rules is mandatory for all core framework contributions.</p>
 
         <div class="rule-card">
             <h3>1. Zero-Allocation Periodic</h3>
@@ -81,7 +81,11 @@ runMechanism();
             <h3>4. Deterministic Logging</h3>
             <p>All subsystem inputs must be logged via <code>AresAutoLogger</code> to enable frame-accurate log replay.</p>
         </div>
-    </main>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 ARESLib Framework - Built for Einstein. Inspired by MARSLib.</p>
+    </footer>
 
     <script>
         const container = document.getElementById('stars-container');
