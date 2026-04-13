@@ -13,7 +13,11 @@ const SEARCH_INDEX = [
     { title: 'Zero-Allocation', desc: 'Eliminate GC jitter in the hot path', url: 'tutorials/zero-allocation.html', keywords: 'performance gc memory' },
     { title: 'Physics Simulation', desc: 'High-fidelity modeling with dyn4j', url: 'tutorials/physics-sim.html', keywords: 'sim physics dyn4j' },
     { title: 'State Machines', desc: 'Managing complex scoring sequences', url: 'tutorials/state-machines.html', keywords: 'state logic sequence' },
-    { title: 'Telemetry & Logging', desc: 'Visualizing state with AdvantageScope', url: 'tutorials/telemetry-logging.html', keywords: 'logs telemetry scope' }
+    { title: 'Telemetry & Logging', desc: 'Visualizing state with AdvantageScope', url: 'tutorials/telemetry-logging.html', keywords: 'logs telemetry scope' },
+    { title: 'SOTM Solver', desc: 'Elite Shooting while moving', url: 'tutorials/sotm.html', keywords: 'sotm elite shooting kinematics aim' },
+    { title: 'Vision Fusion', desc: 'MegaTag 2.0 and pose estimation', url: 'tutorials/vision-fusion.html', keywords: 'vision apriltag fusion megatag localization' },
+    { title: 'Swerve Kinematics', desc: 'Vector summation and discretization', url: 'tutorials/swerve-kinematics.html', keywords: 'swerve kinematics vector math discretization' },
+    { title: 'Championship Testing', desc: 'Headless JUnit 5 and IO mocking', url: 'tutorials/championship-testing.html', keywords: 'testing junit unit headless coverage' }
 ];
 
 function injectHeader() {

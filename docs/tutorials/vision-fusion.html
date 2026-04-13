@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutorial: Vision Fusion — ARESLib</title>
+    <link rel="stylesheet" href="../areslib-theme.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+</head>
+<body>
+
+<div id="stars-container"></div>
+<div id="header-placeholder"></div>
+
+<div class="page-wrapper">
+    <div class="container">
+        <a href="index.html" class="back-link">← BACK TO TUTORIALS</a>
+        
+        <div style="text-align: center; margin-bottom: 60px;">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">👁️</div>
+            <h1 class="hero-title">Vision Fusion</h1>
+            <p class="hero-subtitle">High-fidelity localization using MegaTag 2.0 and Kalman-style filtering.</p>
+        </div>
+
+        <section>
+            <p>Odometry is fast but drifts over time. Vision is global but slow and noisy. <strong>Vision Fusion</strong> is the process of combining both to achieve a "source of truth" pose that is both high-frequency and drift-free. ARESLib uses a latency-compensating rollback algorithm to ensure bit-perfect accuracy.</p>
+
+            <h2>1. The Fusion Pipeline</h2>
+            <p>Fusion happens in three distinct layers to ensure reliability under competition stress:</p>
+            
+            <div style="background: #0d0d0d; padding: 30px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); margin: 40px 0;">
+                <pre class="mermaid" style="background: transparent; border: none; overflow: visible; display: flex; justify-content: center;">
+                graph TD
+                    A[Hardware Sensors<br/><i>Encoders + IMU</i>] -->|250Hz| B(Odometry Thread)
+                    C[AprilTag Cameras<br/><i>PhotonVision / Limelight</i>] -->|20Hz| D(Vision Subsystem)
+                    B --> E{AresPoseEstimator}
+                    D -->|Pose + Timestamp| E
+                    E --> F[Final Field Pose<br/><i>AdvantageScope 3D</i>]
+
+                    style A fill:#1a1a1a,stroke:#CD7F32,stroke-width:2px,color:#fff
+                    style B fill:#1a1a1a,stroke:#CD7F32,stroke-width:2px,color:#fff
+                    style C fill:#1a1a1a,stroke:#B32416,stroke-width:2px,color:#fff
+                    style D fill:#1a1a1a,stroke:#B32416,stroke-width:2px,color:#fff
+                    style E fill:#CD7F32,stroke:#fff,stroke-width:2px,color:#000
+                    style F fill:#0d0d0d,stroke:#fff,stroke-width:2px,color:#fff
+                </pre>
+            </div>
+
+            <h2>2. MegaTag 2.0 & Pose Seeding</h2>
+            <p>Traditional vision pose estimation (PnP) creates large "jumps" when tags are at awkward angles. ARESLib supports **MegaTag 2.0**, which uses the robot's IMU heading to seed the vision solve.</p>
+            
+            <div class="callout">
+                <h4>6-DOF Localization</h4>
+                <p>By using the IMU to define the "Down" vector, the vision system only needs to solve for 2D translation and 1D rotation. This significantly reduces "pose ambiguity" and prevents the robot from teleporting into the floor or ceiling in the 3D visualizer.</p>
+            </div>
+
+            <h2>3. Lag Compensation (Rollback)</h2>
+            <p>Vision measurements are always "old" (e.g., 50ms ago) by the time the code receives them. The <code>VisionFusionHelper</code> handles this by:</p>
+            <ol>
+                <li>Maintaining a timestamped buffer of all previous odometry poses.</li>
+                <li>When a vision sample arrives, "rolling back" to that exact timestamp.</li>
+                <li>Computing the distance between where odometry <i>thought</i> we were and where vision <i>saw</i> we were.</li>
+                <li>Applying a weighted correction and "replaying" all movement from that point to the present.</li>
+            </ol>
+
+            <pre><code class="language-java">// VisionFusionHelper.java snippet
+public static Pose2d applyVisionMeasurement(...) {
+    Pose2d sample = poseBuffer.getSample(timestampSeconds);
+    if (sample == null) return currentEstimate;
+
+    // Compute correctionAT the measurement timestamp
+    double kX = 1.0 / (1.0 + visionStdDevs[0]);
+    double kY = 1.0 / (1.0 + visionStdDevs[1]);
+    
+    Pose2d correctedRetroPose = new Pose2d(
+        sample.getX() + xError * kX,
+        sample.getY() + yError * kY,
+        ...
+    );
+
+    // Replay movement forward to 'Now'
+    Twist2d replayTwist = sample.log(currentEstimate);
+    return correctedRetroPose.exp(replayTwist);
+}</code></pre>
+
+            <h2>4. Tuning Trust (StdDevs)</h2>
+            <p>You can tell the estimator how much to "trust" a vision measurement by adjusting the Standard Deviations. Large values = less trust; small values = strong correction.</p>
+            
+            <div class="callout-warning">
+                <h4>Dynamic Trust</h4>
+                <p>ARESLib automatically scales trust based on distance. If a tag is 5 meters away, we increase the StdDev (trust it less). If the robot is moving at 4 m/s, we increase it further to prevent motion blur artifacts from corrupting the pose.</p>
+            </div>
+        </section>
+    </div>
+</div>
+
+<div id="footer-placeholder"></div>
+
+<script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+        startOnLoad: true,
+        theme: 'dark',
+        fontFamily: 'Inter'
+    });
+</script>
+<script src="../assets/js/common.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+</body>
+</html>
