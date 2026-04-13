@@ -19,87 +19,36 @@
     </style>
 </head>
 <body>
+    <div id="header-placeholder"></div>
     <div id="stars-container"></div>
-    <header class="nav-header">
-        <nav>
-            <div class="logo">ARESLib<span>2</span></div>
-            <div class="nav-links">
-                <a href="index.html">Home</a>
-                <a href="standards.html" class="active">Standards</a>
-                <a href="tutorials/index.html">Tutorials</a>
-            </nav>
-        </header>
 
-    <div class="container" style="max-width: 900px;">
+    <main class="container" style="max-width: 900px; padding-top: 10rem;">
         <h1 class="hero-title" style="font-size: clamp(2.5rem, 8vw, 4rem); text-align: left;">The ARESLib Standard</h1>
         <p style="color: var(--text-light); font-size: 1.25rem; font-weight: 500; margin-bottom: 3rem; opacity: 0.8;">Championship-grade FTC software must be deterministic, efficient, and readable. Compliance with these rules is mandatory for all core framework contributions.</p>
 
         <div class="rule-card">
             <h3>1. Zero-Allocation Periodic</h3>
-            <p>Allocating objects inside <code>update()</code> or <code>periodic()</code> is strictly forbidden. This prevents Garbage Collection jitter in high-frequency control loops.</p>
-            <div class="code-comparison">
-                <div class="code-block bad">
-void update() {<br>
-&nbsp;&nbsp;Vector2d pos = new Vector2d(x, y);<br>
-&nbsp;&nbsp;process(pos);<br>
-}
-                </div>
-                <div class="code-block good">
-private final Vector2d pos = new Vector2d();<br><br>
-void update() {<br>
-&nbsp;&nbsp;pos.setX(x); pos.setY(y);<br>
-&nbsp;&nbsp;process(pos);<br>
-}
-                </div>
-            </div>
+            <p>Code running in <code>periodic()</code> or <code>teleopPeriodic()</code> MUST NOT allocate memory on the heap. Use <code>static</code> pre-allocated objects or the <code>AresPool</code> for geometry and math operations.</p>
         </div>
 
         <div class="rule-card">
-            <h3>2. Never Nester</h3>
-            <p>Avoid deep logic nesting. Use Guard Clauses (early returns) to keep the primary execution path at the lowest indentation level possible.</p>
-            <div class="code-comparison">
-                <div class="code-block bad">
-if (isEnabled) {<br>
-&nbsp;&nbsp;if (hasTarget) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;runMechanism();<br>
-&nbsp;&nbsp;}<br>
-}
-                </div>
-                <div class="code-block good">
-if (!isEnabled || !hasTarget) return;<br><br>
-runMechanism();
-                </div>
-            </div>
+            <h3>2. Unit-Explicit Interfaces</h3>
+            <p>All method signatures and variables must explicitly state their units. Avoid <code>double distance</code>; use <code>double distanceMeters</code> or the WPILib <code>Unit</code> classes.</p>
         </div>
 
         <div class="rule-card">
-            <h3>3. Unit Safety</h3>
-            <p>Explicitly document and use standard units (Meters, Radians, Volts). Avoid raw motor "power" percentages in core algorithms.</p>
+            <h3>3. Fail-Safe Hardware</h3>
+            <p>Hardware IO must be isolated behind <code>IO</code> interfaces. Every subsystem must have an <code>IOSim</code> implementation to ensure simulation parity.</p>
         </div>
 
         <div class="rule-card">
             <h3>4. Deterministic Logging</h3>
             <p>All subsystem inputs must be logged via <code>AresAutoLogger</code> to enable frame-accurate log replay.</p>
         </div>
-    </div>
+    </main>
 
-    <footer>
-        <p>&copy; 2026 ARESLib Framework - Built for Einstein. Inspired by MARSLib.</p>
-    </footer>
+    <div id="footer-placeholder"></div>
 
-    <script>
-        const container = document.getElementById('stars-container');
-        for (let i = 0; i < 50; i++) {
-            const star = document.createElement('div');
-            star.className = 'star';
-            const size = Math.random() * 2 + 'px';
-            star.style.width = size;
-            star.style.height = size;
-            star.style.left = Math.random() * 100 + '%';
-            star.style.top = Math.random() * 100 + '%';
-            star.style.setProperty('--duration', (Math.random() * 3 + 2) + 's');
-            container.appendChild(star);
-        }
-    </script>
+    <script src="assets/js/common.js"></script>
 </body>
 </html>

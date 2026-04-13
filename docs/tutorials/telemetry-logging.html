@@ -20,30 +20,20 @@
     </style>
 </head>
 <body>
-    <div class="stars"></div>
-    <div class="container">
-        <header class="nav-header">
-            <nav>
-                <div class="logo">ARESLib<span>2</span></div>
-                <div class="nav-links">
-                    <a href="../index.html">Home</a>
-                    <a href="../standards.html">Standards</a>
-                    <a href="index.html">Tutorials</a>
-                </div>
-            </nav>
-        </header>
+    <div id="header-placeholder"></div>
+    <div id="stars-container"></div>
 
-        <section class="hero" style="min-height: auto; padding: 4rem 0;">
-            <h1>Telemetry & <span>Logging</span></h1>
-            <p>High-fidelity data visualization with zero configuration.</p>
-        </section>
+    <div class="container" style="padding-top: 10rem;">
+        <h1 class="hero-title" style="text-align: left;">Automated Telemetry</h1>
+        <p style="color: var(--text-light); font-size: 1.25rem;">Visualizing robot state is critical for debugging. This tutorial explains the <code>@AutoLog</code> pattern and AdvantageScope integration.</p>
+    </div>
 
-        <div class="content-body">
-            <h2>AdvantageKit Pattern</h2>
-            <p>ARESLib implements its own version of the FRC <strong>AdvantageKit</strong> @AutoLog pattern. Instead of manual <code>telemetry.addData()</code> calls, you define your inputs in a structured way.</p>
+    <div class="content-body">
+        <h2>AdvantageKit Pattern</h2>
+        <p>ARESLib implements its own version of the FRC <strong>AdvantageKit</strong> @AutoLog pattern. Instead of manual <code>telemetry.addData()</code> calls, you define your inputs in a structured way.</p>
 
-            <h3>1. Define Inputs</h3>
-            <pre><code>@AutoLog
+        <h3>1. Define Inputs</h3>
+        <pre><code>@AutoLog
 public static class DriveIOInputs {
     public double leftPositionRad = 0.0;
     public double rightPositionRad = 0.0;

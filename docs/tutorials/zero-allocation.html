@@ -34,29 +34,24 @@
     </style>
 </head>
 <body>
-    <div class="stars"></div>
-    <div class="container">
-        <header class="nav-header">
-            <nav>
-                <div class="logo">ARESLib<span>2</span></div>
-                <div class="nav-links">
-                    <a href="../index.html">Home</a>
-                    <a href="../standards.html">Standards</a>
-                    <a href="index.html">Tutorials</a>
-                </div>
-            </nav>
-        </header>
+    <div id="header-placeholder"></div>
+    <div id="stars-container"></div>
 
-        <section class="hero" style="min-height: auto; padding: 4rem 0;">
-            <h1>Zero-Allocation <span>Standard</span></h1>
-            <p>Achieving absolute determinism in the 20ms Control Loop.</p>
+    <div class="container" style="padding-top: 10rem;">
+        <h1 class="hero-title" style="text-align: left;">Zero-Allocation Standard</h1>
+        <p style="color: var(--text-light); font-size: 1.25rem;">Deterministic performance requires avoiding the heap. This tutorial covers object pooling and static memory management.</p>
+
+        <section style="margin-top: 3rem;">
+            <h2>The Problem with <code>new</code></h2>
+            <p>In FTC, the Java Garbage Collector (GC) can trigger at any time. If it triggers during a tight control loop, your 20ms loop might balloon to 50ms or more, causing "jitter" in your odometry and PID controllers.</p>
         </section>
+    </div>
 
-        <div class="content-body">
-            <h2>The Challenge</h2>
-            <p>In FTC, the Java Virtual Machine (JVM) manages memory automatically. However, when the "Garbage Collector" (GC) runs, it temporarily halts the program to clean up unused objects. In a high-speed control loop, a even a 10ms GC pause can cause missed sensor readings and jerky movement.</p>
-            
-            <div class="success-box">
+    <div id="footer-placeholder"></div>
+
+    <script src="../assets/js/common.js"></script>
+</body>
+<div class="success-box">
                 <strong>The ARESLib Rule:</strong> No objects may be instantiated (using <code>new</code>) inside any method called by <code>OpMode.loop()</code> or <code>Command.execute()</code>.
             </div>
 

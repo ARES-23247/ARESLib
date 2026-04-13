@@ -20,33 +20,6 @@
     </style>
 </head>
 <body>
-    <div class="stars"></div>
-    <div class="container">
-        <header class="nav-header">
-            <nav>
-                <div class="logo">ARESLib<span>2</span></div>
-                <div class="nav-links">
-                    <a href="../index.html">Home</a>
-                    <a href="../standards.html">Standards</a>
-                    <a href="index.html">Tutorials</a>
-                </div>
-            </nav>
-        </header>
-
-        <section class="hero" style="min-height: auto; padding: 4rem 0;">
-            <h1>State Machine <span>Logic</span></h1>
-            <p>Managing complexity with clean, enum-based transitions.</p>
-        </section>
-
-        <div class="content-body">
-            <h2>The Problem</h2>
-            <p>Robots often perform complex sequences: "Intake -> Retract -> Sort -> Score". Using raw <code>if/else</code> statements in your periodic loop quickly leads to "spaghetti code" that is hard to debug and impossible to test.</p>
-
-            <h2>The ARESLib Solution</h2>
-            <p>The <code>StateMachine</code> framework provides a structured way to define states and transitions.</p>
-
-            <pre><code>public enum IntakeState {
-    IDLE,
     INTAKING,
     REVERSING,
     FULL

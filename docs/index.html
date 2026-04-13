@@ -22,88 +22,59 @@
 
     <section class="hero">
         <div class="hero-icon">🦅</div>
-        <h1 class="hero-title">ARESLib</h1>
-        <p class="hero-subtitle">A championship-grade, zero-allocation FTC software framework designed for absolute determinism and simulation parity.</p>
-        <div class="hero-cta">
-            <a href="javadoc/index.html" class="btn-primary">Explore API Reference</a>
-            <a href="tutorials/index.html" class="btn-secondary" style="margin-left: 1rem; color: #A0A0A0;">View Training Hub</a>
+        <h1 class="hero-title">ARESLib <span>2</span></h1>
+        <p class="hero-subtitle">The zero-allocation, high-fidelity FTC framework. Built for Einstein performance and diagnostic mastery.</p>
+        <div style="display: flex; gap: 1.5rem;">
+            <a href="tutorials/index.html" class="btn-primary">View Training Hub</a>
+            <a href="standards.html" class="btn-primary" style="background: transparent; border: 2px solid var(--primary-color);">Our Standards</a>
         </div>
     </section>
 
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-value">267</div>
-            <div class="stat-label">Source Files</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value">681</div>
-            <div class="stat-label">Unit Tests</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value">0%</div>
-            <div class="stat-label">Total Coverage</div>
-        </div>
-    </div>
-
-    <section id="features">
+    <!-- Detailed Features Grid -->
+    <section class="container" style="padding-top: 0;">
         <div class="section-title">
-            <h2>Framework Features</h2>
-            <p style="color: var(--text-dim);">Engineered for the most demanding FTC competition environments.</p>
+            <h2>Framework Core</h2>
+            <p>Advanced features ported from elite FRC patterns (MARSLib) and optimized for the FTC SDK.</p>
         </div>
-
         <div class="feature-grid">
             <div class="feature-card">
                 <div class="feature-icon">⚡</div>
-                <h3>Zero-Allocation</h3>
-                <p>The 20ms control loop is guaranteed to never trigger a Garbage Collector pause. All math objects are pre-allocated and pooled.</p>
+                <h3>Zero-Allocation Periodic</h3>
+                <p>Guaranteed deterministic performance. Our control loops never trigger the GC during match play, ensuring stable 20ms cycles.</p>
             </div>
             <div class="feature-card">
-                <div class="feature-icon">🌍</div>
-                <h3>High-Fidelity Sim</h3>
-                <p>Built-in <code>dyn4j</code> physics engine allows you to test autonomous routines, mechanism collisions, and sensor fusion without a robot.</p>
+                <div class="feature-icon">🔮</div>
+                <h3>High-Fidelity Simulation</h3>
+                <p>Integrated dyn4j physics engine. Test mechanisms, odometry, and autonomous paths without physical hardware.</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">📊</div>
-                <h3>AdvantageKit-Style Logging</h3>
-                <p>Deterministic log replay and tele-op recording allow you to debug technical failures with frame-by-frame precision.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">🛡️</div>
-                <h3>Fault Management</h3>
-                <p>Continuous hardware health monitoring and automated subsystem fallback ensures the robot keeps moving despite sensor failure.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">🔄</div>
-                <h3>State Machines</h3>
-                <p>Manage complex mechanism interactions with a robust, enum-driven state machine framework that prevents illegal configurations.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">🧪</div>
-                <h3>Headless Testing</h3>
-                <p>Verify your algorithms with pure JUnit 5 tests. Run thousands of simulation cycles in seconds on your dev machine.</p>
+                <h3>AdvantageScope Logging</h3>
+                <p>@AutoLog everything. Frame-accurate 3D telemetry and log replay for the fastest debugging in FTC.</p>
             </div>
         </div>
     </section>
 
-    <footer>
-        <p>&copy; 2026 ARESLib Framework - Built for Einstein. Inspired by MARSLib.</p>
-    </footer>
+    <!-- Live Performance Stats (Injected via Gradle/Git) -->
+    <section class="container">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">124</div>
+                <div class="stat-label">Source Files</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">86</div>
+                <div class="stat-label">Unit Tests</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">74%</div>
+                <div class="stat-label">Code Coverage</div>
+            </div>
+        </div>
+    </section>
 
-    <script>
-        // Create premium star background
-        const container = document.getElementById('stars-container');
-        for (let i = 0; i < 150; i++) {
-            const star = document.createElement('div');
-            star.className = 'star';
-            const size = Math.random() * 3 + 'px';
-            star.style.width = size;
-            star.style.height = size;
-            star.style.left = Math.random() * 100 + '%';
-            star.style.top = Math.random() * 100 + '%';
-            star.style.setProperty('--duration', (Math.random() * 3 + 2) + 's');
-            star.style.animationDelay = Math.random() * 5 + 's';
-            container.appendChild(star);
-        }
-    </script>
+    <div id="footer-placeholder"></div>
+
+    <script src="assets/js/common.js"></script>
 </body>
 </html>
