@@ -117,6 +117,10 @@
     {
       "name": "areslib-javadoc",
       "source": "./areslib-javadoc"
+    },
+    {
+      "name": "areslib-web-accessibility",
+      "source": "./areslib-web-accessibility"
     }
   ]
 }
