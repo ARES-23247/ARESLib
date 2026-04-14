@@ -1,0 +1,51 @@
+---
+title: Zero-Allocation Standard
+description: Deterministic performance requires avoiding the heap in the hot path.
+---
+
+Deterministic performance requires avoiding the heap in the "hot path" (code that runs every loop). This tutorial covers object pooling and static memory management in ARESLib.
+
+## The Problem with `new`
+
+In FTC, the Java Garbage Collector (GC) can trigger at any time. If it triggers during a tight control loop, your 20ms loop might balloon to 50ms or more, causing "jitter" in your odometry and PID controllers.
+
+:::tip[The ARESLib Rule]
+No objects may be instantiated (using `new`) inside any method called by `OpMode.loop()` or `Command.execute()`.
+:::
+
+## How to achieve zero-allocation?
+
+### 1. Use Pre-allocated Static Constants
+Instead of creating new `Pose2d` or `Rotation2d` objects every tick, use static constants or pre-allocated buffers.
+
+```java
+// ❌ DO NOT: Creates a new object every 20ms
+Rotation2d angle = new Rotation2d(Math.toRadians(90));
+
+// ✅ PREFERRED: Reusable constant
+private static final Rotation2d NINETY_DEGREES = Rotation2d.fromDegrees(90);
+```
+
+### 2. Object Pooling & Static Buffers
+For mathematical operations, use "Copy" or "Set" methods instead of creating new results.
+
+```java
+// ❌ DO NOT
+Pose2d current = odometry.getPose();
+Pose2d next = current.plus(transform); // Creates new Pose2d
+
+// ✅ PREFERRED (ARESLib Pattern)
+private final Pose2d poseBuffer = new Pose2d();
+
+public void periodic() {
+    Pose2d current = odometry.getPose();
+    poseBuffer.set(current.getX(), current.getY(), current.getRotation());
+}
+```
+
+### 3. Avoid List Allocations
+Don't use `Stream`, `ArrayList.addAll()`, or any lambda that captures variables inside the hot path.
+
+## Verification
+
+To verify your code is zero-allocation, run the **Android Studio Profiler** and look for a flat "Memory Allocation" graph during your run. Our **ProjectDoctor** extension will also highlight violations in your IDE.

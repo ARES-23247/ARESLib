@@ -35,7 +35,7 @@ spotless {
     groovyGradle {
         target fileTree('.') {
             include '**/*.gradle'
-            exclude '**/build/**', '**/build-*/**'
+            exclude '**/build/**', '**/build-*/**', 'website/**', 'areslib-vscode/**'
         }
         leadingTabsToSpaces(4)
         trimTrailingWhitespace()
@@ -44,14 +44,14 @@ spotless {
     json {
         target fileTree('.') {
             include '**/*.json'
-            exclude '**/build/**', '**/build-*/**'
+            exclude '**/build/**', '**/build-*/**', 'website/**', 'areslib-vscode/**', '**/node_modules/**'
         }
         gson().indentWithSpaces(2)
     }
     format 'misc', {
         target fileTree('.') {
             include '**/*.md', '**/.gitignore'
-            exclude '**/build/**', '**/build-*/**', 'CONTROLLER_MAPPINGS.md'
+            exclude '**/build/**', '**/build-*/**', 'CONTROLLER_MAPPINGS.md', 'website/**', 'areslib-vscode/**'
         }
         trimTrailingWhitespace()
         leadingTabsToSpaces(2)
