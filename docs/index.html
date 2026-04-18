@@ -3,76 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ARESLib — FTC Team 23247 Software Framework</title>
+    <title>ARESLib API Docs | FTC 23247</title>
     <link rel="stylesheet" href="areslib-theme.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&family=Orbitron:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        .hero { padding: 4rem 2rem; min-height: 60vh; }
+        .hero-title { font-size: 4rem; }
+        .links-container { display: flex; gap: 2rem; justify-content: center; margin-top: 2rem; }
+    </style>
 </head>
 <body>
-    <div id="header-placeholder"></div>
     <div id="stars-container"></div>
-
     <div class="page-wrapper">
         <section class="hero">
             <div class="hero-icon">🦅</div>
-            <h1 class="hero-title">ARESLib <span>2</span></h1>
-            <p class="hero-subtitle">The zero-allocation, high-fidelity FTC framework. Built for Championship performance and diagnostic mastery.</p>
-            <div style="display: flex; gap: 1.5rem;">
-                <a href="tutorials/index.html" class="btn-primary">View Training Hub</a>
-                <a href="standards.html" class="btn-primary" style="background: transparent; border: 2px solid var(--primary-color);">Our Standards</a>
+            <h1 class="hero-title">ARESLib <span>API</span></h1>
+            <p class="hero-subtitle">Local technical reference for the ARESLib core library and subsystems.</p>
+            
+            <div class="links-container">
+                <a href="javadoc/index.html" class="btn-primary">Browse API Reference</a>
+                <a href="https://ares23247.org/docs" class="btn-primary" style="background: transparent; border: 2px solid var(--primary-color);">Training Hub (ARESWEB)</a>
             </div>
         </section>
 
-        <!-- Detailed Features Grid -->
-        <section class="container" style="padding-top: 0;">
-            <div class="section-title">
-                <h2>Framework Core</h2>
-                <p>Advanced features ported from elite FRC patterns (MARSLib) and optimized for the FTC SDK.</p>
-            </div>
+        <section class="container">
             <div class="feature-grid">
                 <div class="feature-card">
-                    <div class="feature-icon">⚡</div>
-                    <h3>Zero-Allocation Periodic</h3>
-                    <p>Guaranteed deterministic performance. Our control loops never trigger the GC during match play, ensuring stable 20ms cycles.</p>
+                    <h3>Technical Docs</h3>
+                    <p>Comprehensive class and method documentation for every package in the framework.</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">🔮</div>
-                    <h3>High-Fidelity Simulation</h3>
-                    <p>Integrated dyn4j physics engine. Test mechanisms, odometry, and autonomous paths without physical hardware.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">📊</div>
-                    <h3>AdvantageScope Logging</h3>
-                    <p>@AutoLog everything. Frame-accurate 3D telemetry and log replay for the fastest debugging in FTC.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🛠️</div>
-                    <h3>Elite Developer Tooling</h3>
-                    <p>Exclusive VS Code extension suite. Real-time physics test generation, automated code audits, and integrated virtual dashboards.</p>
+                    <h3>Zero-Allocation</h3>
+                    <p>Refer to timing and GC-safety notes in class documentation headers.</p>
                 </div>
             </div>
         </section>
-
-        <!-- Live Performance Stats -->
-        <section class="container">
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-value">124</div>
-                    <div class="stat-label">Source Files</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value">86</div>
-                    <div class="stat-label">Unit Tests</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value">74%</div>
-                    <div class="stat-label">Code Coverage</div>
-                </div>
-            </div>
-        </section>
-
-        <div id="footer-placeholder"></div>
     </div>
-
-    <script src="assets/js/common.js"></script>
 </body>
 </html>

@@ -461,3 +461,54 @@ li { margin-bottom: 1rem; }
     box-shadow: 0 4px 10px var(--glow-secondary);
     line-height: 1;
 }
+
+/* Javadoc Specific Overrides */
+.header, .contentContainer, .description, .summary, .details, .indexContainer {
+    background-color: var(--bg-dark) !important;
+    color: var(--text-light) !important;
+}
+
+.title {
+    color: var(--primary-color) !important;
+    font-family: 'Orbitron', sans-serif !important;
+}
+
+.subTitle {
+    color: var(--secondary-color) !important;
+    font-weight: 700;
+}
+
+.navBarCell1Rev {
+    background-color: var(--primary-color) !important;
+    color: white !important;
+}
+
+a:link, a:visited {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--secondary-color);
+    text-shadow: 0 0 5px var(--glow-primary);
+}
+
+.memberSummary td, .typeSummary td, .packageSummary td {
+    background-color: var(--card-bg) !important;
+    border: 1px solid rgba(255,255,255,0.05) !important;
+}
+
+.blockList {
+    background-color: transparent !important;
+}
+
+.summary .table-tabs {
+    background-color: var(--bg-dark) !important;
+}
+
+.description .block {
+    background: rgba(205, 127, 50, 0.05);
+    border-left: 4px solid var(--primary-color);
+    padding: 1rem;
+    margin: 1rem 0;
+}

@@ -88,6 +88,7 @@ javadoc {
     options.docEncoding = 'UTF-8'
     options.addBooleanOption('Werror', false)
     options.addStringOption('Xdoclint:all,-missing', '-quiet')
+    options.addStringOption('stylesheetfile', "${projectDir}/docs/areslib-theme.css")
 }
 
 tasks.withType(Javadoc).configureEach {
@@ -100,8 +101,9 @@ tasks.withType(Javadoc).configureEach {
     options.windowTitle = 'ARESLib API - FTC Team 23247'
     options.docTitle = 'ARESLib API Reference'
     options.header = '<a href="../index.html" style="color:#CD7F32;text-decoration:none;font-weight:700;">ARESLib</a> - FTC 23247'
+    options.bottom = '&copy; 2026 ARES 23247. Built for Championship Performance.'
 
-    // Inject Bronze/Red/White theme colors via CSS
+    // Ensure stylesheet is active
     doFirst {
         def themeCss = file("${projectDir}/docs/areslib-theme.css")
         if (!themeCss.exists()) {
@@ -232,14 +234,8 @@ def performDocsGeneration = {
 // Generate docs site: landing page + themed javadoc
 task generateDocs {
     description = 'Generates the full ARESLib documentation site into docs/'
-    dependsOn jacocoTestReport
-    // Optional javadoc - don't fail the whole docs build if javadoc is cranky
+    dependsOn jacocoTestReport, javadoc
     doLast {
-        try {
-            tasks.javadoc.execute()
-        } catch (Exception e) {
-            println "Warning: Javadoc generation failed, skipping copy. Error: ${e.message}"
-        }
         performDocsGeneration()
     }
 }

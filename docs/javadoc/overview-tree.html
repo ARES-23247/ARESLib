@@ -7,7 +7,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta name="description" content="class tree">
 <meta name="generator" content="javadoc/TreeWriter">
-<link rel="stylesheet" type="text/css" href="stylesheet.css" title="Style">
+<link rel="stylesheet" type="text/css" href="areslib-theme.css" title="Style">
 <link rel="stylesheet" type="text/css" href="script-dir/jquery-ui.min.css" title="Style">
 <link rel="stylesheet" type="text/css" href="jquery-ui.overrides.css" title="Style">
 <script type="text/javascript" src="script.js"></script>
@@ -59,6 +59,7 @@ loadScripts(document, 'script');</script>
 <li><a href="org/areslib/core/package-tree.html">org.areslib.core</a>, </li>
 <li><a href="org/areslib/core/async/package-tree.html">org.areslib.core.async</a>, </li>
 <li><a href="org/areslib/core/simulation/package-tree.html">org.areslib.core.simulation</a>, </li>
+<li><a href="org/areslib/diagnostics/package-tree.html">org.areslib.diagnostics</a>, </li>
 <li><a href="org/areslib/faults/package-tree.html">org.areslib.faults</a>, </li>
 <li><a href="org/areslib/hardware/package-tree.html">org.areslib.hardware</a>, </li>
 <li><a href="org/areslib/hardware/coprocessors/package-tree.html">org.areslib.hardware.coprocessors</a>, </li>
@@ -83,6 +84,7 @@ loadScripts(document, 'script');</script>
 <li><a href="org/areslib/pathplanner/pathfinding/package-tree.html">org.areslib.pathplanner.pathfinding</a>, </li>
 <li><a href="org/areslib/pathplanner/util/package-tree.html">org.areslib.pathplanner.util</a>, </li>
 <li><a href="org/areslib/sim/package-tree.html">org.areslib.sim</a>, </li>
+<li><a href="org/areslib/subsystems/package-tree.html">org.areslib.subsystems</a>, </li>
 <li><a href="org/areslib/subsystems/controllers/examples/package-tree.html">org.areslib.subsystems.controllers.examples</a>, </li>
 <li><a href="org/areslib/subsystems/drive/package-tree.html">org.areslib.subsystems.drive</a>, </li>
 <li><a href="org/areslib/subsystems/vision/package-tree.html">org.areslib.subsystems.vision</a>, </li>
@@ -124,6 +126,7 @@ loadScripts(document, 'script');</script>
 <li class="circle">org.areslib.hardware.wrappers.<a href="org/areslib/hardware/wrappers/AresSrsColorSensor.html" class="type-name-link" title="class in org.areslib.hardware.wrappers">AresSrsColorSensor</a> (implements org.areslib.hardware.interfaces.<a href="org/areslib/hardware/interfaces/AresColorSensor.html" title="interface in org.areslib.hardware.interfaces">AresColorSensor</a>)</li>
 <li class="circle">org.areslib.hardware.wrappers.<a href="org/areslib/hardware/wrappers/AresSrsSensor.html" class="type-name-link" title="class in org.areslib.hardware.wrappers">AresSrsSensor</a> (implements org.areslib.hardware.interfaces.<a href="org/areslib/hardware/interfaces/AresAbsoluteEncoder.html" title="interface in org.areslib.hardware.interfaces">AresAbsoluteEncoder</a>, org.areslib.hardware.interfaces.<a href="org/areslib/hardware/interfaces/AresAnalogSensor.html" title="interface in org.areslib.hardware.interfaces">AresAnalogSensor</a>, org.areslib.hardware.interfaces.<a href="org/areslib/hardware/interfaces/AresDigitalSensor.html" title="interface in org.areslib.hardware.interfaces">AresDigitalSensor</a>)</li>
 <li class="circle">org.areslib.telemetry.<a href="org/areslib/telemetry/AresTelemetry.html" class="type-name-link" title="class in org.areslib.telemetry">AresTelemetry</a></li>
+<li class="circle">org.areslib.core.<a href="org/areslib/core/AresTimer.html" class="type-name-link" title="class in org.areslib.core">AresTimer</a></li>
 <li class="circle">org.areslib.math.controller.<a href="org/areslib/math/controller/ArmFeedforward.html" class="type-name-link" title="class in org.areslib.math.controller">ArmFeedforward</a></li>
 <li class="circle">org.areslib.hardware.interfaces.<a href="org/areslib/hardware/interfaces/ArrayLidarIO.ArrayLidarInputs.html" class="type-name-link" title="class in org.areslib.hardware.interfaces">ArrayLidarIO.ArrayLidarInputs</a> (implements org.areslib.telemetry.<a href="org/areslib/telemetry/AresLoggableInputs.html" title="interface in org.areslib.telemetry">AresLoggableInputs</a>)</li>
 <li class="circle">org.areslib.hardware.wrappers.<a href="org/areslib/hardware/wrappers/ArrayLidarIOSim.html" class="type-name-link" title="class in org.areslib.hardware.wrappers">ArrayLidarIOSim</a> (implements org.areslib.hardware.interfaces.<a href="org/areslib/hardware/interfaces/ArrayLidarIO.html" title="interface in org.areslib.hardware.interfaces">ArrayLidarIO</a>, org.areslib.hardware.faults.<a href="org/areslib/hardware/faults/FaultMonitor.html" title="interface in org.areslib.hardware.faults">FaultMonitor</a>)</li>
@@ -173,9 +176,11 @@ loadScripts(document, 'script');</script>
 <li class="circle">org.areslib.pathplanner.commands.<a href="org/areslib/pathplanner/commands/PathfindThenFollowPathHolonomic.html" class="type-name-link" title="class in org.areslib.pathplanner.commands">PathfindThenFollowPathHolonomic</a></li>
 <li class="circle">org.areslib.pathplanner.commands.<a href="org/areslib/pathplanner/commands/PathfindThenFollowPathLTV.html" class="type-name-link" title="class in org.areslib.pathplanner.commands">PathfindThenFollowPathLTV</a></li>
 <li class="circle">org.areslib.pathplanner.commands.<a href="org/areslib/pathplanner/commands/PathfindThenFollowPathRamsete.html" class="type-name-link" title="class in org.areslib.pathplanner.commands">PathfindThenFollowPathRamsete</a></li>
+<li class="circle">org.areslib.diagnostics.<a href="org/areslib/diagnostics/SystemCheckCommand.html" class="type-name-link" title="class in org.areslib.diagnostics">SystemCheckCommand</a></li>
 </ul>
 </li>
 <li class="circle">org.areslib.command.autoaim.<a href="org/areslib/command/autoaim/ShootOnTheMoveCommand.html" class="type-name-link" title="class in org.areslib.command.autoaim">ShootOnTheMoveCommand</a></li>
+<li class="circle">org.areslib.command.<a href="org/areslib/command/SmartAssistAlign.html" class="type-name-link" title="class in org.areslib.command">SmartAssistAlign</a></li>
 <li class="circle">org.areslib.command.sysid.<a href="org/areslib/command/sysid/SysIdCommand.html" class="type-name-link" title="class in org.areslib.command.sysid">SysIdCommand</a></li>
 <li class="circle">org.areslib.command.<a href="org/areslib/command/WaitCommand.html" class="type-name-link" title="class in org.areslib.command">WaitCommand</a></li>
 </ul>
@@ -208,6 +213,7 @@ loadScripts(document, 'script');</script>
 <li class="circle">org.areslib.math.controller.<a href="org/areslib/math/controller/ElevatorFeedforward.html" class="type-name-link" title="class in org.areslib.math.controller">ElevatorFeedforward</a></li>
 <li class="circle">org.areslib.math.<a href="org/areslib/math/EliteShooterMath.html" class="type-name-link" title="class in org.areslib.math">EliteShooterMath</a></li>
 <li class="circle">org.areslib.math.<a href="org/areslib/math/EliteShooterMath.EliteShooterSetpoint.html" class="type-name-link" title="class in org.areslib.math">EliteShooterMath.EliteShooterSetpoint</a></li>
+<li class="circle">org.areslib.core.simulation.<a href="org/areslib/core/simulation/EnhancedAresPhysicsWorld.html" class="type-name-link" title="class in org.areslib.core.simulation">EnhancedAresPhysicsWorld</a></li>
 <li class="circle">org.areslib.pathplanner.path.<a href="org/areslib/pathplanner/path/EventMarker.html" class="type-name-link" title="class in org.areslib.pathplanner.path">EventMarker</a></li>
 <li class="circle">org.areslib.core.<a href="org/areslib/core/FieldConstants.html" class="type-name-link" title="class in org.areslib.core">FieldConstants</a></li>
 <li class="circle">org.areslib.pathplanner.dummy.<a href="org/areslib/pathplanner/dummy/Filesystem.html" class="type-name-link" title="class in org.areslib.pathplanner.dummy">Filesystem</a></li>
@@ -237,7 +243,6 @@ loadScripts(document, 'script');</script>
 <li class="circle">org.areslib.hardware.coprocessors.<a href="org/areslib/hardware/coprocessors/SRSHub.html" class="type-name-link" title="class in org.areslib.hardware.coprocessors">SRSHub</a></li>
 </ul>
 </li>
-<li class="circle">org.areslib.hardware.interfaces.<a href="org/areslib/hardware/interfaces/IMUIO.IMUInputs.html" class="type-name-link" title="class in org.areslib.hardware.interfaces">IMUIO.IMUInputs</a> (implements org.areslib.telemetry.<a href="org/areslib/telemetry/AresLoggableInputs.html" title="interface in org.areslib.telemetry">AresLoggableInputs</a>)</li>
 <li class="circle">org.areslib.math.filter.<a href="org/areslib/math/filter/InterpolatingTreeMap.html" class="type-name-link" title="class in org.areslib.math.filter">InterpolatingTreeMap</a>&lt;K,<wbr>V&gt;</li>
 <li class="circle">org.areslib.math.kinematics.<a href="org/areslib/math/kinematics/InverseMatrixHelper.html" class="type-name-link" title="class in org.areslib.math.kinematics">InverseMatrixHelper</a></li>
 <li class="circle">org.areslib.math.filter.<a href="org/areslib/math/filter/KalmanFilter1D.html" class="type-name-link" title="class in org.areslib.math.filter">KalmanFilter1D</a></li>
@@ -286,6 +291,7 @@ loadScripts(document, 'script');</script>
 <li class="circle">org.areslib.hardware.coprocessors.<a href="org/areslib/hardware/coprocessors/OctoQuadV1Impl.html" class="type-name-link" title="class in org.areslib.hardware.coprocessors">OctoQuadV1Impl</a> (implements org.areslib.hardware.coprocessors.<a href="org/areslib/hardware/coprocessors/AresOctoQuadDriver.html" title="interface in org.areslib.hardware.coprocessors">AresOctoQuadDriver</a>)</li>
 <li class="circle">org.areslib.hardware.coprocessors.<a href="org/areslib/hardware/coprocessors/OctoQuadV2Impl.html" class="type-name-link" title="class in org.areslib.hardware.coprocessors">OctoQuadV2Impl</a> (implements org.areslib.hardware.coprocessors.<a href="org/areslib/hardware/coprocessors/AresOctoQuadDriver.html" title="interface in org.areslib.hardware.coprocessors">AresOctoQuadDriver</a>)</li>
 <li class="circle">org.areslib.hardware.interfaces.<a href="org/areslib/hardware/interfaces/OdometryIO.OdometryInputs.html" class="type-name-link" title="class in org.areslib.hardware.interfaces">OdometryIO.OdometryInputs</a> (implements org.areslib.telemetry.<a href="org/areslib/telemetry/AresLoggableInputs.html" title="interface in org.areslib.telemetry">AresLoggableInputs</a>)</li>
+<li class="circle">org.areslib.math.controller.<a href="org/areslib/math/controller/OnlineFeedforwardEstimator.html" class="type-name-link" title="class in org.areslib.math.controller">OnlineFeedforwardEstimator</a></li>
 <li class="circle">com.qualcomm.robotcore.eventloop.opmode.OpMode
 <ul>
 <li class="circle">com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
@@ -325,7 +331,6 @@ loadScripts(document, 'script');</script>
 <li class="circle">org.areslib.telemetry.<a href="org/areslib/telemetry/ReplayAutoLogger.html" class="type-name-link" title="class in org.areslib.telemetry">ReplayAutoLogger</a></li>
 <li class="circle">org.areslib.hardware.wrappers.<a href="org/areslib/hardware/wrappers/RevDistanceSensorWrapper.html" class="type-name-link" title="class in org.areslib.hardware.wrappers">RevDistanceSensorWrapper</a> (implements org.areslib.hardware.interfaces.<a href="org/areslib/hardware/interfaces/AresDistanceSensor.html" title="interface in org.areslib.hardware.interfaces">AresDistanceSensor</a>)</li>
 <li class="circle">org.areslib.hardware.wrappers.<a href="org/areslib/hardware/wrappers/RevEncoderWrapper.html" class="type-name-link" title="class in org.areslib.hardware.wrappers">RevEncoderWrapper</a> (implements org.areslib.hardware.interfaces.<a href="org/areslib/hardware/interfaces/AresAbsoluteEncoder.html" title="interface in org.areslib.hardware.interfaces">AresAbsoluteEncoder</a>)</li>
-<li class="circle">org.areslib.hardware.wrappers.<a href="org/areslib/hardware/wrappers/RevIMUWrapper.html" class="type-name-link" title="class in org.areslib.hardware.wrappers">RevIMUWrapper</a> (implements org.areslib.hardware.interfaces.<a href="org/areslib/hardware/interfaces/IMUIO.html" title="interface in org.areslib.hardware.interfaces">IMUIO</a>)</li>
 <li class="circle">org.areslib.telemetry.<a href="org/areslib/telemetry/RlogServerBackend.html" class="type-name-link" title="class in org.areslib.telemetry">RlogServerBackend</a> (implements org.areslib.telemetry.<a href="org/areslib/telemetry/AresLoggerBackend.html" title="interface in org.areslib.telemetry">AresLoggerBackend</a>)</li>
 <li class="circle">org.areslib.pathplanner.dummy.<a href="org/areslib/pathplanner/dummy/RobotBase.html" class="type-name-link" title="class in org.areslib.pathplanner.dummy">RobotBase</a></li>
 <li class="circle">org.areslib.templates.<a href="org/areslib/templates/RotaryMechanismIO.Inputs.html" class="type-name-link" title="class in org.areslib.templates">RotaryMechanismIO.Inputs</a></li>
@@ -365,6 +370,7 @@ loadScripts(document, 'script');</script>
 <li class="circle">org.areslib.command.<a href="org/areslib/command/SubsystemBase.html" class="type-name-link" title="class in org.areslib.command">SubsystemBase</a> (implements org.areslib.command.<a href="org/areslib/command/Subsystem.html" title="interface in org.areslib.command">Subsystem</a>)
 <ul>
 <li class="circle">org.areslib.hmi.<a href="org/areslib/hmi/AresOperatorInterface.html" class="type-name-link" title="class in org.areslib.hmi">AresOperatorInterface</a></li>
+<li class="circle">org.areslib.subsystems.<a href="org/areslib/subsystems/AresSuperstructure.html" class="type-name-link" title="class in org.areslib.subsystems">AresSuperstructure</a>&lt;S&gt;</li>
 <li class="circle">org.areslib.subsystems.vision.<a href="org/areslib/subsystems/vision/AresVisionSubsystem.html" class="type-name-link" title="class in org.areslib.subsystems.vision">AresVisionSubsystem</a></li>
 <li class="circle">org.areslib.subsystems.drive.<a href="org/areslib/subsystems/drive/DifferentialDriveSubsystem.html" class="type-name-link" title="class in org.areslib.subsystems.drive">DifferentialDriveSubsystem</a> (implements org.areslib.subsystems.drive.<a href="org/areslib/subsystems/drive/AresDrivetrain.html" title="interface in org.areslib.subsystems.drive">AresDrivetrain</a>)</li>
 <li class="circle">org.areslib.subsystems.drive.<a href="org/areslib/subsystems/drive/MecanumDriveSubsystem.html" class="type-name-link" title="class in org.areslib.subsystems.drive">MecanumDriveSubsystem</a> (implements org.areslib.subsystems.drive.<a href="org/areslib/subsystems/drive/AresDrivetrain.html" title="interface in org.areslib.subsystems.drive">AresDrivetrain</a>)</li>
@@ -387,6 +393,7 @@ loadScripts(document, 'script');</script>
 <li class="circle">org.areslib.command.sysid.<a href="org/areslib/command/sysid/SysIdRoutine.html" class="type-name-link" title="class in org.areslib.command.sysid">SysIdRoutine</a></li>
 <li class="circle">org.areslib.command.sysid.<a href="org/areslib/command/sysid/SysIdRoutine.Config.html" class="type-name-link" title="class in org.areslib.command.sysid">SysIdRoutine.Config</a></li>
 <li class="circle">org.areslib.command.sysid.<a href="org/areslib/command/sysid/SysIdRoutine.Mechanism.html" class="type-name-link" title="class in org.areslib.command.sysid">SysIdRoutine.Mechanism</a></li>
+<li class="circle">org.areslib.hmi.<a href="org/areslib/hmi/TelemetryGamepad.html" class="type-name-link" title="class in org.areslib.hmi">TelemetryGamepad</a></li>
 <li class="circle">org.areslib.subsystems.drive.<a href="org/areslib/subsystems/drive/TeleopDriveMath.html" class="type-name-link" title="class in org.areslib.subsystems.drive">TeleopDriveMath</a></li>
 <li class="circle">java.lang.<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Throwable.html" class="type-name-link external-link" title="class or interface in java.lang">Throwable</a> (implements java.io.<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a>)
 <ul>
@@ -458,7 +465,6 @@ loadScripts(document, 'script');</script>
 <li class="circle">org.areslib.subsystems.drive.<a href="org/areslib/subsystems/drive/DifferentialDriveIO.html" class="type-name-link" title="interface in org.areslib.subsystems.drive">DifferentialDriveIO</a></li>
 <li class="circle">org.areslib.hardware.faults.<a href="org/areslib/hardware/faults/FaultMonitor.html" class="type-name-link" title="interface in org.areslib.hardware.faults">FaultMonitor</a></li>
 <li class="circle">org.areslib.templates.<a href="org/areslib/templates/FlywheelIO.html" class="type-name-link" title="interface in org.areslib.templates">FlywheelIO</a></li>
-<li class="circle">org.areslib.hardware.interfaces.<a href="org/areslib/hardware/interfaces/IMUIO.html" class="type-name-link" title="interface in org.areslib.hardware.interfaces">IMUIO</a></li>
 <li class="circle">org.areslib.math.geometry.<a href="org/areslib/math/geometry/Interpolatable.html" class="type-name-link" title="interface in org.areslib.math.geometry">Interpolatable</a>&lt;T&gt;</li>
 <li class="circle">org.areslib.templates.<a href="org/areslib/templates/LinearMechanismIO.html" class="type-name-link" title="interface in org.areslib.templates">LinearMechanismIO</a></li>
 <li class="circle">org.areslib.subsystems.drive.<a href="org/areslib/subsystems/drive/MecanumDriveIO.html" class="type-name-link" title="interface in org.areslib.subsystems.drive">MecanumDriveIO</a></li>
@@ -475,7 +481,14 @@ loadScripts(document, 'script');</script>
 </ul>
 </li>
 <li class="circle">org.areslib.subsystems.drive.<a href="org/areslib/subsystems/drive/SwerveModuleIO.html" class="type-name-link" title="interface in org.areslib.subsystems.drive">SwerveModuleIO</a></li>
+<li class="circle">org.areslib.diagnostics.<a href="org/areslib/diagnostics/SystemTestable.html" class="type-name-link" title="interface in org.areslib.diagnostics">SystemTestable</a></li>
 <li class="circle">org.areslib.hardware.interfaces.<a href="org/areslib/hardware/interfaces/VisionIO.html" class="type-name-link" title="interface in org.areslib.hardware.interfaces">VisionIO</a></li>
+</ul>
+</section>
+<section class="hierarchy">
+<h2 title="Annotation Interface Hierarchy">Annotation Interface Hierarchy</h2>
+<ul>
+<li class="circle">org.areslib.telemetry.<a href="org/areslib/telemetry/AresAutoLogger.AutoLog.html" class="type-name-link" title="annotation interface in org.areslib.telemetry">AresAutoLogger.AutoLog</a> (implements java.lang.annotation.<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/annotation/Annotation.html" title="class or interface in java.lang.annotation" class="external-link">Annotation</a>)</li>
 </ul>
 </section>
 <section class="hierarchy">
@@ -513,6 +526,10 @@ loadScripts(document, 'script');</script>
 </ul>
 </section>
 </main>
+<footer role="contentinfo">
+<hr>
+<p class="legal-copy"><small>&copy; 2026 ARES 23247. Built for Championship Performance.</small></p>
+</footer>
 </div>
 </div>
 </body>

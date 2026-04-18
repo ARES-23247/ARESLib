@@ -7,7 +7,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta name="description" content="index">
 <meta name="generator" content="javadoc/IndexWriter">
-<link rel="stylesheet" type="text/css" href="stylesheet.css" title="Style">
+<link rel="stylesheet" type="text/css" href="areslib-theme.css" title="Style">
 <link rel="stylesheet" type="text/css" href="script-dir/jquery-ui.min.css" title="Style">
 <link rel="stylesheet" type="text/css" href="jquery-ui.overrides.css" title="Style">
 <script type="text/javascript" src="script.js"></script>
@@ -71,6 +71,10 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Registers a new physics body into the shared environment.</div>
 </dd>
+<dt><a href="org/areslib/core/simulation/EnhancedAresPhysicsWorld.html#addBody(org.dyn4j.dynamics.Body)" class="member-name-link">addBody(Body)</a> - Method in class org.areslib.core.simulation.<a href="org/areslib/core/simulation/EnhancedAresPhysicsWorld.html" title="class in org.areslib.core.simulation">EnhancedAresPhysicsWorld</a></dt>
+<dd>
+<div class="block">Adds a body to the physics world.</div>
+</dd>
 <dt><a href="org/areslib/pathplanner/dummy/SendableBuilder.html#addBooleanProperty(java.lang.String,java.util.function.BooleanSupplier,org.areslib.pathplanner.dummy.BooleanConsumer)" class="member-name-link">addBooleanProperty(String, BooleanSupplier, BooleanConsumer)</a> - Method in interface org.areslib.pathplanner.dummy.<a href="org/areslib/pathplanner/dummy/SendableBuilder.html" title="interface in org.areslib.pathplanner.dummy">SendableBuilder</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/areslib/command/CommandScheduler.html#addButton(java.lang.Runnable)" class="member-name-link">addButton(Runnable)</a> - Method in class org.areslib.command.<a href="org/areslib/command/CommandScheduler.html" title="class in org.areslib.command">CommandScheduler</a></dt>
@@ -93,6 +97,10 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Adds a ContactListener to the physics world.</div>
 </dd>
+<dt><a href="org/areslib/core/simulation/EnhancedAresPhysicsWorld.html#addContactListener(org.dyn4j.world.listener.ContactListener)" class="member-name-link">addContactListener(ContactListener&lt;Body&gt;)</a> - Method in class org.areslib.core.simulation.<a href="org/areslib/core/simulation/EnhancedAresPhysicsWorld.html" title="class in org.areslib.core.simulation">EnhancedAresPhysicsWorld</a></dt>
+<dd>
+<div class="block">Adds a contact listener to the physics world.</div>
+</dd>
 <dt><a href="org/areslib/sim/AresBatterySim.html#addDirectLoad(double)" class="member-name-link">addDirectLoad(double)</a> - Method in class org.areslib.sim.<a href="org/areslib/sim/AresBatterySim.html" title="class in org.areslib.sim">AresBatterySim</a></dt>
 <dd>
 <div class="block">Directly adds a known current draw to the battery load.</div>
@@ -103,9 +111,17 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Standard layout required by WPILib SysId schema: [timestamp, voltage, position, velocity]</div>
 </dd>
+<dt><a href="org/areslib/core/simulation/EnhancedAresPhysicsWorld.html#addFrameCurrentDrawAmps(double)" class="member-name-link">addFrameCurrentDrawAmps(double)</a> - Method in class org.areslib.core.simulation.<a href="org/areslib/core/simulation/EnhancedAresPhysicsWorld.html" title="class in org.areslib.core.simulation">EnhancedAresPhysicsWorld</a></dt>
+<dd>
+<div class="block">Adds current draw to the frame total for battery sag calculation.</div>
+</dd>
 <dt><a href="org/areslib/hardware/coprocessors/SRSHub.Config.html#addI2CDevice(int,org.areslib.hardware.coprocessors.SRSHub.I2CDevice)" class="member-name-link">addI2CDevice(int, SRSHub.I2CDevice)</a> - Method in class org.areslib.hardware.coprocessors.<a href="org/areslib/hardware/coprocessors/SRSHub.Config.html" title="class in org.areslib.hardware.coprocessors">SRSHub.Config</a></dt>
 <dd>
 <div class="block">adds a device to an I2C bus</div>
+</dd>
+<dt><a href="org/areslib/math/controller/OnlineFeedforwardEstimator.html#addMeasurement(double,double,double)" class="member-name-link">addMeasurement(double, double, double)</a> - Method in class org.areslib.math.controller.<a href="org/areslib/math/controller/OnlineFeedforwardEstimator.html" title="class in org.areslib.math.controller">OnlineFeedforwardEstimator</a></dt>
+<dd>
+<div class="block">Feeds the live telemetry into the sliding regression window.</div>
 </dd>
 <dt><a href="org/areslib/sim/AresBatterySim.html#addMotorLoad(double,double,double,double)" class="member-name-link">addMotorLoad(double, double, double, double)</a> - Method in class org.areslib.sim.<a href="org/areslib/sim/AresBatterySim.html" title="class in org.areslib.sim">AresBatterySim</a></dt>
 <dd>
@@ -341,6 +357,10 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="org/areslib/telemetry/AresAutoLogger.html#%3Cinit%3E()" class="member-name-link">AresAutoLogger()</a> - Constructor for class org.areslib.telemetry.<a href="org/areslib/telemetry/AresAutoLogger.html" title="class in org.areslib.telemetry">AresAutoLogger</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="org/areslib/telemetry/AresAutoLogger.AutoLog.html" class="type-name-link" title="annotation interface in org.areslib.telemetry">AresAutoLogger.AutoLog</a> - Annotation Interface in <a href="org/areslib/telemetry/package-summary.html">org.areslib.telemetry</a></dt>
+<dd>
+<div class="block">Annotation used to mark IO Input classes for automatic telemetry logging.</div>
+</dd>
 <dt><a href="org/areslib/sim/AresBatterySim.html" class="type-name-link" title="class in org.areslib.sim">AresBatterySim</a> - Class in <a href="org/areslib/sim/package-summary.html">org.areslib.sim</a></dt>
 <dd>
 <div class="block">Battery Simulation Model for ARESLib.</div>
@@ -521,6 +541,14 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="org/areslib/hardware/wrappers/AresSrsSensor.html#%3Cinit%3E(int,org.areslib.hardware.wrappers.SrsMode)" class="member-name-link">AresSrsSensor(int, SrsMode)</a> - Constructor for class org.areslib.hardware.wrappers.<a href="org/areslib/hardware/wrappers/AresSrsSensor.html" title="class in org.areslib.hardware.wrappers">AresSrsSensor</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="org/areslib/subsystems/AresSuperstructure.html" class="type-name-link" title="class in org.areslib.subsystems">AresSuperstructure</a>&lt;<a href="org/areslib/subsystems/AresSuperstructure.html" title="type parameter in AresSuperstructure">S</a> extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Enum.html" title="class or interface in java.lang" class="external-link">Enum</a>&lt;<a href="org/areslib/subsystems/AresSuperstructure.html" title="type parameter in AresSuperstructure">S</a>&gt;&gt; - Class in <a href="org/areslib/subsystems/package-summary.html">org.areslib.subsystems</a></dt>
+<dd>
+<div class="block">Base class for a robot Superstructure.</div>
+</dd>
+<dt><a href="org/areslib/subsystems/AresSuperstructure.html#%3Cinit%3E(java.lang.String,java.lang.Class,S,java.util.function.Supplier)" class="member-name-link">AresSuperstructure(String, Class&lt;S&gt;, S, Supplier&lt;Pose2d&gt;)</a> - Constructor for class org.areslib.subsystems.<a href="org/areslib/subsystems/AresSuperstructure.html" title="class in org.areslib.subsystems">AresSuperstructure</a></dt>
+<dd>
+<div class="block">Constructs the superstructure.</div>
+</dd>
 <dt><a href="org/areslib/testing/AresSystemCheckOpMode.html" class="type-name-link" title="class in org.areslib.testing">AresSystemCheckOpMode</a> - Class in <a href="org/areslib/testing/package-summary.html">org.areslib.testing</a></dt>
 <dd>
 <div class="block">Abstract base OpMode for running standardized pre-match hardware system checks.</div>
@@ -533,12 +561,18 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="org/areslib/telemetry/AresTelemetry.html#%3Cinit%3E()" class="member-name-link">AresTelemetry()</a> - Constructor for class org.areslib.telemetry.<a href="org/areslib/telemetry/AresTelemetry.html" title="class in org.areslib.telemetry">AresTelemetry</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="org/areslib/core/AresTimer.html" class="type-name-link" title="class in org.areslib.core">AresTimer</a> - Class in <a href="org/areslib/core/package-summary.html">org.areslib.core</a></dt>
+<dd>
+<div class="block">Universal Timing engine for the ARESLib framework.</div>
+</dd>
+<dt><a href="org/areslib/core/AresTimer.html#%3Cinit%3E()" class="member-name-link">AresTimer()</a> - Constructor for class org.areslib.core.<a href="org/areslib/core/AresTimer.html" title="class in org.areslib.core">AresTimer</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="org/areslib/subsystems/vision/AresVisionSubsystem.html" class="type-name-link" title="class in org.areslib.subsystems.vision">AresVisionSubsystem</a> - Class in <a href="org/areslib/subsystems/vision/package-summary.html">org.areslib.subsystems.vision</a></dt>
 <dd>
 <div class="block">Core vision subsystem that wraps a <a href="org/areslib/hardware/interfaces/VisionIO.html" title="interface in org.areslib.hardware.interfaces"><code>VisionIO</code></a> interface to provide validated
  AprilTag-derived pose estimates and configurable confidence scoring.</div>
 </dd>
-<dt><a href="org/areslib/subsystems/vision/AresVisionSubsystem.html#%3Cinit%3E(org.areslib.hardware.interfaces.VisionIO,double,double)" class="member-name-link">AresVisionSubsystem(VisionIO, double, double)</a> - Constructor for class org.areslib.subsystems.vision.<a href="org/areslib/subsystems/vision/AresVisionSubsystem.html" title="class in org.areslib.subsystems.vision">AresVisionSubsystem</a></dt>
+<dt><a href="org/areslib/subsystems/vision/AresVisionSubsystem.html#%3Cinit%3E(org.areslib.hardware.interfaces.VisionIO,double)" class="member-name-link">AresVisionSubsystem(VisionIO, double)</a> - Constructor for class org.areslib.subsystems.vision.<a href="org/areslib/subsystems/vision/AresVisionSubsystem.html" title="class in org.areslib.subsystems.vision">AresVisionSubsystem</a></dt>
 <dd>
 <div class="block">Constructs a core vision subsystem, parameterized for specific game or camera heuristics.</div>
 </dd>
@@ -700,15 +734,34 @@ loadScripts(document, 'script');</script>
 <div class="block">Binds a command to a Trigger's `.onFalse()` scheduling method while automatically publishing
  the mapped action name to AresTelemetry.</div>
 </dd>
+<dt><a href="org/areslib/hmi/TelemetryGamepad.html#bindOnFalse(org.areslib.command.button.Trigger,java.lang.String,java.lang.String,org.areslib.command.Command)" class="member-name-link">bindOnFalse(Trigger, String, String, Command)</a> - Method in class org.areslib.hmi.<a href="org/areslib/hmi/TelemetryGamepad.html" title="class in org.areslib.hmi">TelemetryGamepad</a></dt>
+<dd>
+<div class="block">Binds a command to a Trigger's `.onFalse()` scheduling method while automatically publishing
+ the mapped action name to telemetry.</div>
+</dd>
 <dt><a href="org/areslib/hardware/wrappers/AresGamepad.html#bindOnTrue(org.areslib.command.button.Trigger,java.lang.String,java.lang.String,org.areslib.command.Command)" class="member-name-link">bindOnTrue(Trigger, String, String, Command)</a> - Method in class org.areslib.hardware.wrappers.<a href="org/areslib/hardware/wrappers/AresGamepad.html" title="class in org.areslib.hardware.wrappers">AresGamepad</a></dt>
 <dd>
 <div class="block">Binds a command to a Trigger's `.onTrue()` scheduling method while automatically publishing the
  mapped action name to AresTelemetry.</div>
 </dd>
+<dt><a href="org/areslib/hmi/TelemetryGamepad.html#bindOnTrue(org.areslib.command.button.Trigger,java.lang.String,java.lang.String,org.areslib.command.Command)" class="member-name-link">bindOnTrue(Trigger, String, String, Command)</a> - Method in class org.areslib.hmi.<a href="org/areslib/hmi/TelemetryGamepad.html" title="class in org.areslib.hmi">TelemetryGamepad</a></dt>
+<dd>
+<div class="block">Binds a command to a Trigger's `.onTrue()` scheduling method while automatically publishing the
+ mapped action name to telemetry.</div>
+</dd>
+<dt><a href="org/areslib/hmi/TelemetryGamepad.html#bindToggle(org.areslib.command.button.Trigger,java.lang.String,java.lang.String,org.areslib.command.Command)" class="member-name-link">bindToggle(Trigger, String, String, Command)</a> - Method in class org.areslib.hmi.<a href="org/areslib/hmi/TelemetryGamepad.html" title="class in org.areslib.hmi">TelemetryGamepad</a></dt>
+<dd>
+<div class="block">Binds a command to toggle on a Trigger.</div>
+</dd>
 <dt><a href="org/areslib/hardware/wrappers/AresGamepad.html#bindWhileTrue(org.areslib.command.button.Trigger,java.lang.String,java.lang.String,org.areslib.command.Command)" class="member-name-link">bindWhileTrue(Trigger, String, String, Command)</a> - Method in class org.areslib.hardware.wrappers.<a href="org/areslib/hardware/wrappers/AresGamepad.html" title="class in org.areslib.hardware.wrappers">AresGamepad</a></dt>
 <dd>
 <div class="block">Binds a command to a Trigger's `.whileTrue()` scheduling method while automatically publishing
  the mapped action name to AresTelemetry.</div>
+</dd>
+<dt><a href="org/areslib/hmi/TelemetryGamepad.html#bindWhileTrue(org.areslib.command.button.Trigger,java.lang.String,java.lang.String,org.areslib.command.Command)" class="member-name-link">bindWhileTrue(Trigger, String, String, Command)</a> - Method in class org.areslib.hmi.<a href="org/areslib/hmi/TelemetryGamepad.html" title="class in org.areslib.hmi">TelemetryGamepad</a></dt>
+<dd>
+<div class="block">Binds a command to a Trigger's `.whileTrue()` scheduling method while automatically publishing
+ the mapped action name to telemetry.</div>
 </dd>
 <dt><a href="org/areslib/hardware/coprocessors/SRSHub.APDS9151.html#blue" class="member-name-link">blue</a> - Variable in class org.areslib.hardware.coprocessors.<a href="org/areslib/hardware/coprocessors/SRSHub.APDS9151.html" title="class in org.areslib.hardware.coprocessors">SRSHub.APDS9151</a></dt>
 <dd>&nbsp;</dd>
@@ -798,6 +851,10 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Calculates the moving-window median for the next value of the input stream.</div>
 </dd>
+<dt><a href="org/areslib/math/filter/SlewRateLimiter.html#calculate(double)" class="member-name-link">calculate(double)</a> - Method in class org.areslib.math.filter.<a href="org/areslib/math/filter/SlewRateLimiter.html" title="class in org.areslib.math.filter">SlewRateLimiter</a></dt>
+<dd>
+<div class="block">Filters the input to limit its slew rate using explicitly measured dynamic Delta-Time.</div>
+</dd>
 <dt><a href="org/areslib/math/controller/ArmFeedforward.html#calculate(double,double)" class="member-name-link">calculate(double, double)</a> - Method in class org.areslib.math.controller.<a href="org/areslib/math/controller/ArmFeedforward.html" title="class in org.areslib.math.controller">ArmFeedforward</a></dt>
 <dd>
 <div class="block">Calculates the feedforward from the gains and setpoints (assuming zero acceleration).</div>
@@ -832,7 +889,7 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="org/areslib/math/TractionControlLimiter.html#calculate(double,double,double,double)" class="member-name-link">calculate(double, double, double, double)</a> - Method in class org.areslib.math.<a href="org/areslib/math/TractionControlLimiter.html" title="class in org.areslib.math">TractionControlLimiter</a></dt>
 <dd>
-<div class="block">Heading-aware variant using the default loop period.</div>
+<div class="block">Heading-aware variant using dynamic delta-time natively.</div>
 </dd>
 <dt><a href="org/areslib/math/TractionControlLimiter.html#calculate(double,double,double,double,double)" class="member-name-link">calculate(double, double, double, double, double)</a> - Method in class org.areslib.math.<a href="org/areslib/math/TractionControlLimiter.html" title="class in org.areslib.math">TractionControlLimiter</a></dt>
 <dd>
@@ -1055,10 +1112,6 @@ loadScripts(document, 'script');</script>
 <dt><a href="org/areslib/testing/AresSystemCheckOpMode.html#configureSubsystems()" class="member-name-link">configureSubsystems()</a> - Method in class org.areslib.testing.<a href="org/areslib/testing/AresSystemCheckOpMode.html" title="class in org.areslib.testing">AresSystemCheckOpMode</a></dt>
 <dd>
 <div class="block">Implement this method to instantiate your robot's subsystems.</div>
-</dd>
-<dt><a href="org/areslib/hardware/interfaces/IMUIO.IMUInputs.html#connected" class="member-name-link">connected</a> - Variable in class org.areslib.hardware.interfaces.<a href="org/areslib/hardware/interfaces/IMUIO.IMUInputs.html" title="class in org.areslib.hardware.interfaces">IMUIO.IMUInputs</a></dt>
-<dd>
-<div class="block">True if the IMU is currently returning healthy data.</div>
 </dd>
 <dt><a href="org/areslib/pathplanner/path/PathPlannerTrajectory.State.html#constraints" class="member-name-link">constraints</a> - Variable in class org.areslib.pathplanner.path.<a href="org/areslib/pathplanner/path/PathPlannerTrajectory.State.html" title="class in org.areslib.pathplanner.path">PathPlannerTrajectory.State</a></dt>
 <dd>
@@ -1624,7 +1677,11 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="org/areslib/command/SequentialCommandGroup.html#end(boolean)" class="member-name-link">end(boolean)</a> - Method in class org.areslib.command.<a href="org/areslib/command/SequentialCommandGroup.html" title="class in org.areslib.command">SequentialCommandGroup</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="org/areslib/command/SmartAssistAlign.html#end(boolean)" class="member-name-link">end(boolean)</a> - Method in class org.areslib.command.<a href="org/areslib/command/SmartAssistAlign.html" title="class in org.areslib.command">SmartAssistAlign</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="org/areslib/command/sysid/SysIdCommand.html#end(boolean)" class="member-name-link">end(boolean)</a> - Method in class org.areslib.command.sysid.<a href="org/areslib/command/sysid/SysIdCommand.html" title="class in org.areslib.command.sysid">SysIdCommand</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="org/areslib/diagnostics/SystemCheckCommand.html#end(boolean)" class="member-name-link">end(boolean)</a> - Method in class org.areslib.diagnostics.<a href="org/areslib/diagnostics/SystemCheckCommand.html" title="class in org.areslib.diagnostics">SystemCheckCommand</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/areslib/pathplanner/commands/FollowPathCommand.html#end(boolean)" class="member-name-link">end(boolean)</a> - Method in class org.areslib.pathplanner.commands.<a href="org/areslib/pathplanner/commands/FollowPathCommand.html" title="class in org.areslib.pathplanner.commands">FollowPathCommand</a></dt>
 <dd>&nbsp;</dd>
@@ -1636,9 +1693,21 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="org/areslib/hardware/coprocessors/OctoQuadFWv3.FirmwareVersion.html#eng" class="member-name-link">eng</a> - Variable in class org.areslib.hardware.coprocessors.<a href="org/areslib/hardware/coprocessors/OctoQuadFWv3.FirmwareVersion.html" title="class in org.areslib.hardware.coprocessors">OctoQuadFWv3.FirmwareVersion</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="org/areslib/core/simulation/EnhancedAresPhysicsWorld.html" class="type-name-link" title="class in org.areslib.core.simulation">EnhancedAresPhysicsWorld</a> - Class in <a href="org/areslib/core/simulation/package-summary.html">org.areslib.core.simulation</a></dt>
+<dd>
+<div class="block">Enhanced physics world manager for ARESLib with battery simulation and telemetry export.</div>
+</dd>
 <dt><a href="org/areslib/pathplanner/pathfinding/Pathfinding.html#ensureInitialized()" class="member-name-link">ensureInitialized()</a> - Static method in class org.areslib.pathplanner.pathfinding.<a href="org/areslib/pathplanner/pathfinding/Pathfinding.html" title="class in org.areslib.pathplanner.pathfinding">Pathfinding</a></dt>
 <dd>
 <div class="block">Ensure that a pathfinding implementation has been chosen.</div>
+</dd>
+<dt><a href="org/areslib/math/MathUtil.html#EPSILON" class="member-name-link">EPSILON</a> - Static variable in class org.areslib.math.<a href="org/areslib/math/MathUtil.html" title="class in org.areslib.math">MathUtil</a></dt>
+<dd>
+<div class="block">Standard epsilon value for double comparisons and division-by-zero safety checks.</div>
+</dd>
+<dt><a href="org/areslib/math/MathUtil.html#epsilonCheck(double)" class="member-name-link">epsilonCheck(double)</a> - Static method in class org.areslib.math.<a href="org/areslib/math/MathUtil.html" title="class in org.areslib.math">MathUtil</a></dt>
+<dd>
+<div class="block">Checks if a value is within epsilon of zero.</div>
 </dd>
 <dt><a href="org/areslib/math/controller/TrapezoidProfile.State.html#equals(java.lang.Object)" class="member-name-link">equals(Object)</a> - Method in class org.areslib.math.controller.<a href="org/areslib/math/controller/TrapezoidProfile.State.html" title="class in org.areslib.math.controller">TrapezoidProfile.State</a></dt>
 <dd>&nbsp;</dd>
@@ -1720,9 +1789,13 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="org/areslib/command/SequentialCommandGroup.html#execute()" class="member-name-link">execute()</a> - Method in class org.areslib.command.<a href="org/areslib/command/SequentialCommandGroup.html" title="class in org.areslib.command">SequentialCommandGroup</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="org/areslib/command/SmartAssistAlign.html#execute()" class="member-name-link">execute()</a> - Method in class org.areslib.command.<a href="org/areslib/command/SmartAssistAlign.html" title="class in org.areslib.command">SmartAssistAlign</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="org/areslib/command/sysid/SysIdCommand.html#execute()" class="member-name-link">execute()</a> - Method in class org.areslib.command.sysid.<a href="org/areslib/command/sysid/SysIdCommand.html" title="class in org.areslib.command.sysid">SysIdCommand</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/areslib/command/WaitCommand.html#execute()" class="member-name-link">execute()</a> - Method in class org.areslib.command.<a href="org/areslib/command/WaitCommand.html" title="class in org.areslib.command">WaitCommand</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="org/areslib/diagnostics/SystemCheckCommand.html#execute()" class="member-name-link">execute()</a> - Method in class org.areslib.diagnostics.<a href="org/areslib/diagnostics/SystemCheckCommand.html" title="class in org.areslib.diagnostics">SystemCheckCommand</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/areslib/pathplanner/commands/FollowPathCommand.html#execute()" class="member-name-link">execute()</a> - Method in class org.areslib.pathplanner.commands.<a href="org/areslib/pathplanner/commands/FollowPathCommand.html" title="class in org.areslib.pathplanner.commands">FollowPathCommand</a></dt>
 <dd>&nbsp;</dd>
@@ -1885,6 +1958,10 @@ loadScripts(document, 'script');</script>
 <dt><a href="org/areslib/core/StateMachine.html#forceState(S)" class="member-name-link">forceState(S)</a> - Method in class org.areslib.core.<a href="org/areslib/core/StateMachine.html" title="class in org.areslib.core">StateMachine</a></dt>
 <dd>
 <div class="block">Forces a state change, bypassing the validated transition table.</div>
+</dd>
+<dt><a href="org/areslib/subsystems/AresSuperstructure.html#forceState(S)" class="member-name-link">forceState(S)</a> - Method in class org.areslib.subsystems.<a href="org/areslib/subsystems/AresSuperstructure.html" title="class in org.areslib.subsystems">AresSuperstructure</a></dt>
+<dd>
+<div class="block">Force the superstructure into a state, bypassing transition table logic.</div>
 </dd>
 <dt><a href="org/areslib/pathplanner/path/ConstraintsZone.html#forSegmentIndex(int)" class="member-name-link">forSegmentIndex(int)</a> - Method in class org.areslib.pathplanner.path.<a href="org/areslib/pathplanner/path/ConstraintsZone.html" title="class in org.areslib.pathplanner.path">ConstraintsZone</a></dt>
 <dd>
@@ -2080,6 +2157,10 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Builds an auto command from the given JSON object.</div>
 </dd>
+<dt><a href="org/areslib/diagnostics/SystemCheckCommand.html#getBatteryVoltage()" class="member-name-link">getBatteryVoltage()</a> - Method in class org.areslib.diagnostics.<a href="org/areslib/diagnostics/SystemCheckCommand.html" title="class in org.areslib.diagnostics">SystemCheckCommand</a></dt>
+<dd>
+<div class="block">Get current battery voltage.</div>
+</dd>
 <dt><a href="org/areslib/hardware/AresHardwareManager.html#getBatteryVoltage()" class="member-name-link">getBatteryVoltage()</a> - Static method in class org.areslib.hardware.<a href="org/areslib/hardware/AresHardwareManager.html" title="class in org.areslib.hardware">AresHardwareManager</a></dt>
 <dd>
 <div class="block">Gets the current, globally cached battery voltage.</div>
@@ -2087,6 +2168,10 @@ loadScripts(document, 'script');</script>
 <dt><a href="org/areslib/hardware/wrappers/AresGamepad.html#getBindingsMap()" class="member-name-link">getBindingsMap()</a> - Method in class org.areslib.hardware.wrappers.<a href="org/areslib/hardware/wrappers/AresGamepad.html" title="class in org.areslib.hardware.wrappers">AresGamepad</a></dt>
 <dd>
 <div class="block">Generates a raw mapping of binding pairs.</div>
+</dd>
+<dt><a href="org/areslib/hmi/TelemetryGamepad.html#getBindingsMap()" class="member-name-link">getBindingsMap()</a> - Method in class org.areslib.hmi.<a href="org/areslib/hmi/TelemetryGamepad.html" title="class in org.areslib.hmi">TelemetryGamepad</a></dt>
+<dd>
+<div class="block">Gets the current button bindings map.</div>
 </dd>
 <dt><a href="org/areslib/hardware/interfaces/AresColorSensor.html#getBlue()" class="member-name-link">getBlue()</a> - Method in interface org.areslib.hardware.interfaces.<a href="org/areslib/hardware/interfaces/AresColorSensor.html" title="interface in org.areslib.hardware.interfaces">AresColorSensor</a></dt>
 <dd>
@@ -2096,6 +2181,10 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="org/areslib/hardware/wrappers/AresSrsColorSensor.html#getBlue()" class="member-name-link">getBlue()</a> - Method in class org.areslib.hardware.wrappers.<a href="org/areslib/hardware/wrappers/AresSrsColorSensor.html" title="class in org.areslib.hardware.wrappers">AresSrsColorSensor</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="org/areslib/core/simulation/EnhancedAresPhysicsWorld.html#getBodyCount()" class="member-name-link">getBodyCount()</a> - Method in class org.areslib.core.simulation.<a href="org/areslib/core/simulation/EnhancedAresPhysicsWorld.html" title="class in org.areslib.core.simulation">EnhancedAresPhysicsWorld</a></dt>
+<dd>
+<div class="block">Gets the number of bodies in the physics world.</div>
+</dd>
 <dt><a href="org/areslib/hardware/coprocessors/photon/PhotonCore.html#getCacheResponse(com.qualcomm.hardware.lynx.commands.LynxCommand)" class="member-name-link">getCacheResponse(LynxCommand)</a> - Static method in class org.areslib.hardware.coprocessors.photon.<a href="org/areslib/hardware/coprocessors/photon/PhotonCore.html" title="class in org.areslib.hardware.coprocessors.photon">PhotonCore</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/areslib/hardware/coprocessors/OctoQuadFWv3.html#getChannelBankConfig()" class="member-name-link">getChannelBankConfig()</a> - Method in class org.areslib.hardware.coprocessors.<a href="org/areslib/hardware/coprocessors/OctoQuadFWv3.html" title="class in org.areslib.hardware.coprocessors">OctoQuadFWv3</a></dt>
@@ -2196,6 +2285,10 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Returns the current active LED state.</div>
 </dd>
+<dt><a href="org/areslib/diagnostics/SystemCheckCommand.html#getCurrentTestIndex()" class="member-name-link">getCurrentTestIndex()</a> - Method in class org.areslib.diagnostics.<a href="org/areslib/diagnostics/SystemCheckCommand.html" title="class in org.areslib.diagnostics">SystemCheckCommand</a></dt>
+<dd>
+<div class="block">Get the index of the currently running test.</div>
+</dd>
 <dt><a href="org/areslib/hardware/coprocessors/SRSHub.Command.html#getData()" class="member-name-link">getData()</a> - Method in class org.areslib.hardware.coprocessors.<a href="org/areslib/hardware/coprocessors/SRSHub.Command.html" title="class in org.areslib.hardware.coprocessors">SRSHub.Command</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/areslib/hardware/coprocessors/SRSHub.GoBildaPinpoint.ResetIMUCommand.html#getData()" class="member-name-link">getData()</a> - Method in class org.areslib.hardware.coprocessors.<a href="org/areslib/hardware/coprocessors/SRSHub.GoBildaPinpoint.ResetIMUCommand.html" title="class in org.areslib.hardware.coprocessors">SRSHub.GoBildaPinpoint.ResetIMUCommand</a></dt>
@@ -2242,6 +2335,14 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Calculates trust coefficient dynamically based on AprilTag latency and visible surface area.</div>
 </dd>
+<dt><a href="org/areslib/math/controller/OnlineFeedforwardEstimator.html#getEstimatedKA()" class="member-name-link">getEstimatedKA()</a> - Method in class org.areslib.math.controller.<a href="org/areslib/math/controller/OnlineFeedforwardEstimator.html" title="class in org.areslib.math.controller">OnlineFeedforwardEstimator</a></dt>
+<dd>
+<div class="block">Retrieves the latest fully-regressed Acceleration Feedforward constant.</div>
+</dd>
+<dt><a href="org/areslib/math/controller/OnlineFeedforwardEstimator.html#getEstimatedKV()" class="member-name-link">getEstimatedKV()</a> - Method in class org.areslib.math.controller.<a href="org/areslib/math/controller/OnlineFeedforwardEstimator.html" title="class in org.areslib.math.controller">OnlineFeedforwardEstimator</a></dt>
+<dd>
+<div class="block">Retrieves the latest fully-regressed Velocity Feedforward constant.</div>
+</dd>
 <dt><a href="org/areslib/math/estimator/AresHardwarePoseEstimator.html#getEstimatedPosition()" class="member-name-link">getEstimatedPosition()</a> - Method in class org.areslib.math.estimator.<a href="org/areslib/math/estimator/AresHardwarePoseEstimator.html" title="class in org.areslib.math.estimator">AresHardwarePoseEstimator</a></dt>
 <dd>
 <div class="block">Returns the globally-corrected location of the robot on the mapping axis.</div>
@@ -2284,13 +2385,19 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="org/areslib/math/Pair.html#getFirst()" class="member-name-link">getFirst()</a> - Method in class org.areslib.math.<a href="org/areslib/math/Pair.html" title="class in org.areslib.math">Pair</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="org/areslib/pathplanner/dummy/Timer.html#getFPGATimestamp()" class="member-name-link">getFPGATimestamp()</a> - Static method in class org.areslib.pathplanner.dummy.<a href="org/areslib/pathplanner/dummy/Timer.html" title="class in org.areslib.pathplanner.dummy">Timer</a></dt>
+<dt><a href="org/areslib/core/AresTimer.html#getFPGATimestamp()" class="member-name-link">getFPGATimestamp()</a> - Static method in class org.areslib.core.<a href="org/areslib/core/AresTimer.html" title="class in org.areslib.core">AresTimer</a></dt>
 <dd>
-<div class="block">Get the FPGA timestamp in seconds.</div>
+<div class="block">Identical to WPILib's global FPGATimestamp.</div>
 </dd>
+<dt><a href="org/areslib/pathplanner/dummy/Timer.html#getFPGATimestamp()" class="member-name-link">getFPGATimestamp()</a> - Static method in class org.areslib.pathplanner.dummy.<a href="org/areslib/pathplanner/dummy/Timer.html" title="class in org.areslib.pathplanner.dummy">Timer</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="org/areslib/hardware/wrappers/AresGamepad.html#getGamepad()" class="member-name-link">getGamepad()</a> - Method in class org.areslib.hardware.wrappers.<a href="org/areslib/hardware/wrappers/AresGamepad.html" title="class in org.areslib.hardware.wrappers">AresGamepad</a></dt>
 <dd>
 <div class="block">Returns the raw underlying FTC Gamepad object.</div>
+</dd>
+<dt><a href="org/areslib/hmi/TelemetryGamepad.html#getGamepadIdentity()" class="member-name-link">getGamepadIdentity()</a> - Method in class org.areslib.hmi.<a href="org/areslib/hmi/TelemetryGamepad.html" title="class in org.areslib.hmi">TelemetryGamepad</a></dt>
+<dd>
+<div class="block">Gets the gamepad identity string.</div>
 </dd>
 <dt><a href="org/areslib/pathplanner/path/PathPlannerPath.html#getGlobalConstraints()" class="member-name-link">getGlobalConstraints()</a> - Method in class org.areslib.pathplanner.path.<a href="org/areslib/pathplanner/path/PathPlannerPath.html" title="class in org.areslib.pathplanner.path">PathPlannerPath</a></dt>
 <dd>
@@ -2362,6 +2469,10 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="org/areslib/core/simulation/AresPhysicsWorld.html#getInstance()" class="member-name-link">getInstance()</a> - Static method in class org.areslib.core.simulation.<a href="org/areslib/core/simulation/AresPhysicsWorld.html" title="class in org.areslib.core.simulation">AresPhysicsWorld</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="org/areslib/core/simulation/EnhancedAresPhysicsWorld.html#getInstance()" class="member-name-link">getInstance()</a> - Static method in class org.areslib.core.simulation.<a href="org/areslib/core/simulation/EnhancedAresPhysicsWorld.html" title="class in org.areslib.core.simulation">EnhancedAresPhysicsWorld</a></dt>
+<dd>
+<div class="block">Gets the singleton instance with stale state detection.</div>
+</dd>
 <dt><a href="org/areslib/hardware/faults/RobotHealthTracker.html#getInstance()" class="member-name-link">getInstance()</a> - Static method in class org.areslib.hardware.faults.<a href="org/areslib/hardware/faults/RobotHealthTracker.html" title="class in org.areslib.hardware.faults">RobotHealthTracker</a></dt>
 <dd>
 <div class="block">Returns the singleton instance (thread-safe).</div>
@@ -2435,6 +2546,10 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Get the end position of the zone</div>
 </dd>
+<dt><a href="org/areslib/core/simulation/EnhancedAresPhysicsWorld.html#getMechanismBody(java.lang.String)" class="member-name-link">getMechanismBody(String)</a> - Method in class org.areslib.core.simulation.<a href="org/areslib/core/simulation/EnhancedAresPhysicsWorld.html" title="class in org.areslib.core.simulation">EnhancedAresPhysicsWorld</a></dt>
+<dd>
+<div class="block">Gets a named mechanism body.</div>
+</dd>
 <dt><a href="org/areslib/pathplanner/path/ConstraintsZone.html#getMinWaypointPos()" class="member-name-link">getMinWaypointPos()</a> - Method in class org.areslib.pathplanner.path.<a href="org/areslib/pathplanner/path/ConstraintsZone.html" title="class in org.areslib.pathplanner.path">ConstraintsZone</a></dt>
 <dd>
 <div class="block">Get the starting position of the zone</div>
@@ -2446,6 +2561,10 @@ loadScripts(document, 'script');</script>
 <dt><a href="org/areslib/core/StateMachine.html#getName()" class="member-name-link">getName()</a> - Method in class org.areslib.core.<a href="org/areslib/core/StateMachine.html" title="class in org.areslib.core">StateMachine</a></dt>
 <dd>
 <div class="block">Returns the human-readable name of this state machine.</div>
+</dd>
+<dt><a href="org/areslib/math/controller/OnlineFeedforwardEstimator.html#getName()" class="member-name-link">getName()</a> - Method in class org.areslib.math.controller.<a href="org/areslib/math/controller/OnlineFeedforwardEstimator.html" title="class in org.areslib.math.controller">OnlineFeedforwardEstimator</a></dt>
+<dd>
+<div class="block">Gets the name of this estimator instance.</div>
 </dd>
 <dt><a href="org/areslib/pathplanner/commands/PathPlannerAuto.html#getName()" class="member-name-link">getName()</a> - Method in class org.areslib.pathplanner.commands.<a href="org/areslib/pathplanner/commands/PathPlannerAuto.html" title="class in org.areslib.pathplanner.commands">PathPlannerAuto</a></dt>
 <dd>&nbsp;</dd>
@@ -2587,6 +2706,10 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Retrieves the interpolated sample at the given timestamp.</div>
 </dd>
+<dt><a href="org/areslib/math/controller/OnlineFeedforwardEstimator.html#getSampleCount()" class="member-name-link">getSampleCount()</a> - Method in class org.areslib.math.controller.<a href="org/areslib/math/controller/OnlineFeedforwardEstimator.html" title="class in org.areslib.math.controller">OnlineFeedforwardEstimator</a></dt>
+<dd>
+<div class="block">Gets the current sample count (how many valid measurements have been collected).</div>
+</dd>
 <dt><a href="org/areslib/math/Pair.html#getSecond()" class="member-name-link">getSecond()</a> - Method in class org.areslib.math.<a href="org/areslib/math/Pair.html" title="class in org.areslib.math">Pair</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/areslib/pathplanner/path/PathSegment.html#getSegmentPoints()" class="member-name-link">getSegmentPoints()</a> - Method in class org.areslib.pathplanner.path.<a href="org/areslib/pathplanner/path/PathSegment.html" title="class in org.areslib.pathplanner.path">PathSegment</a></dt>
@@ -2603,6 +2726,10 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="org/areslib/math/controller/ProfiledPIDController.html#getSetpointVelocity()" class="member-name-link">getSetpointVelocity()</a> - Method in class org.areslib.math.controller.<a href="org/areslib/math/controller/ProfiledPIDController.html" title="class in org.areslib.math.controller">ProfiledPIDController</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="org/areslib/core/simulation/EnhancedAresPhysicsWorld.html#getSimulatedVoltage()" class="member-name-link">getSimulatedVoltage()</a> - Method in class org.areslib.core.simulation.<a href="org/areslib/core/simulation/EnhancedAresPhysicsWorld.html" title="class in org.areslib.core.simulation">EnhancedAresPhysicsWorld</a></dt>
+<dd>
+<div class="block">Gets the current simulated battery voltage.</div>
+</dd>
 <dt><a href="org/areslib/math/geometry/Rotation2d.html#getSin()" class="member-name-link">getSin()</a> - Method in class org.areslib.math.geometry.<a href="org/areslib/math/geometry/Rotation2d.html" title="class in org.areslib.math.geometry">Rotation2d</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/areslib/hardware/coprocessors/OctoQuadFWv3.html#getSingleChannelPulseWidthParams(int)" class="member-name-link">getSingleChannelPulseWidthParams(int)</a> - Method in class org.areslib.hardware.coprocessors.<a href="org/areslib/hardware/coprocessors/OctoQuadFWv3.html" title="class in org.areslib.hardware.coprocessors">OctoQuadFWv3</a></dt>
@@ -2650,6 +2777,8 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Returns the current state of the profile.</div>
 </dd>
+<dt><a href="org/areslib/subsystems/AresSuperstructure.html#getState()" class="member-name-link">getState()</a> - Method in class org.areslib.subsystems.<a href="org/areslib/subsystems/AresSuperstructure.html" title="class in org.areslib.subsystems">AresSuperstructure</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="org/areslib/pathplanner/path/PathPlannerTrajectory.html#getState(int)" class="member-name-link">getState(int)</a> - Method in class org.areslib.pathplanner.path.<a href="org/areslib/pathplanner/path/PathPlannerTrajectory.html" title="class in org.areslib.pathplanner.path">PathPlannerTrajectory</a></dt>
 <dd>
 <div class="block">Get the goal state at the given index</div>
@@ -2665,6 +2794,10 @@ loadScripts(document, 'script');</script>
 <dt><a href="org/areslib/command/CommandScheduler.html#getSubsystems()" class="member-name-link">getSubsystems()</a> - Method in class org.areslib.command.<a href="org/areslib/command/CommandScheduler.html" title="class in org.areslib.command">CommandScheduler</a></dt>
 <dd>
 <div class="block">Returns an unmodifiable set of all registered subsystems.</div>
+</dd>
+<dt><a href="org/areslib/diagnostics/SystemTestable.html#getSystemCheckCommand()" class="member-name-link">getSystemCheckCommand()</a> - Method in interface org.areslib.diagnostics.<a href="org/areslib/diagnostics/SystemTestable.html" title="interface in org.areslib.diagnostics">SystemTestable</a></dt>
+<dd>
+<div class="block">Generates an autonomous, state-machine style verification routine for this subsystem.</div>
 </dd>
 <dt><a href="org/areslib/testing/AresSystemCheckOpMode.html#getSystemCheckCommand()" class="member-name-link">getSystemCheckCommand()</a> - Method in class org.areslib.testing.<a href="org/areslib/testing/AresSystemCheckOpMode.html" title="class in org.areslib.testing">AresSystemCheckOpMode</a></dt>
 <dd>
@@ -2693,6 +2826,10 @@ loadScripts(document, 'script');</script>
 <dt><a href="org/areslib/subsystems/vision/AresVisionSubsystem.html#getTargetYOffset()" class="member-name-link">getTargetYOffset()</a> - Method in class org.areslib.subsystems.vision.<a href="org/areslib/subsystems/vision/AresVisionSubsystem.html" title="class in org.areslib.subsystems.vision">AresVisionSubsystem</a></dt>
 <dd>
 <div class="block">Gets the vertical offset from the crosshair.</div>
+</dd>
+<dt><a href="org/areslib/diagnostics/SystemCheckCommand.html#getTestCount()" class="member-name-link">getTestCount()</a> - Method in class org.areslib.diagnostics.<a href="org/areslib/diagnostics/SystemCheckCommand.html" title="class in org.areslib.diagnostics">SystemCheckCommand</a></dt>
+<dd>
+<div class="block">Get the number of tests in this system check.</div>
 </dd>
 <dt><a href="org/areslib/faults/AresAlert.html#getText()" class="member-name-link">getText()</a> - Method in class org.areslib.faults.<a href="org/areslib/faults/AresAlert.html" title="class in org.areslib.faults">AresAlert</a></dt>
 <dd>&nbsp;</dd>
@@ -2838,6 +2975,8 @@ loadScripts(document, 'script');</script>
 <div class="block">Get the waypoint relative position of this marker</div>
 </dd>
 <dt><a href="org/areslib/core/simulation/AresPhysicsWorld.html#getWorld()" class="member-name-link">getWorld()</a> - Method in class org.areslib.core.simulation.<a href="org/areslib/core/simulation/AresPhysicsWorld.html" title="class in org.areslib.core.simulation">AresPhysicsWorld</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="org/areslib/core/simulation/EnhancedAresPhysicsWorld.html#getWorld()" class="member-name-link">getWorld()</a> - Method in class org.areslib.core.simulation.<a href="org/areslib/core/simulation/EnhancedAresPhysicsWorld.html" title="class in org.areslib.core.simulation">EnhancedAresPhysicsWorld</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/areslib/math/geometry/Pose2d.html#getX()" class="member-name-link">getX()</a> - Method in class org.areslib.math.geometry.<a href="org/areslib/math/geometry/Pose2d.html" title="class in org.areslib.math.geometry">Pose2d</a></dt>
 <dd>&nbsp;</dd>
@@ -3024,6 +3163,10 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="org/areslib/templates/SimpleIntakeSubsystem.html#hasPiece()" class="member-name-link">hasPiece()</a> - Method in class org.areslib.templates.<a href="org/areslib/templates/SimpleIntakeSubsystem.html" title="class in org.areslib.templates">SimpleIntakeSubsystem</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="org/areslib/math/controller/OnlineFeedforwardEstimator.html#hasReliableEstimates()" class="member-name-link">hasReliableEstimates()</a> - Method in class org.areslib.math.controller.<a href="org/areslib/math/controller/OnlineFeedforwardEstimator.html" title="class in org.areslib.math.controller">OnlineFeedforwardEstimator</a></dt>
+<dd>
+<div class="block">Checks if the estimator has enough data to provide reliable estimates.</div>
+</dd>
 <dt><a href="org/areslib/hardware/interfaces/VisionIO.VisionInputs.html#hasTarget" class="member-name-link">hasTarget</a> - Variable in class org.areslib.hardware.interfaces.<a href="org/areslib/hardware/interfaces/VisionIO.VisionInputs.html" title="class in org.areslib.hardware.interfaces">VisionIO.VisionInputs</a></dt>
 <dd>
 <div class="block">True if the vision processor currently sees a valid target.</div>
@@ -3120,14 +3263,6 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Default mode with no active scoring behavior.</div>
 </dd>
-<dt><a href="org/areslib/hardware/interfaces/IMUIO.IMUInputs.html#%3Cinit%3E()" class="member-name-link">IMUInputs()</a> - Constructor for class org.areslib.hardware.interfaces.<a href="org/areslib/hardware/interfaces/IMUIO.IMUInputs.html" title="class in org.areslib.hardware.interfaces">IMUIO.IMUInputs</a></dt>
-<dd>&nbsp;</dd>
-<dt><a href="org/areslib/hardware/interfaces/IMUIO.html" class="type-name-link" title="interface in org.areslib.hardware.interfaces">IMUIO</a> - Interface in <a href="org/areslib/hardware/interfaces/package-summary.html">org.areslib.hardware.interfaces</a></dt>
-<dd>
-<div class="block">AdvantageKit-style IO abstraction for IMU units (Inertial Measurement Units).</div>
-</dd>
-<dt><a href="org/areslib/hardware/interfaces/IMUIO.IMUInputs.html" class="type-name-link" title="class in org.areslib.hardware.interfaces">IMUIO.IMUInputs</a> - Class in <a href="org/areslib/hardware/interfaces/package-summary.html">org.areslib.hardware.interfaces</a></dt>
-<dd>&nbsp;</dd>
 <dt><a href="org/areslib/core/FieldConstants.html#INCHES_TO_METERS" class="member-name-link">INCHES_TO_METERS</a> - Static variable in class org.areslib.core.<a href="org/areslib/core/FieldConstants.html" title="class in org.areslib.core">FieldConstants</a></dt>
 <dd>
 <div class="block">Conversion factor from inches to meters.</div>
@@ -3187,6 +3322,8 @@ loadScripts(document, 'script');</script>
 <dt><a href="org/areslib/command/sysid/SysIdCommand.html#initialize()" class="member-name-link">initialize()</a> - Method in class org.areslib.command.sysid.<a href="org/areslib/command/sysid/SysIdCommand.html" title="class in org.areslib.command.sysid">SysIdCommand</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/areslib/command/WaitCommand.html#initialize()" class="member-name-link">initialize()</a> - Method in class org.areslib.command.<a href="org/areslib/command/WaitCommand.html" title="class in org.areslib.command">WaitCommand</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="org/areslib/diagnostics/SystemCheckCommand.html#initialize()" class="member-name-link">initialize()</a> - Method in class org.areslib.diagnostics.<a href="org/areslib/diagnostics/SystemCheckCommand.html" title="class in org.areslib.diagnostics">SystemCheckCommand</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/areslib/pathplanner/commands/FollowPathCommand.html#initialize()" class="member-name-link">initialize()</a> - Method in class org.areslib.pathplanner.commands.<a href="org/areslib/pathplanner/commands/FollowPathCommand.html" title="class in org.areslib.pathplanner.commands">FollowPathCommand</a></dt>
 <dd>&nbsp;</dd>
@@ -3255,6 +3392,10 @@ loadScripts(document, 'script');</script>
 <dt><a href="org/areslib/pathplanner/path/PathPlannerTrajectory.State.html#interpolate(org.areslib.pathplanner.path.PathPlannerTrajectory.State,double)" class="member-name-link">interpolate(PathPlannerTrajectory.State, double)</a> - Method in class org.areslib.pathplanner.path.<a href="org/areslib/pathplanner/path/PathPlannerTrajectory.State.html" title="class in org.areslib.pathplanner.path">PathPlannerTrajectory.State</a></dt>
 <dd>
 <div class="block">Interpolate between this state and the given state</div>
+</dd>
+<dt><a href="org/areslib/pathplanner/path/PathPlannerTrajectory.State.html#interpolate(org.areslib.pathplanner.path.PathPlannerTrajectory.State,double,org.areslib.pathplanner.path.PathPlannerTrajectory.State)" class="member-name-link">interpolate(PathPlannerTrajectory.State, double, PathPlannerTrajectory.State)</a> - Method in class org.areslib.pathplanner.path.<a href="org/areslib/pathplanner/path/PathPlannerTrajectory.State.html" title="class in org.areslib.pathplanner.path">PathPlannerTrajectory.State</a></dt>
+<dd>
+<div class="block">Interpolate between this state and the given state in-place.</div>
 </dd>
 <dt><a href="org/areslib/math/geometry/Interpolatable.html#interpolate(T,double)" class="member-name-link">interpolate(T, double)</a> - Method in interface org.areslib.math.geometry.<a href="org/areslib/math/geometry/Interpolatable.html" title="interface in org.areslib.math.geometry">Interpolatable</a></dt>
 <dd>
@@ -3338,9 +3479,13 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="org/areslib/command/SequentialCommandGroup.html#isFinished()" class="member-name-link">isFinished()</a> - Method in class org.areslib.command.<a href="org/areslib/command/SequentialCommandGroup.html" title="class in org.areslib.command">SequentialCommandGroup</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="org/areslib/command/SmartAssistAlign.html#isFinished()" class="member-name-link">isFinished()</a> - Method in class org.areslib.command.<a href="org/areslib/command/SmartAssistAlign.html" title="class in org.areslib.command">SmartAssistAlign</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="org/areslib/command/sysid/SysIdCommand.html#isFinished()" class="member-name-link">isFinished()</a> - Method in class org.areslib.command.sysid.<a href="org/areslib/command/sysid/SysIdCommand.html" title="class in org.areslib.command.sysid">SysIdCommand</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/areslib/command/WaitCommand.html#isFinished()" class="member-name-link">isFinished()</a> - Method in class org.areslib.command.<a href="org/areslib/command/WaitCommand.html" title="class in org.areslib.command">WaitCommand</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="org/areslib/diagnostics/SystemCheckCommand.html#isFinished()" class="member-name-link">isFinished()</a> - Method in class org.areslib.diagnostics.<a href="org/areslib/diagnostics/SystemCheckCommand.html" title="class in org.areslib.diagnostics">SystemCheckCommand</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/areslib/math/controller/TrapezoidProfile.html#isFinished()" class="member-name-link">isFinished()</a> - Method in class org.areslib.math.controller.<a href="org/areslib/math/controller/TrapezoidProfile.html" title="class in org.areslib.math.controller">TrapezoidProfile</a></dt>
 <dd>
@@ -3643,10 +3788,6 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Log the target robot pose.</div>
 </dd>
-<dt><a href="org/areslib/core/AresRobot.html#LOOP_PERIOD_SECS" class="member-name-link">LOOP_PERIOD_SECS</a> - Static variable in class org.areslib.core.<a href="org/areslib/core/AresRobot.html" title="class in org.areslib.core">AresRobot</a></dt>
-<dd>
-<div class="block">Standard loop execution period for the robot (20ms) used in controllers and simulation physics.</div>
-</dd>
 <dt><a href="org/areslib/templates/LinearMechanismIO.Inputs.html#lowerLimitSwitch" class="member-name-link">lowerLimitSwitch</a> - Variable in class org.areslib.templates.<a href="org/areslib/templates/LinearMechanismIO.Inputs.html" title="class in org.areslib.templates">LinearMechanismIO.Inputs</a></dt>
 <dd>
 <div class="block">Whether the lower limit switch is triggered.</div>
@@ -3742,6 +3883,10 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="org/areslib/pathplanner/dummy/TrapezoidProfile.Constraints.html#maxVelocity" class="member-name-link">maxVelocity</a> - Variable in class org.areslib.pathplanner.dummy.<a href="org/areslib/pathplanner/dummy/TrapezoidProfile.Constraints.html" title="class in org.areslib.pathplanner.dummy">TrapezoidProfile.Constraints</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="org/areslib/core/AresTimer.html#measureDeltaTimeSecs()" class="member-name-link">measureDeltaTimeSecs()</a> - Static method in class org.areslib.core.<a href="org/areslib/core/AresTimer.html" title="class in org.areslib.core">AresTimer</a></dt>
+<dd>
+<div class="block">Computes the exact delta-time (dt) since the last time this function was called.</div>
+</dd>
 <dt><a href="org/areslib/subsystems/drive/MecanumDriveIO.MecanumDriveInputs.html#%3Cinit%3E()" class="member-name-link">MecanumDriveInputs()</a> - Constructor for class org.areslib.subsystems.drive.<a href="org/areslib/subsystems/drive/MecanumDriveIO.MecanumDriveInputs.html" title="class in org.areslib.subsystems.drive">MecanumDriveIO.MecanumDriveInputs</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/areslib/subsystems/drive/MecanumDriveIO.html" class="type-name-link" title="interface in org.areslib.subsystems.drive">MecanumDriveIO</a> - Interface in <a href="org/areslib/subsystems/drive/package-summary.html">org.areslib.subsystems.drive</a></dt>
@@ -4087,6 +4232,14 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Starts the given command whenever the trigger just becomes inactive.</div>
 </dd>
+<dt><a href="org/areslib/math/controller/OnlineFeedforwardEstimator.html" class="type-name-link" title="class in org.areslib.math.controller">OnlineFeedforwardEstimator</a> - Class in <a href="org/areslib/math/controller/package-summary.html">org.areslib.math.controller</a></dt>
+<dd>
+<div class="block">ARESLib - FTC Team 23247 "ARES" Software Framework (c) 2024-2026</div>
+</dd>
+<dt><a href="org/areslib/math/controller/OnlineFeedforwardEstimator.html#%3Cinit%3E(java.lang.String,int,double)" class="member-name-link">OnlineFeedforwardEstimator(String, int, double)</a> - Constructor for class org.areslib.math.controller.<a href="org/areslib/math/controller/OnlineFeedforwardEstimator.html" title="class in org.areslib.math.controller">OnlineFeedforwardEstimator</a></dt>
+<dd>
+<div class="block">Constructs the Online Estimator.</div>
+</dd>
 <dt><a href="org/areslib/hardware/coprocessors/photon/PhotonCore.html#onOpModePostStop(com.qualcomm.robotcore.eventloop.opmode.OpMode)" class="member-name-link">onOpModePostStop(OpMode)</a> - Method in class org.areslib.hardware.coprocessors.photon.<a href="org/areslib/hardware/coprocessors/photon/PhotonCore.html" title="class in org.areslib.hardware.coprocessors.photon">PhotonCore</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/areslib/hardware/coprocessors/photon/PhotonCore.html#onOpModePreInit(com.qualcomm.robotcore.eventloop.opmode.OpMode)" class="member-name-link">onOpModePreInit(OpMode)</a> - Method in class org.areslib.hardware.coprocessors.photon.<a href="org/areslib/hardware/coprocessors/photon/PhotonCore.html" title="class in org.areslib.hardware.coprocessors.photon">PhotonCore</a></dt>
@@ -4126,6 +4279,8 @@ loadScripts(document, 'script');</script>
 <dt><a href="org/areslib/core/async/package-summary.html">org.areslib.core.async</a> - package org.areslib.core.async</dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/areslib/core/simulation/package-summary.html">org.areslib.core.simulation</a> - package org.areslib.core.simulation</dt>
+<dd>&nbsp;</dd>
+<dt><a href="org/areslib/diagnostics/package-summary.html">org.areslib.diagnostics</a> - package org.areslib.diagnostics</dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/areslib/faults/package-summary.html">org.areslib.faults</a> - package org.areslib.faults</dt>
 <dd>&nbsp;</dd>
@@ -4174,6 +4329,8 @@ loadScripts(document, 'script');</script>
 <dt><a href="org/areslib/pathplanner/util/package-summary.html">org.areslib.pathplanner.util</a> - package org.areslib.pathplanner.util</dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/areslib/sim/package-summary.html">org.areslib.sim</a> - package org.areslib.sim</dt>
+<dd>&nbsp;</dd>
+<dt><a href="org/areslib/subsystems/package-summary.html">org.areslib.subsystems</a> - package org.areslib.subsystems</dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/areslib/subsystems/controllers/examples/package-summary.html">org.areslib.subsystems.controllers.examples</a> - package org.areslib.subsystems.controllers.examples</dt>
 <dd>&nbsp;</dd>
@@ -4486,6 +4643,8 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="org/areslib/hmi/AresOperatorInterface.html#periodic()" class="member-name-link">periodic()</a> - Method in class org.areslib.hmi.<a href="org/areslib/hmi/AresOperatorInterface.html" title="class in org.areslib.hmi">AresOperatorInterface</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="org/areslib/subsystems/AresSuperstructure.html#periodic()" class="member-name-link">periodic()</a> - Method in class org.areslib.subsystems.<a href="org/areslib/subsystems/AresSuperstructure.html" title="class in org.areslib.subsystems">AresSuperstructure</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="org/areslib/subsystems/drive/DifferentialDriveSubsystem.html#periodic()" class="member-name-link">periodic()</a> - Method in class org.areslib.subsystems.drive.<a href="org/areslib/subsystems/drive/DifferentialDriveSubsystem.html" title="class in org.areslib.subsystems.drive">DifferentialDriveSubsystem</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/areslib/subsystems/drive/MecanumDriveSubsystem.html#periodic()" class="member-name-link">periodic()</a> - Method in class org.areslib.subsystems.drive.<a href="org/areslib/subsystems/drive/MecanumDriveSubsystem.html" title="class in org.areslib.subsystems.drive">MecanumDriveSubsystem</a></dt>
@@ -4553,14 +4712,6 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">The ID of the currently loaded vision pipeline.</div>
 </dd>
-<dt><a href="org/areslib/hardware/interfaces/IMUIO.IMUInputs.html#pitchRadians" class="member-name-link">pitchRadians</a> - Variable in class org.areslib.hardware.interfaces.<a href="org/areslib/hardware/interfaces/IMUIO.IMUInputs.html" title="class in org.areslib.hardware.interfaces">IMUIO.IMUInputs</a></dt>
-<dd>
-<div class="block">Raw pitch angle in radians.</div>
-</dd>
-<dt><a href="org/areslib/hardware/interfaces/IMUIO.IMUInputs.html#pitchVelocityRadPerSec" class="member-name-link">pitchVelocityRadPerSec</a> - Variable in class org.areslib.hardware.interfaces.<a href="org/areslib/hardware/interfaces/IMUIO.IMUInputs.html" title="class in org.areslib.hardware.interfaces">IMUIO.IMUInputs</a></dt>
-<dd>
-<div class="block">Rotational velocity around the Y axis (pitch) in radians per second.</div>
-</dd>
 <dt><a href="org/areslib/math/geometry/Pose2d.html#plus(org.areslib.math.geometry.Pose2d)" class="member-name-link">plus(Pose2d)</a> - Method in class org.areslib.math.geometry.<a href="org/areslib/math/geometry/Pose2d.html" title="class in org.areslib.math.geometry">Pose2d</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/areslib/math/geometry/Rotation2d.html#plus(org.areslib.math.geometry.Rotation2d)" class="member-name-link">plus(Rotation2d)</a> - Method in class org.areslib.math.geometry.<a href="org/areslib/math/geometry/Rotation2d.html" title="class in org.areslib.math.geometry">Rotation2d</a></dt>
@@ -4605,6 +4756,8 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Constructs a Pose3d from a translation and rotation.</div>
 </dd>
+<dt><a href="org/areslib/subsystems/AresSuperstructure.html#poseSupplier" class="member-name-link">poseSupplier</a> - Variable in class org.areslib.subsystems.<a href="org/areslib/subsystems/AresSuperstructure.html" title="class in org.areslib.subsystems">AresSuperstructure</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="org/areslib/hardware/coprocessors/SRSHub.PosVel.html#position" class="member-name-link">position</a> - Variable in class org.areslib.hardware.coprocessors.<a href="org/areslib/hardware/coprocessors/SRSHub.PosVel.html" title="class in org.areslib.hardware.coprocessors">SRSHub.PosVel</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/areslib/math/controller/TrapezoidProfile.State.html#position" class="member-name-link">position</a> - Variable in class org.areslib.math.controller.<a href="org/areslib/math/controller/TrapezoidProfile.State.html" title="class in org.areslib.math.controller">TrapezoidProfile.State</a></dt>
@@ -5006,6 +5159,10 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Registers a looping function to run asynchronously at a specific update rate.</div>
 </dd>
+<dt><a href="org/areslib/core/simulation/EnhancedAresPhysicsWorld.html#registerMechanismBody(java.lang.String,org.dyn4j.dynamics.Body)" class="member-name-link">registerMechanismBody(String, Body)</a> - Method in class org.areslib.core.simulation.<a href="org/areslib/core/simulation/EnhancedAresPhysicsWorld.html" title="class in org.areslib.core.simulation">EnhancedAresPhysicsWorld</a></dt>
+<dd>
+<div class="block">Registers a named mechanism body for tracking and export.</div>
+</dd>
 <dt><a href="org/areslib/hardware/faults/RobotHealthTracker.html#registerMonitor(org.areslib.hardware.faults.FaultMonitor)" class="member-name-link">registerMonitor(FaultMonitor)</a> - Method in class org.areslib.hardware.faults.<a href="org/areslib/hardware/faults/RobotHealthTracker.html" title="class in org.areslib.hardware.faults">RobotHealthTracker</a></dt>
 <dd>
 <div class="block">Registers a new fault monitor to be checked every robot loop.</div>
@@ -5027,6 +5184,10 @@ loadScripts(document, 'script');</script>
 <dt><a href="org/areslib/core/simulation/AresPhysicsWorld.html#removeBody(org.dyn4j.dynamics.Body)" class="member-name-link">removeBody(Body)</a> - Method in class org.areslib.core.simulation.<a href="org/areslib/core/simulation/AresPhysicsWorld.html" title="class in org.areslib.core.simulation">AresPhysicsWorld</a></dt>
 <dd>
 <div class="block">Removes a physics body from the shared environment.</div>
+</dd>
+<dt><a href="org/areslib/core/simulation/EnhancedAresPhysicsWorld.html#removeBody(org.dyn4j.dynamics.Body)" class="member-name-link">removeBody(Body)</a> - Method in class org.areslib.core.simulation.<a href="org/areslib/core/simulation/EnhancedAresPhysicsWorld.html" title="class in org.areslib.core.simulation">EnhancedAresPhysicsWorld</a></dt>
+<dd>
+<div class="block">Removes a body from the physics world.</div>
 </dd>
 <dt><a href="org/areslib/pathplanner/path/PathPlannerPath.html#replan(org.areslib.math.geometry.Pose2d,org.areslib.math.kinematics.ChassisSpeeds)" class="member-name-link">replan(Pose2d, ChassisSpeeds)</a> - Method in class org.areslib.pathplanner.path.<a href="org/areslib/pathplanner/path/PathPlannerPath.html" title="class in org.areslib.pathplanner.path">PathPlannerPath</a></dt>
 <dd>
@@ -5072,6 +5233,10 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="org/areslib/core/AresCommandOpMode.html#requestOpModeStop()" class="member-name-link">requestOpModeStop()</a> - Method in class org.areslib.core.<a href="org/areslib/core/AresCommandOpMode.html" title="class in org.areslib.core">AresCommandOpMode</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="org/areslib/subsystems/AresSuperstructure.html#requestState(S)" class="member-name-link">requestState(S)</a> - Method in class org.areslib.subsystems.<a href="org/areslib/subsystems/AresSuperstructure.html" title="class in org.areslib.subsystems">AresSuperstructure</a></dt>
+<dd>
+<div class="block">Request a transition to a new state.</div>
+</dd>
 <dt><a href="org/areslib/core/StateMachine.html#requestTransition(S)" class="member-name-link">requestTransition(S)</a> - Method in class org.areslib.core.<a href="org/areslib/core/StateMachine.html" title="class in org.areslib.core">StateMachine</a></dt>
 <dd>
 <div class="block">Requests a state change.</div>
@@ -5093,9 +5258,17 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Resets the alliance to the default (Red).</div>
 </dd>
+<dt><a href="org/areslib/core/AresTimer.html#reset()" class="member-name-link">reset()</a> - Static method in class org.areslib.core.<a href="org/areslib/core/AresTimer.html" title="class in org.areslib.core">AresTimer</a></dt>
+<dd>
+<div class="block">Resets the entire timer subsystem state to zero.</div>
+</dd>
 <dt><a href="org/areslib/core/simulation/AresPhysicsWorld.html#reset()" class="member-name-link">reset()</a> - Method in class org.areslib.core.simulation.<a href="org/areslib/core/simulation/AresPhysicsWorld.html" title="class in org.areslib.core.simulation">AresPhysicsWorld</a></dt>
 <dd>
 <div class="block">Flushes the current physics simulation state, usually triggered during robotInit or resetting.</div>
+</dd>
+<dt><a href="org/areslib/core/simulation/EnhancedAresPhysicsWorld.html#reset()" class="member-name-link">reset()</a> - Method in class org.areslib.core.simulation.<a href="org/areslib/core/simulation/EnhancedAresPhysicsWorld.html" title="class in org.areslib.core.simulation">EnhancedAresPhysicsWorld</a></dt>
+<dd>
+<div class="block">Resets the physics world, removing all bodies and listeners.</div>
 </dd>
 <dt><a href="org/areslib/faults/AresFaultManager.html#reset()" class="member-name-link">reset()</a> - Static method in class org.areslib.faults.<a href="org/areslib/faults/AresFaultManager.html" title="class in org.areslib.faults">AresFaultManager</a></dt>
 <dd>
@@ -5108,6 +5281,10 @@ loadScripts(document, 'script');</script>
 <dt><a href="org/areslib/hardware/faults/RobotHealthTracker.html#reset()" class="member-name-link">reset()</a> - Static method in class org.areslib.hardware.faults.<a href="org/areslib/hardware/faults/RobotHealthTracker.html" title="class in org.areslib.hardware.faults">RobotHealthTracker</a></dt>
 <dd>
 <div class="block">Resets the singleton.</div>
+</dd>
+<dt><a href="org/areslib/math/controller/OnlineFeedforwardEstimator.html#reset()" class="member-name-link">reset()</a> - Method in class org.areslib.math.controller.<a href="org/areslib/math/controller/OnlineFeedforwardEstimator.html" title="class in org.areslib.math.controller">OnlineFeedforwardEstimator</a></dt>
+<dd>
+<div class="block">Resets the estimator state.</div>
 </dd>
 <dt><a href="org/areslib/math/controller/PIDController.html#reset()" class="member-name-link">reset()</a> - Method in class org.areslib.math.controller.<a href="org/areslib/math/controller/PIDController.html" title="class in org.areslib.math.controller">PIDController</a></dt>
 <dd>
@@ -5181,6 +5358,10 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="org/areslib/hardware/coprocessors/SRSHub.GoBildaPinpoint.ResetIMUCommand.html#%3Cinit%3E(int)" class="member-name-link">ResetIMUCommand(int)</a> - Constructor for class org.areslib.hardware.coprocessors.<a href="org/areslib/hardware/coprocessors/SRSHub.GoBildaPinpoint.ResetIMUCommand.html" title="class in org.areslib.hardware.coprocessors">SRSHub.GoBildaPinpoint.ResetIMUCommand</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="org/areslib/core/simulation/EnhancedAresPhysicsWorld.html#resetInstance()" class="member-name-link">resetInstance()</a> - Static method in class org.areslib.core.simulation.<a href="org/areslib/core/simulation/EnhancedAresPhysicsWorld.html" title="class in org.areslib.core.simulation">EnhancedAresPhysicsWorld</a></dt>
+<dd>
+<div class="block">Resets the singleton instance.</div>
+</dd>
 <dt><a href="org/areslib/hardware/coprocessors/OctoQuadFWv3.html#resetLocalizerAndCalibrateIMU()" class="member-name-link">resetLocalizerAndCalibrateIMU()</a> - Method in class org.areslib.hardware.coprocessors.<a href="org/areslib/hardware/coprocessors/OctoQuadFWv3.html" title="class in org.areslib.hardware.coprocessors">OctoQuadFWv3</a></dt>
 <dd>
 <div class="block">Reset the localizer pose to (0,0,0) and recalibrate the IMU.</div>
@@ -5227,12 +5408,6 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Resets the robot's pose translation without disrupting internal kinematic wheel buffers.</div>
 </dd>
-<dt><a href="org/areslib/hardware/interfaces/IMUIO.html#resetYaw()" class="member-name-link">resetYaw()</a> - Method in interface org.areslib.hardware.interfaces.<a href="org/areslib/hardware/interfaces/IMUIO.html" title="interface in org.areslib.hardware.interfaces">IMUIO</a></dt>
-<dd>
-<div class="block">Re-zeroes the IMU heading to zero (or resets the sensor origin if supported).</div>
-</dd>
-<dt><a href="org/areslib/hardware/wrappers/RevIMUWrapper.html#resetYaw()" class="member-name-link">resetYaw()</a> - Method in class org.areslib.hardware.wrappers.<a href="org/areslib/hardware/wrappers/RevIMUWrapper.html" title="class in org.areslib.hardware.wrappers">RevIMUWrapper</a></dt>
-<dd>&nbsp;</dd>
 <dt><a href="org/areslib/pathplanner/path/PathSegment.html#RESOLUTION" class="member-name-link">RESOLUTION</a> - Static variable in class org.areslib.pathplanner.path.<a href="org/areslib/pathplanner/path/PathSegment.html" title="class in org.areslib.pathplanner.path">PathSegment</a></dt>
 <dd>
 <div class="block">The resolution used during path generation</div>
@@ -5288,14 +5463,6 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="org/areslib/hardware/coprocessors/SRSHub.GoBildaPinpoint.EncoderDirection.html#REVERSED" class="member-name-link">REVERSED</a> - Enum constant in enum class org.areslib.hardware.coprocessors.<a href="org/areslib/hardware/coprocessors/SRSHub.GoBildaPinpoint.EncoderDirection.html" title="enum class in org.areslib.hardware.coprocessors">SRSHub.GoBildaPinpoint.EncoderDirection</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="org/areslib/hardware/wrappers/RevIMUWrapper.html" class="type-name-link" title="class in org.areslib.hardware.wrappers">RevIMUWrapper</a> - Class in <a href="org/areslib/hardware/wrappers/package-summary.html">org.areslib.hardware.wrappers</a></dt>
-<dd>&nbsp;</dd>
-<dt><a href="org/areslib/hardware/wrappers/RevIMUWrapper.html#%3Cinit%3E(com.qualcomm.robotcore.hardware.HardwareMap,java.lang.String)" class="member-name-link">RevIMUWrapper(HardwareMap, String)</a> - Constructor for class org.areslib.hardware.wrappers.<a href="org/areslib/hardware/wrappers/RevIMUWrapper.html" title="class in org.areslib.hardware.wrappers">RevIMUWrapper</a></dt>
-<dd>&nbsp;</dd>
-<dt><a href="org/areslib/hardware/wrappers/RevIMUWrapper.html#%3Cinit%3E(com.qualcomm.robotcore.hardware.HardwareMap,java.lang.String,com.qualcomm.robotcore.hardware.IMU.Parameters)" class="member-name-link">RevIMUWrapper(HardwareMap, String, IMU.Parameters)</a> - Constructor for class org.areslib.hardware.wrappers.<a href="org/areslib/hardware/wrappers/RevIMUWrapper.html" title="class in org.areslib.hardware.wrappers">RevIMUWrapper</a></dt>
-<dd>
-<div class="block">Optional secondary constructor if creating with specific IMU parameters.</div>
-</dd>
 <dt><a href="org/areslib/hardware/wrappers/AresGamepad.html#rightBumper()" class="member-name-link">rightBumper()</a> - Method in class org.areslib.hardware.wrappers.<a href="org/areslib/hardware/wrappers/AresGamepad.html" title="class in org.areslib.hardware.wrappers">AresGamepad</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/areslib/hardware/wrappers/AresGamepad.html#rightBumper(java.lang.String)" class="member-name-link">rightBumper(String)</a> - Method in class org.areslib.hardware.wrappers.<a href="org/areslib/hardware/wrappers/AresGamepad.html" title="class in org.areslib.hardware.wrappers">AresGamepad</a></dt>
@@ -5346,14 +5513,6 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="org/areslib/testing/AresSystemCheckOpMode.html#robotInit()" class="member-name-link">robotInit()</a> - Method in class org.areslib.testing.<a href="org/areslib/testing/AresSystemCheckOpMode.html" title="class in org.areslib.testing">AresSystemCheckOpMode</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="org/areslib/hardware/interfaces/IMUIO.IMUInputs.html#rollRadians" class="member-name-link">rollRadians</a> - Variable in class org.areslib.hardware.interfaces.<a href="org/areslib/hardware/interfaces/IMUIO.IMUInputs.html" title="class in org.areslib.hardware.interfaces">IMUIO.IMUInputs</a></dt>
-<dd>
-<div class="block">Raw roll angle in radians.</div>
-</dd>
-<dt><a href="org/areslib/hardware/interfaces/IMUIO.IMUInputs.html#rollVelocityRadPerSec" class="member-name-link">rollVelocityRadPerSec</a> - Variable in class org.areslib.hardware.interfaces.<a href="org/areslib/hardware/interfaces/IMUIO.IMUInputs.html" title="class in org.areslib.hardware.interfaces">IMUIO.IMUInputs</a></dt>
-<dd>
-<div class="block">Rotational velocity around the X axis (roll) in radians per second.</div>
-</dd>
 <dt><a href="org/areslib/templates/RotaryMechanismIO.html" class="type-name-link" title="interface in org.areslib.templates">RotaryMechanismIO</a> - Interface in <a href="org/areslib/templates/package-summary.html">org.areslib.templates</a></dt>
 <dd>
 <div class="block">IO interface template for a rotary mechanism (arms, wrists, pivots, turrets).</div>
@@ -5510,7 +5669,11 @@ loadScripts(document, 'script');</script>
 <dl class="index">
 <dt><a href="org/areslib/pathplanner/path/PathPlannerTrajectory.html#sample(double)" class="member-name-link">sample(double)</a> - Method in class org.areslib.pathplanner.path.<a href="org/areslib/pathplanner/path/PathPlannerTrajectory.html" title="class in org.areslib.pathplanner.path">PathPlannerTrajectory</a></dt>
 <dd>
-<div class="block">Get the target state at the given point in time along the trajectory</div>
+<div class="block">Get the target state at the given point in time along the trajectory.</div>
+</dd>
+<dt><a href="org/areslib/pathplanner/path/PathPlannerTrajectory.html#sample(double,org.areslib.pathplanner.path.PathPlannerTrajectory.State)" class="member-name-link">sample(double, PathPlannerTrajectory.State)</a> - Method in class org.areslib.pathplanner.path.<a href="org/areslib/pathplanner/path/PathPlannerTrajectory.html" title="class in org.areslib.pathplanner.path">PathPlannerTrajectory</a></dt>
+<dd>
+<div class="block">Get the target state at the given point in time along the trajectory in-place.</div>
 </dd>
 <dt><a href="org/areslib/hardware/coprocessors/OctoQuadFWv3.html#saveParametersToFlash()" class="member-name-link">saveParametersToFlash()</a> - Method in class org.areslib.hardware.coprocessors.<a href="org/areslib/hardware/coprocessors/OctoQuadFWv3.html" title="class in org.areslib.hardware.coprocessors">OctoQuadFWv3</a></dt>
 <dd>
@@ -5634,6 +5797,10 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="org/areslib/math/kinematics/MecanumDriveWheelPositions.html#set(org.areslib.math.kinematics.MecanumDriveWheelPositions)" class="member-name-link">set(MecanumDriveWheelPositions)</a> - Method in class org.areslib.math.kinematics.<a href="org/areslib/math/kinematics/MecanumDriveWheelPositions.html" title="class in org.areslib.math.kinematics">MecanumDriveWheelPositions</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="org/areslib/pathplanner/path/PathPlannerTrajectory.State.html#set(org.areslib.pathplanner.path.PathPlannerTrajectory.State)" class="member-name-link">set(PathPlannerTrajectory.State)</a> - Method in class org.areslib.pathplanner.path.<a href="org/areslib/pathplanner/path/PathPlannerTrajectory.State.html" title="class in org.areslib.pathplanner.path">PathPlannerTrajectory.State</a></dt>
+<dd>
+<div class="block">Sets this state to match another state in-place.</div>
+</dd>
 <dt><a href="org/areslib/core/AllianceUtil.html#setAlliance(org.areslib.core.FieldConstants.Alliance)" class="member-name-link">setAlliance(FieldConstants.Alliance)</a> - Static method in class org.areslib.core.<a href="org/areslib/core/AllianceUtil.html" title="class in org.areslib.core">AllianceUtil</a></dt>
 <dd>
 <div class="block">Sets the current alliance.</div>
@@ -5783,6 +5950,10 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Sets the integral zone.</div>
 </dd>
+<dt><a href="org/areslib/core/simulation/EnhancedAresPhysicsWorld.html#setInternalResistance(double)" class="member-name-link">setInternalResistance(double)</a> - Method in class org.areslib.core.simulation.<a href="org/areslib/core/simulation/EnhancedAresPhysicsWorld.html" title="class in org.areslib.core.simulation">EnhancedAresPhysicsWorld</a></dt>
+<dd>
+<div class="block">Sets the battery internal resistance for sag calculation (default 0.02 Ohms).</div>
+</dd>
 <dt><a href="org/areslib/hardware/wrappers/AresGamepad.html#setLedColor(double,double,double,int)" class="member-name-link">setLedColor(double, double, double, int)</a> - Method in class org.areslib.hardware.wrappers.<a href="org/areslib/hardware/wrappers/AresGamepad.html" title="class in org.areslib.hardware.wrappers">AresGamepad</a></dt>
 <dd>
 <div class="block">Sets the LED color of the controller (PS4/PS5 compatibility).</div>
@@ -5862,6 +6033,10 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="org/areslib/templates/SimpleIntakeSubsystem.IntakeIOSim.html#setMotorVoltage(double)" class="member-name-link">setMotorVoltage(double)</a> - Method in class org.areslib.templates.<a href="org/areslib/templates/SimpleIntakeSubsystem.IntakeIOSim.html" title="class in org.areslib.templates">SimpleIntakeSubsystem.IntakeIOSim</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="org/areslib/core/simulation/EnhancedAresPhysicsWorld.html#setNominalVoltage(double)" class="member-name-link">setNominalVoltage(double)</a> - Method in class org.areslib.core.simulation.<a href="org/areslib/core/simulation/EnhancedAresPhysicsWorld.html" title="class in org.areslib.core.simulation">EnhancedAresPhysicsWorld</a></dt>
+<dd>
+<div class="block">Sets the nominal battery voltage (default 12.0V).</div>
+</dd>
 <dt><a href="org/areslib/hardware/interfaces/AresAbsoluteEncoder.html#setOffset(double)" class="member-name-link">setOffset(double)</a> - Method in interface org.areslib.hardware.interfaces.<a href="org/areslib/hardware/interfaces/AresAbsoluteEncoder.html" title="interface in org.areslib.hardware.interfaces">AresAbsoluteEncoder</a></dt>
 <dd>
 <div class="block">Sets the zero offset for formatting the absolute position.</div>
@@ -6170,6 +6345,14 @@ loadScripts(document, 'script');</script>
 <div class="block">Creates a new SlewRateLimiter with the given positive and negative rate limits and initial
  value.</div>
 </dd>
+<dt><a href="org/areslib/command/SmartAssistAlign.html" class="type-name-link" title="class in org.areslib.command">SmartAssistAlign</a> - Class in <a href="org/areslib/command/package-summary.html">org.areslib.command</a></dt>
+<dd>
+<div class="block">Command for dynamic, odometry-based robot alignment specifically for scoring on game pieces.</div>
+</dd>
+<dt><a href="org/areslib/command/SmartAssistAlign.html#%3Cinit%3E(java.util.function.Consumer,java.util.function.DoubleSupplier,org.areslib.math.geometry.Pose2d,org.areslib.math.geometry.Pose2d,double,double,double,double)" class="member-name-link">SmartAssistAlign(Consumer&lt;ChassisSpeeds&gt;, DoubleSupplier, Pose2d, Pose2d, double, double, double, double)</a> - Constructor for class org.areslib.command.<a href="org/areslib/command/SmartAssistAlign.html" title="class in org.areslib.command">SmartAssistAlign</a></dt>
+<dd>
+<div class="block">Creates a SmartAssistAlign command for semi-autonomous scoring.</div>
+</dd>
 <dt><a href="org/areslib/pathplanner/dummy/SmartDashboard.html" class="type-name-link" title="class in org.areslib.pathplanner.dummy">SmartDashboard</a> - Class in <a href="org/areslib/pathplanner/dummy/package-summary.html">org.areslib.pathplanner.dummy</a></dt>
 <dd>
 <div class="block">A dummy shim implementation to allow PathPlanner compilation without native WPILib/Android
@@ -6244,9 +6427,7 @@ loadScripts(document, 'script');</script>
 <div class="block">Start the timer tracking.</div>
 </dd>
 <dt><a href="org/areslib/telemetry/AresLogUploader.html#startDaemon()" class="member-name-link">startDaemon()</a> - Static method in class org.areslib.telemetry.<a href="org/areslib/telemetry/AresLogUploader.html" title="class in org.areslib.telemetry">AresLogUploader</a></dt>
-<dd>
-<div class="block">Starts the background daemon thread.</div>
-</dd>
+<dd>&nbsp;</dd>
 <dt><a href="org/areslib/core/simulation/IntakeSimulation.html#startIntake()" class="member-name-link">startIntake()</a> - Method in class org.areslib.core.simulation.<a href="org/areslib/core/simulation/IntakeSimulation.html" title="class in org.areslib.core.simulation">IntakeSimulation</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/areslib/templates/SimpleIntakeSubsystem.html#startIntake()" class="member-name-link">startIntake()</a> - Method in class org.areslib.templates.<a href="org/areslib/templates/SimpleIntakeSubsystem.html" title="class in org.areslib.templates">SimpleIntakeSubsystem</a></dt>
@@ -6274,6 +6455,8 @@ loadScripts(document, 'script');</script>
  containing a Mermaid-JS state diagram.</div>
 </dd>
 <dt><a href="org/areslib/telemetry/StateGraphExporter.html#%3Cinit%3E()" class="member-name-link">StateGraphExporter()</a> - Constructor for class org.areslib.telemetry.<a href="org/areslib/telemetry/StateGraphExporter.html" title="class in org.areslib.telemetry">StateGraphExporter</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="org/areslib/subsystems/AresSuperstructure.html#stateMachine" class="member-name-link">stateMachine</a> - Variable in class org.areslib.subsystems.<a href="org/areslib/subsystems/AresSuperstructure.html" title="class in org.areslib.subsystems">AresSuperstructure</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/areslib/core/StateMachine.html" class="type-name-link" title="class in org.areslib.core">StateMachine</a>&lt;<a href="org/areslib/core/StateMachine.html" title="type parameter in StateMachine">S</a> extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Enum.html" title="class or interface in java.lang" class="external-link">Enum</a>&lt;<a href="org/areslib/core/StateMachine.html" title="type parameter in StateMachine">S</a>&gt;&gt; - Class in <a href="org/areslib/core/package-summary.html">org.areslib.core</a></dt>
 <dd>
@@ -6478,6 +6661,18 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Binds the mechanism IO specifically for testing.</div>
 </dd>
+<dt><a href="org/areslib/diagnostics/SystemCheckCommand.html" class="type-name-link" title="class in org.areslib.diagnostics">SystemCheckCommand</a> - Class in <a href="org/areslib/diagnostics/package-summary.html">org.areslib.diagnostics</a></dt>
+<dd>
+<div class="block">A comprehensive, robust pre-match diagnostic routine decoupled from mechanism logic.</div>
+</dd>
+<dt><a href="org/areslib/diagnostics/SystemCheckCommand.html#%3Cinit%3E(org.areslib.diagnostics.SystemTestable...)" class="member-name-link">SystemCheckCommand(SystemTestable...)</a> - Constructor for class org.areslib.diagnostics.<a href="org/areslib/diagnostics/SystemCheckCommand.html" title="class in org.areslib.diagnostics">SystemCheckCommand</a></dt>
+<dd>
+<div class="block">Safely iterates through all passed testable subsystems.</div>
+</dd>
+<dt><a href="org/areslib/diagnostics/SystemTestable.html" class="type-name-link" title="interface in org.areslib.diagnostics">SystemTestable</a> - Interface in <a href="org/areslib/diagnostics/package-summary.html">org.areslib.diagnostics</a></dt>
+<dd>
+<div class="block">Indicates that a subsystem or component can perform an automated self-test.</div>
+</dd>
 </dl>
 <h2 class="title" id="I:T">T</h2>
 <dl class="index">
@@ -6496,6 +6691,14 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="org/areslib/core/AresCommandOpMode.html#telemetry" class="member-name-link">telemetry</a> - Variable in class org.areslib.core.<a href="org/areslib/core/AresCommandOpMode.html" title="class in org.areslib.core">AresCommandOpMode</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="org/areslib/hmi/TelemetryGamepad.html" class="type-name-link" title="class in org.areslib.hmi">TelemetryGamepad</a> - Class in <a href="org/areslib/hmi/package-summary.html">org.areslib.hmi</a></dt>
+<dd>
+<div class="block">A wrapper for gamepad controls that automatically logs button bindings to telemetry.</div>
+</dd>
+<dt><a href="org/areslib/hmi/TelemetryGamepad.html#%3Cinit%3E(java.lang.String)" class="member-name-link">TelemetryGamepad(String)</a> - Constructor for class org.areslib.hmi.<a href="org/areslib/hmi/TelemetryGamepad.html" title="class in org.areslib.hmi">TelemetryGamepad</a></dt>
+<dd>
+<div class="block">Creates a telemetry-enabled gamepad wrapper.</div>
+</dd>
 <dt><a href="org/areslib/subsystems/drive/TeleopDriveMath.html" class="type-name-link" title="class in org.areslib.subsystems.drive">TeleopDriveMath</a> - Class in <a href="org/areslib/subsystems/drive/package-summary.html">org.areslib.subsystems.drive</a></dt>
 <dd>
 <div class="block">Teleop drive math utilities for processing raw joystick inputs into smooth, predictable robot
@@ -6945,6 +7148,10 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="org/areslib/telemetry/WpiLogBackend.html#update()" class="member-name-link">update()</a> - Method in class org.areslib.telemetry.<a href="org/areslib/telemetry/WpiLogBackend.html" title="class in org.areslib.telemetry">WpiLogBackend</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="org/areslib/core/simulation/EnhancedAresPhysicsWorld.html#update(double)" class="member-name-link">update(double)</a> - Method in class org.areslib.core.simulation.<a href="org/areslib/core/simulation/EnhancedAresPhysicsWorld.html" title="class in org.areslib.core.simulation">EnhancedAresPhysicsWorld</a></dt>
+<dd>
+<div class="block">Steps the physics simulation and updates battery voltage.</div>
+</dd>
 <dt><a href="org/areslib/math/estimator/AresHardwarePoseEstimator.html#update(org.areslib.math.geometry.Pose2d,double)" class="member-name-link">update(Pose2d, double)</a> - Method in class org.areslib.math.estimator.<a href="org/areslib/math/estimator/AresHardwarePoseEstimator.html" title="class in org.areslib.math.estimator">AresHardwarePoseEstimator</a></dt>
 <dd>
 <div class="block">Primary loop update parameter.</div>
@@ -6986,13 +7193,6 @@ loadScripts(document, 'script');</script>
 <dt><a href="org/areslib/hardware/wrappers/ArrayLidarIOSim.html#updateInputs(org.areslib.hardware.interfaces.ArrayLidarIO.ArrayLidarInputs)" class="member-name-link">updateInputs(ArrayLidarIO.ArrayLidarInputs)</a> - Method in class org.areslib.hardware.wrappers.<a href="org/areslib/hardware/wrappers/ArrayLidarIOSim.html" title="class in org.areslib.hardware.wrappers">ArrayLidarIOSim</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/areslib/hardware/wrappers/ArrayLidarIOSrs.html#updateInputs(org.areslib.hardware.interfaces.ArrayLidarIO.ArrayLidarInputs)" class="member-name-link">updateInputs(ArrayLidarIO.ArrayLidarInputs)</a> - Method in class org.areslib.hardware.wrappers.<a href="org/areslib/hardware/wrappers/ArrayLidarIOSrs.html" title="class in org.areslib.hardware.wrappers">ArrayLidarIOSrs</a></dt>
-<dd>&nbsp;</dd>
-<dt><a href="org/areslib/hardware/interfaces/IMUIO.html#updateInputs(org.areslib.hardware.interfaces.IMUIO.IMUInputs)" class="member-name-link">updateInputs(IMUIO.IMUInputs)</a> - Method in interface org.areslib.hardware.interfaces.<a href="org/areslib/hardware/interfaces/IMUIO.html" title="interface in org.areslib.hardware.interfaces">IMUIO</a></dt>
-<dd>
-<div class="block">Updates the data structure with the latest values from the underlying hardware sensor or
- simulation.</div>
-</dd>
-<dt><a href="org/areslib/hardware/wrappers/RevIMUWrapper.html#updateInputs(org.areslib.hardware.interfaces.IMUIO.IMUInputs)" class="member-name-link">updateInputs(IMUIO.IMUInputs)</a> - Method in class org.areslib.hardware.wrappers.<a href="org/areslib/hardware/wrappers/RevIMUWrapper.html" title="class in org.areslib.hardware.wrappers">RevIMUWrapper</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/areslib/hardware/interfaces/OdometryIO.html#updateInputs(org.areslib.hardware.interfaces.OdometryIO.OdometryInputs)" class="member-name-link">updateInputs(OdometryIO.OdometryInputs)</a> - Method in interface org.areslib.hardware.interfaces.<a href="org/areslib/hardware/interfaces/OdometryIO.html" title="interface in org.areslib.hardware.interfaces">OdometryIO</a></dt>
 <dd>
@@ -7065,6 +7265,10 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="org/areslib/templates/SimpleIntakeSubsystem.IntakeIOSim.html#updateInputs(org.areslib.templates.SimpleIntakeSubsystem.IntakeIO.IntakeInputs)" class="member-name-link">updateInputs(SimpleIntakeSubsystem.IntakeIO.IntakeInputs)</a> - Method in class org.areslib.templates.<a href="org/areslib/templates/SimpleIntakeSubsystem.IntakeIOSim.html" title="class in org.areslib.templates">SimpleIntakeSubsystem.IntakeIOSim</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="org/areslib/subsystems/AresSuperstructure.html#updateMechanisms(S)" class="member-name-link">updateMechanisms(S)</a> - Method in class org.areslib.subsystems.<a href="org/areslib/subsystems/AresSuperstructure.html" title="class in org.areslib.subsystems">AresSuperstructure</a></dt>
+<dd>
+<div class="block">Subclasses implement this to drive subsystem targets based on the current superstructure state.</div>
+</dd>
 <dt><a href="org/areslib/math/filter/KalmanFilter1D.html#updatePosition(double,double)" class="member-name-link">updatePosition(double, double)</a> - Method in class org.areslib.math.filter.<a href="org/areslib/math/filter/KalmanFilter1D.html" title="class in org.areslib.math.filter">KalmanFilter1D</a></dt>
 <dd>
 <div class="block">Updates the state with a new position measurement.</div>
@@ -7490,14 +7694,6 @@ the order they are declared.</div>
 <dd>&nbsp;</dd>
 <dt><a href="org/areslib/hardware/coprocessors/OctoQuadFWv3.LocalizerYawAxis.html#Y_INV" class="member-name-link">Y_INV</a> - Enum constant in enum class org.areslib.hardware.coprocessors.<a href="org/areslib/hardware/coprocessors/OctoQuadFWv3.LocalizerYawAxis.html" title="enum class in org.areslib.hardware.coprocessors">OctoQuadFWv3.LocalizerYawAxis</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="org/areslib/hardware/interfaces/IMUIO.IMUInputs.html#yawRadians" class="member-name-link">yawRadians</a> - Variable in class org.areslib.hardware.interfaces.<a href="org/areslib/hardware/interfaces/IMUIO.IMUInputs.html" title="class in org.areslib.hardware.interfaces">IMUIO.IMUInputs</a></dt>
-<dd>
-<div class="block">Raw yaw tracking angle (heading) in radians.</div>
-</dd>
-<dt><a href="org/areslib/hardware/interfaces/IMUIO.IMUInputs.html#yawVelocityRadPerSec" class="member-name-link">yawVelocityRadPerSec</a> - Variable in class org.areslib.hardware.interfaces.<a href="org/areslib/hardware/interfaces/IMUIO.IMUInputs.html" title="class in org.areslib.hardware.interfaces">IMUIO.IMUInputs</a></dt>
-<dd>
-<div class="block">Rotational velocity around the Z axis (yaw) in radians per second.</div>
-</dd>
 <dt><a href="org/areslib/hardware/interfaces/OdometryIO.OdometryInputs.html#yMeters" class="member-name-link">yMeters</a> - Variable in class org.areslib.hardware.interfaces.<a href="org/areslib/hardware/interfaces/OdometryIO.OdometryInputs.html" title="class in org.areslib.hardware.interfaces">OdometryIO.OdometryInputs</a></dt>
 <dd>
 <div class="block">Estimated Y position in meters.</div>
@@ -7519,6 +7715,10 @@ the order they are declared.</div>
 <dd>&nbsp;</dd>
 </dl>
 <a href="#I:A">A</a>&nbsp;<a href="#I:B">B</a>&nbsp;<a href="#I:C">C</a>&nbsp;<a href="#I:D">D</a>&nbsp;<a href="#I:E">E</a>&nbsp;<a href="#I:F">F</a>&nbsp;<a href="#I:G">G</a>&nbsp;<a href="#I:H">H</a>&nbsp;<a href="#I:I">I</a>&nbsp;<a href="#I:K">K</a>&nbsp;<a href="#I:L">L</a>&nbsp;<a href="#I:M">M</a>&nbsp;<a href="#I:N">N</a>&nbsp;<a href="#I:O">O</a>&nbsp;<a href="#I:P">P</a>&nbsp;<a href="#I:Q">Q</a>&nbsp;<a href="#I:R">R</a>&nbsp;<a href="#I:S">S</a>&nbsp;<a href="#I:T">T</a>&nbsp;<a href="#I:U">U</a>&nbsp;<a href="#I:V">V</a>&nbsp;<a href="#I:W">W</a>&nbsp;<a href="#I:X">X</a>&nbsp;<a href="#I:Y">Y</a>&nbsp;<a href="#I:Z">Z</a>&nbsp;<br><a href="allclasses-index.html">All&nbsp;Classes&nbsp;and&nbsp;Interfaces</a><span class="vertical-separator">|</span><a href="allpackages-index.html">All&nbsp;Packages</a><span class="vertical-separator">|</span><a href="constant-values.html">Constant&nbsp;Field&nbsp;Values</a><span class="vertical-separator">|</span><a href="serialized-form.html">Serialized&nbsp;Form</a></main>
+<footer role="contentinfo">
+<hr>
+<p class="legal-copy"><small>&copy; 2026 ARES 23247. Built for Championship Performance.</small></p>
+</footer>
 </div>
 </div>
 </body>

@@ -24,13 +24,18 @@ body {
     overflow-x: hidden;
 }
 
+h1, h2, h3, .hero-title, .logo {
+    font-family: 'Orbitron', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+
 /* Premium Background */
 #stars-container {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
+    height: 100vh;
     z-index: -1;
     background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
 }
@@ -48,20 +53,185 @@ body {
     50% { opacity: 1; transform: scale(1.2); }
 }
 
-/* Header & Nav */
-header {
-    height: 100vh;
+/* Navigation & Header */
+.nav-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    background: rgba(18, 18, 18, 0.8);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    height: 70px; /* Fixed height for consistency */
+    display: flex;
+    align-items: center;
+}
+
+nav {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--text-light);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.logo span {
+    color: var(--primary-color);
+    font-size: 1rem;
+}
+
+.nav-links {
+    display: flex;
+    gap: 2rem;
+}
+
+.nav-links a {
+    color: var(--text-dim);
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: color 0.3s ease;
+}
+
+.nav-links a:hover, .nav-links a.active {
+    color: var(--primary-color);
+}
+
+.nav-edit {
+    border: 1px solid rgba(205, 127, 50, 0.4);
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 0.8rem !important;
+    background: rgba(205, 127, 50, 0.05);
+}
+
+.nav-edit:hover {
+    background: rgba(205, 127, 50, 0.15);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 10px var(--glow-primary);
+}
+
+/* Search Bar Styles */
+.nav-search {
+    position: relative;
+    margin-left: 2rem;
+    flex: 1;
+    max-width: 400px;
+}
+
+.search-input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 0.6rem 1rem 0.6rem 2.5rem;
+    color: white;
+    font-size: 0.9rem;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.search-input:focus {
+    border-color: var(--primary-color);
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 15px rgba(205, 127, 50, 0.2);
+}
+
+.search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+#search-results {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 0;
+    right: 0;
+    background: rgba(30, 30, 30, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    max-height: 400px;
+    overflow-y: auto;
+    z-index: 1001;
+    display: none;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.search-result-item {
+    padding: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.search-result-item:hover {
+    background: rgba(205, 127, 50, 0.1);
+}
+
+.search-result-item .title {
+    display: block;
+    font-weight: 700;
+    color: var(--primary-color);
+    font-size: 0.9rem;
+}
+
+.search-result-item .desc {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+}
+
+/* Layout Stabilization */
+.page-wrapper {
+    padding-top: 100px; /* Exact offset for 70px header + breath room */
+    min-height: 100vh;
+    width: 100%;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.hero {
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
-    padding: 2rem;
-    background: linear-gradient(180deg, rgba(18,18,18,0) 0%, var(--bg-dark) 100%);
+    padding: 8rem 2rem 4rem; /* Top padding to clear fixed header */
+}
+
+.hero-icon {
+    font-size: 6rem;
+    margin-bottom: 2rem;
+    filter: drop-shadow(0 0 20px var(--glow-primary));
 }
 
 .hero-title {
-    font-size: 5rem;
+    font-size: clamp(3rem, 10vw, 6rem);
     font-weight: 800;
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     -webkit-background-clip: text;
@@ -190,21 +360,155 @@ header {
     font-size: 1.1rem;
 }
 
-/* Javadoc Link Customization */
-code {
-    background: rgba(205, 127, 50, 0.1);
-    color: var(--primary-color);
-    padding: 2px 6px;
-    border-radius: 4px;
+
+/* Tutorial & Documentation Styles */
+.callout {
+    background: rgba(205, 127, 50, 0.05); /* Tint of bronze */
+    border: 1px solid rgba(205, 127, 50, 0.3);
+    padding: 24px;
+    border-radius: 12px;
+    margin: 30px 0;
 }
 
-a {
+.callout h4 {
+    color: var(--primary-color);
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.callout-warning {
+    background: rgba(179, 36, 22, 0.05); /* Tint of red */
+    border: 1px solid rgba(179, 36, 22, 0.3);
+}
+
+.callout-warning h4 {
+    color: #ff5252;
+}
+
+.back-link {
+    display: inline-block;
+    margin-bottom: 40px;
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: 0.1em;
+    transition: transform 0.2s;
+}
+
+.back-link:hover {
+    transform: translateX(-5px);
+}
+
+.simulator-container {
+    background: #0d0d0d;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 30px;
+    margin: 40px 0;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+}
+
+.simulator-container h3 {
+    margin: 0;
+    color: white;
+}
+
+.simulator-container p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--text-dim);
+}
+
+/* Code Formatting */
+pre {
+    background: #1a1a1a;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 24px;
+    border-radius: 12px;
+    overflow-x: auto;
+    margin-bottom: 40px;
+}
+
+code {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--primary-color);
+    font-size: 1rem;
+}
+
+/* Typography for Tutorials */
+h1 { font-size: 3rem; margin-bottom: 1.5rem; text-align: center; }
+h2 { font-size: 2rem; margin-top: 4rem; margin-bottom: 1.5rem; border-left: 5px solid var(--primary-color); padding-left: 20px; }
+h3 { font-size: 1.3rem; margin-top: 2rem; color: var(--primary-color); }
+p { margin-bottom: 1.5rem; font-size: 1.1rem; color: var(--text-dim); }
+ol, ul { margin-bottom: 2rem; padding-left: 1.5rem; color: var(--text-dim); }
+li { margin-bottom: 1rem; }
+
+/* Tutorial Header Number Styling */
+.ares-num, .mars-num {
+    display: inline-block;
+    background: var(--secondary-color); /* Red */
+    color: #ffffff;
+    padding: 0.1em 0.5em;
+    border-radius: 6px;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 800;
+    margin-right: 0.4em;
+    box-shadow: 0 4px 10px var(--glow-secondary);
+    line-height: 1;
+}
+
+/* Javadoc Specific Overrides */
+.header, .contentContainer, .description, .summary, .details, .indexContainer {
+    background-color: var(--bg-dark) !important;
+    color: var(--text-light) !important;
+}
+
+.title {
+    color: var(--primary-color) !important;
+    font-family: 'Orbitron', sans-serif !important;
+}
+
+.subTitle {
+    color: var(--secondary-color) !important;
+    font-weight: 700;
+}
+
+.navBarCell1Rev {
+    background-color: var(--primary-color) !important;
+    color: white !important;
+}
+
+a:link, a:visited {
     color: var(--primary-color);
     text-decoration: none;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .hero-title { font-size: 3rem; }
-    .stats-grid { margin-top: 50px; }
+a:hover {
+    color: var(--secondary-color);
+    text-shadow: 0 0 5px var(--glow-primary);
+}
+
+.memberSummary td, .typeSummary td, .packageSummary td {
+    background-color: var(--card-bg) !important;
+    border: 1px solid rgba(255,255,255,0.05) !important;
+}
+
+.blockList {
+    background-color: transparent !important;
+}
+
+.summary .table-tabs {
+    background-color: var(--bg-dark) !important;
+}
+
+.description .block {
+    background: rgba(205, 127, 50, 0.05);
+    border-left: 4px solid var(--primary-color);
+    padding: 1rem;
+    margin: 1rem 0;
 }

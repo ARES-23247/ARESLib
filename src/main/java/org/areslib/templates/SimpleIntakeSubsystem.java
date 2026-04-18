@@ -15,7 +15,7 @@ import org.areslib.telemetry.AresTelemetry;
  *   <li>State machine for intake control
  * </ul>
  *
- * <h3>Quick Start:</h3>
+ * <p><b>Quick Start:</b>
  *
  * <pre>
  * // In your OpMode:

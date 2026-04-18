@@ -7,7 +7,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta name="description" content="declaration: package: org.areslib.subsystems.vision, class: AresVisionSubsystem">
 <meta name="generator" content="javadoc/ClassWriterImpl">
-<link rel="stylesheet" type="text/css" href="../../../../stylesheet.css" title="Style">
+<link rel="stylesheet" type="text/css" href="../../../../areslib-theme.css" title="Style">
 <link rel="stylesheet" type="text/css" href="../../../../script-dir/jquery-ui.min.css" title="Style">
 <link rel="stylesheet" type="text/css" href="../../../../jquery-ui.overrides.css" title="Style">
 <script type="text/javascript" src="../../../../script.js"></script>
@@ -99,7 +99,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <ul class="see-list">
 <li><a href="../../hardware/interfaces/VisionIO.html" title="interface in org.areslib.hardware.interfaces"><code>VisionIO</code></a></li>
-<li><code>AresSensorFusionSubsystem</code></li>
+<li><a href="../../math/estimator/AresHardwarePoseEstimator.html" title="class in org.areslib.math.estimator"><code>AresHardwarePoseEstimator</code></a></li>
 </ul>
 </dd>
 </dl>
@@ -114,8 +114,7 @@ loadScripts(document, 'script');</script>
 <div class="summary-table two-column-summary">
 <div class="table-header col-first">Constructor</div>
 <div class="table-header col-last">Description</div>
-<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(org.areslib.hardware.interfaces.VisionIO,double,double)" class="member-name-link">AresVisionSubsystem</a><wbr>(<a href="../../hardware/interfaces/VisionIO.html" title="interface in org.areslib.hardware.interfaces">VisionIO</a>&nbsp;io,
- double&nbsp;minTargetAreaPercent,
+<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(org.areslib.hardware.interfaces.VisionIO,double)" class="member-name-link">AresVisionSubsystem</a><wbr>(<a href="../../hardware/interfaces/VisionIO.html" title="interface in org.areslib.hardware.interfaces">VisionIO</a>&nbsp;io,
  double&nbsp;maxTrustAreaPercent)</code></div>
 <div class="col-last even-row-color">
 <div class="block">Constructs a core vision subsystem, parameterized for specific game or camera heuristics.</div>
@@ -198,16 +197,14 @@ loadScripts(document, 'script');</script>
 <h2>Constructor Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="&lt;init&gt;(org.areslib.hardware.interfaces.VisionIO,double,double)">
+<section class="detail" id="&lt;init&gt;(org.areslib.hardware.interfaces.VisionIO,double)">
 <h3>AresVisionSubsystem</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">AresVisionSubsystem</span><wbr><span class="parameters">(<a href="../../hardware/interfaces/VisionIO.html" title="interface in org.areslib.hardware.interfaces">VisionIO</a>&nbsp;io,
- double&nbsp;minTargetAreaPercent,
  double&nbsp;maxTrustAreaPercent)</span></div>
 <div class="block">Constructs a core vision subsystem, parameterized for specific game or camera heuristics.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>io</code> - The hardware IO interface (e.g., LimelightVisionWrapper).</dd>
-<dd><code>minTargetAreaPercent</code> - Absolute minimum target size (% of image) to be considered valid.</dd>
 <dd><code>maxTrustAreaPercent</code> - Target size (% of image) corresponding to 100% confidence.</dd>
 </dl>
 </section>
@@ -286,10 +283,10 @@ loadScripts(document, 'script');</script>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../../math/geometry/Pose2d.html" title="class in org.areslib.math.geometry">Pose2d</a></span>&nbsp;<span class="element-name">getEstimatedGlobalPose</span>()</div>
 <div class="block">Calculates trust coefficient dynamically based on AprilTag latency and visible surface area.
 
- <p><b>IMPORTANT: Coordinate Frame Assumption</b>: This subsystem and its consumer <code>AresSensorFusionSubsystem</code> assume the vision system's botPose3d X/Y axes are pre-aligned to the
- PathPlanner frame (no axis swap). If using a WPILib-standard Limelight with MegaTag2, this is
- typically true. If using a custom PhotonVision setup where X=forward and Y=left, the axes must
- be swapped before fusion blending.</div>
+ <p><b>IMPORTANT: Coordinate Frame Assumption</b>: This subsystem and its consumer <a href="../../math/estimator/AresHardwarePoseEstimator.html" title="class in org.areslib.math.estimator"><code>AresHardwarePoseEstimator</code></a> assume the vision system's botPose3d X/Y
+ axes are pre-aligned to the PathPlanner frame (no axis swap). If using a WPILib-standard
+ Limelight with MegaTag2, this is typically true. If using a custom PhotonVision setup where
+ X=forward and Y=left, the axes must be swapped before fusion blending.</div>
 <dl class="notes">
 <dt>Returns:</dt>
 <dd>Field-centric 2D pose estimated by the vision system. Null if target isn't trustworthy.</dd>
@@ -324,6 +321,10 @@ loadScripts(document, 'script');</script>
 </section>
 <!-- ========= END OF CLASS DATA ========= -->
 </main>
+<footer role="contentinfo">
+<hr>
+<p class="legal-copy"><small>&copy; 2026 ARES 23247. Built for Championship Performance.</small></p>
+</footer>
 </div>
 </div>
 </body>

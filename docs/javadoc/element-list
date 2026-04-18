@@ -6,6 +6,7 @@ org.areslib.command.sysid
 org.areslib.core
 org.areslib.core.async
 org.areslib.core.simulation
+org.areslib.diagnostics
 org.areslib.faults
 org.areslib.hardware
 org.areslib.hardware.coprocessors
@@ -30,6 +31,7 @@ org.areslib.pathplanner.path
 org.areslib.pathplanner.pathfinding
 org.areslib.pathplanner.util
 org.areslib.sim
+org.areslib.subsystems
 org.areslib.subsystems.controllers.examples
 org.areslib.subsystems.drive
 org.areslib.subsystems.vision

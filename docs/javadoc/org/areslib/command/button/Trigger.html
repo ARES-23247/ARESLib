@@ -7,7 +7,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta name="description" content="declaration: package: org.areslib.command.button, class: Trigger">
 <meta name="generator" content="javadoc/ClassWriterImpl">
-<link rel="stylesheet" type="text/css" href="../../../../stylesheet.css" title="Style">
+<link rel="stylesheet" type="text/css" href="../../../../areslib-theme.css" title="Style">
 <link rel="stylesheet" type="text/css" href="../../../../script-dir/jquery-ui.min.css" title="Style">
 <link rel="stylesheet" type="text/css" href="../../../../jquery-ui.overrides.css" title="Style">
 <script type="text/javascript" src="../../../../script.js"></script>
@@ -314,8 +314,8 @@ loadScripts(document, 'script');</script>
 <div class="block">Creates a new trigger that only activates after the condition has been continuously true for
  the specified duration. Resets if the condition becomes false.
 
- <p>Uses deterministic loop counting based on <a href="../../core/AresRobot.html#LOOP_PERIOD_SECS"><code>AresRobot.LOOP_PERIOD_SECS</code></a> rather than wall clock time to ensure consistent
- behavior.</div>
+ <p>Uses precise elapsed time measurement based on <a href="../../core/AresTimer.html" title="class in org.areslib.core"><code>AresTimer</code></a> rather
+ than deterministic loop counting to ensure consistent behavior.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>seconds</code> - The duration the condition must be continuously true before activating.</dd>
@@ -331,6 +331,10 @@ loadScripts(document, 'script');</script>
 </section>
 <!-- ========= END OF CLASS DATA ========= -->
 </main>
+<footer role="contentinfo">
+<hr>
+<p class="legal-copy"><small>&copy; 2026 ARES 23247. Built for Championship Performance.</small></p>
+</footer>
 </div>
 </div>
 </body>

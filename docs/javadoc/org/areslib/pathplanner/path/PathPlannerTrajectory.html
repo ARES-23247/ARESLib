@@ -7,7 +7,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta name="description" content="declaration: package: org.areslib.pathplanner.path, class: PathPlannerTrajectory">
 <meta name="generator" content="javadoc/ClassWriterImpl">
-<link rel="stylesheet" type="text/css" href="../../../../stylesheet.css" title="Style">
+<link rel="stylesheet" type="text/css" href="../../../../areslib-theme.css" title="Style">
 <link rel="stylesheet" type="text/css" href="../../../../script-dir/jquery-ui.min.css" title="Style">
 <link rel="stylesheet" type="text/css" href="../../../../jquery-ui.overrides.css" title="Style">
 <script type="text/javascript" src="../../../../script.js"></script>
@@ -181,7 +181,13 @@ loadScripts(document, 'script');</script>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="PathPlannerTrajectory.State.html" title="class in org.areslib.pathplanner.path">PathPlannerTrajectory.State</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#sample(double)" class="member-name-link">sample</a><wbr>(double&nbsp;time)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Get the target state at the given point in time along the trajectory</div>
+<div class="block">Get the target state at the given point in time along the trajectory.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#sample(double,org.areslib.pathplanner.path.PathPlannerTrajectory.State)" class="member-name-link">sample</a><wbr>(double&nbsp;time,
+ <a href="PathPlannerTrajectory.State.html" title="class in org.areslib.pathplanner.path">PathPlannerTrajectory.State</a>&nbsp;out)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Get the target state at the given point in time along the trajectory in-place.</div>
 </div>
 </div>
 </div>
@@ -251,12 +257,26 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="sample(double)">
 <h3>sample</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="PathPlannerTrajectory.State.html" title="class in org.areslib.pathplanner.path">PathPlannerTrajectory.State</a></span>&nbsp;<span class="element-name">sample</span><wbr><span class="parameters">(double&nbsp;time)</span></div>
-<div class="block">Get the target state at the given point in time along the trajectory</div>
+<div class="block">Get the target state at the given point in time along the trajectory.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>time</code> - The time to sample the trajectory at in seconds</dd>
 <dt>Returns:</dt>
-<dd>The target state</dd>
+<dd>A NEW target state instance. Use the mutable sample() for zero-GC paths.</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="sample(double,org.areslib.pathplanner.path.PathPlannerTrajectory.State)">
+<h3>sample</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">sample</span><wbr><span class="parameters">(double&nbsp;time,
+ <a href="PathPlannerTrajectory.State.html" title="class in org.areslib.pathplanner.path">PathPlannerTrajectory.State</a>&nbsp;out)</span></div>
+<div class="block">Get the target state at the given point in time along the trajectory in-place. Eliminates
+ allocation overhead in the path-following loop.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>time</code> - The time to sample the trajectory at in seconds</dd>
+<dd><code>out</code> - The state object to populate with the sampled data.</dd>
 </dl>
 </section>
 </li>
@@ -359,6 +379,10 @@ loadScripts(document, 'script');</script>
 </section>
 <!-- ========= END OF CLASS DATA ========= -->
 </main>
+<footer role="contentinfo">
+<hr>
+<p class="legal-copy"><small>&copy; 2026 ARES 23247. Built for Championship Performance.</small></p>
+</footer>
 </div>
 </div>
 </body>
