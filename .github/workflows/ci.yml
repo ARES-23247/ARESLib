@@ -47,7 +47,7 @@ jobs:
       
     - name: Commit Auto-formatted Code
       if: matrix.os == 'ubuntu-latest'
-      uses: stefanzweifel/git-auto-commit-action@v5
+      uses: stefanzweifel/git-auto-commit-action@v7
       with:
         commit_message: "style: auto-format code with spotless"
 
@@ -96,7 +96,7 @@ jobs:
 
     - name: Commit JaCoCo Badges
       if: github.ref == 'refs/heads/main' && github.event_name == 'push' && matrix.os == 'ubuntu-latest'
-      uses: stefanzweifel/git-auto-commit-action@v5
+      uses: stefanzweifel/git-auto-commit-action@v7
       with:
         commit_message: "docs: update jacoco coverage badges [skip ci]"
         file_pattern: ".github/badges/*.svg"
