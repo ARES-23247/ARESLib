@@ -284,7 +284,7 @@ dependencies {
     implementation 'com.acmerobotics.dashboard:core:0.6.0'
     implementation 'com.google.code.gson:gson:2.14.0'
     implementation 'com.google.android:android:4.1.1.4'
-    implementation 'org.dyn4j:dyn4j:5.0.2'
+    implementation 'org.dyn4j:dyn4j:6.0.0'
     errorprone "com.google.errorprone:error_prone_core:2.50.0"
     ftcAars 'com.acmerobotics.dashboard:dashboard:0.6.0@aar'
     ftcAars 'org.firstinspires.ftc:RobotCore:11.2.1@aar'
